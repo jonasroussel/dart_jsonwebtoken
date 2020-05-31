@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
-import 'package:jsonwebtoken/jsonwebtoken.dart';
+import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 
 abstract class JWTAlgorithm {
   static const HS256 = HS256Algorithm();

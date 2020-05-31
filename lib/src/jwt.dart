@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:jsonwebtoken/jsonwebtoken.dart';
+import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 
 import './utils.dart';
 
@@ -39,8 +39,8 @@ class JWT {
         issuer: payload.remove('iss'),
         subject: payload.remove('sub'),
       );
-    } on JWTError catch (ex) {
-      throw ex;
+    } on JWTError {
+      rethrow;
     } catch (ex) {
       throw JWTInvalidError('jwt invalid');
     }
@@ -61,7 +61,7 @@ class JWT {
   String sign(
     String key, {
     JWTAlgorithm algorithm = JWTAlgorithm.HS256,
-    Duration expiresIn = null,
+    Duration expiresIn,
     bool noTimestamp = false,
   }) {
     final header = {'alg': algorithm.name, 'typ': 'JWT'};

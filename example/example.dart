@@ -1,4 +1,4 @@
-import 'package:jsonwebtoken/jsonwebtoken.dart';
+import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 
 main() {
   String token;
