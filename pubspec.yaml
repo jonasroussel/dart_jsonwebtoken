@@ -1,7 +1,8 @@
 name: jsonwebtoken
-description: A starting point for Dart libraries or applications.
-version: 1.0.0
-homepage: https://www.example.com
+description: A dart implementation of JSON Web Tokens.
+version: 0.1.0
+repository: https://github.com/jonasroussel/jsonwebtoken
+homepage: https://github.com/jonasroussel/jsonwebtoken#readme
 
 environment:
   sdk: '>=2.7.0 <3.0.0'

@@ -1,3 +1,5 @@
 library jsonwebtoken;
 
-export 'src/jsonwebtoken.dart';
+export 'src/jwt.dart';
+export 'src/errors.dart';
+export 'src/algorithms.dart';
