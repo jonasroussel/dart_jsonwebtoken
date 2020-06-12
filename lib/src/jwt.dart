@@ -5,45 +5,39 @@ import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import './utils.dart';
 
 class JWT {
-  static JWT verify(String token, String key) {
-    try {
-      final parts = token.split('.');
+  static JWT verify(String token, Key key) {
+    final parts = token.split('.');
 
-      final header = Map<String, dynamic>.from(jsonBase64.decode(base64Padded(parts[0])));
+    final header = Map<String, dynamic>.from(jsonBase64.decode(base64Padded(parts[0])));
 
-      if (header['typ'] != 'JWT') throw JWTInvalidError('not a jwt');
+    if (header['typ'] != 'JWT') throw JWTInvalidError('not a jwt');
 
-      final algorithm = JWTAlgorithm.fromName(header['alg']);
+    final algorithm = JWTAlgorithm.fromName(header['alg']);
 
-      if (parts.length < 3) throw JWTInvalidError('jwt malformated');
+    if (parts.length < 3) throw JWTInvalidError('jwt malformated');
 
-      final body = utf8.encode(parts[0] + '.' + parts[1]);
-      final signature = base64Url.decode(base64Padded(parts[2]));
+    final body = utf8.encode(parts[0] + '.' + parts[1]);
+    final signature = base64Url.decode(base64Padded(parts[2]));
 
-      if (!algorithm.verify(key, body, signature)) {
-        throw JWTInvalidError('invalid signature');
-      }
-
-      final payload = Map<String, dynamic>.from(jsonBase64.decode(base64Padded(parts[1])));
-
-      if (payload.containsKey('exp')) {
-        final exp = DateTime.fromMillisecondsSinceEpoch(payload['exp'] * 1000);
-        if (exp.isBefore(DateTime.now())) {
-          throw JWTExpiredError();
-        }
-      }
-
-      return JWT(
-        payload: payload,
-        audience: payload.remove('aud'),
-        issuer: payload.remove('iss'),
-        subject: payload.remove('sub'),
-      );
-    } on JWTError {
-      rethrow;
-    } catch (ex) {
-      throw JWTInvalidError('jwt invalid');
+    if (!algorithm.verify(key, body, signature)) {
+      throw JWTInvalidError('invalid signature');
     }
+
+    final payload = Map<String, dynamic>.from(jsonBase64.decode(base64Padded(parts[1])));
+
+    if (payload.containsKey('exp')) {
+      final exp = DateTime.fromMillisecondsSinceEpoch(payload['exp'] * 1000);
+      if (exp.isBefore(DateTime.now())) {
+        throw JWTExpiredError();
+      }
+    }
+
+    return JWT(
+      payload: payload,
+      audience: payload.remove('aud'),
+      issuer: payload.remove('iss'),
+      subject: payload.remove('sub'),
+    );
   }
 
   JWT({
@@ -59,7 +53,7 @@ class JWT {
   final String issuer;
 
   String sign(
-    String key, {
+    Key key, {
     JWTAlgorithm algorithm = JWTAlgorithm.HS256,
     Duration expiresIn,
     bool noTimestamp = false,

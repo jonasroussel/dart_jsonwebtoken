@@ -17,7 +17,7 @@ main() {
     );
 
     // Sign it
-    token = jwt.sign('secret-key');
+    token = jwt.sign(SecretKey('secret passphrase'));
 
     print('Signed token: $token\n');
   }
@@ -25,7 +25,7 @@ main() {
   /* Verify */ {
     try {
       // Verify a token
-      final jwt = JWT.verify(token, 'secret-key');
+      final jwt = JWT.verify(token, SecretKey('secret passphrase'));
 
       print('Payload: ${jwt.payload}');
     } on JWTExpiredError {

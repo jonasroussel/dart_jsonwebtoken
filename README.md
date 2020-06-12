@@ -1,7 +1,10 @@
-# JsonWebToken
+# JSON Web Token
 [![pub package](https://img.shields.io/pub/v/dart_jsonwebtoken.svg)](https://pub.dev/packages/dart_jsonwebtoken)
 
 A dart implementation of the famous javascript library `jsonwebtoken`.
+
+JSON Web Tokens are an open, industry standard RFC 7519 method for representing claims securely between two parties.
+https://jwt.io allows you to decode, verify and generate JWT.
 
 ## Usage
 
@@ -25,8 +28,8 @@ final jwt = JWT(
   issuer: 'https://github.com/jonasroussel/jsonwebtoken',
 );
 
-// Sign it
-token = jwt.sign('secret-key');
+// Sign it (default with HS256 algorithm)
+token = jwt.sign(SecretKey('secret passphrase'));
 
 print('Signed token: $token\n');
 ```
@@ -36,7 +39,7 @@ print('Signed token: $token\n');
 ```dart
 try {
   // Verify a token
-  final jwt = JWT.verify(token, 'secret-key');
+  final jwt = JWT.verify(token, SecretKey('secret passphrase'));
 
   print('Payload: ${jwt.payload}');
 } on JWTExpiredError {
@@ -45,3 +48,9 @@ try {
   print(ex.message); // ex: invalid signature
 }
 ```
+
+
+### Supported Algorithms
+
+- HS256 (HMAC / SHA256)
+- RS256 (RSA / SHA256)
