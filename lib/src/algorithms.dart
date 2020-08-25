@@ -73,10 +73,8 @@ class RS256Algorithm extends JWTAlgorithm {
     final parser = RSAPKCSParser();
     RSAKeyPair pair;
 
-    try {
-      pair = parser.parsePEM(privateKey.key, password: privateKey.passphrase);
-      assert(pair.private != null);
-    } catch (ex) {
+    pair = parser.parsePEM(privateKey.key, password: privateKey.passphrase);
+    if (pair.private == null) {
       throw JWTInvalidError('invalid private RSA key');
     }
 

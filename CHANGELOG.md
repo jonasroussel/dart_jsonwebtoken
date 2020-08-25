@@ -1,3 +1,8 @@
+## 1.0.1
+
+- More details on exceptions
+- New examples
+
 ## 1.0.0
 
 - New RSA Algorithm (RS256)
