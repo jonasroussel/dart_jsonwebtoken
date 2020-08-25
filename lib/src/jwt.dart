@@ -5,6 +5,11 @@ import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import './utils.dart';
 
 class JWT {
+  /// Verify a token.
+  /// 
+  /// `key` must be
+  /// - SecretKey with HS256 algorithm
+  /// - PublicKey with RS256 algorithm
   static JWT verify(String token, Key key) {
     final parts = token.split('.');
 
@@ -40,6 +45,7 @@ class JWT {
     );
   }
 
+  /// JSON Web Token
   JWT({
     this.payload = const {},
     this.audience,
@@ -47,11 +53,23 @@ class JWT {
     this.issuer,
   });
 
+  /// Custom claims
   final Map<String, dynamic> payload;
+
+  /// Audience claim
   final String audience;
+  
+  /// Subject claim
   final String subject;
+  
+  /// Issuer claim
   final String issuer;
 
+  /// Sign and generate a new token.
+  /// 
+  /// `key` must be
+  /// - SecretKey with HS256 algorithm
+  /// - PrivateKey with RS256 algorithm
   String sign(
     Key key, {
     JWTAlgorithm algorithm = JWTAlgorithm.HS256,

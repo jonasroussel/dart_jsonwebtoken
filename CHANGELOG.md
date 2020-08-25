@@ -1,3 +1,7 @@
+## 1.0.2
+
+- Docs & examples
+
 ## 1.0.1
 
 - More details on exceptions
