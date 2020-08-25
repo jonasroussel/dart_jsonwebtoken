@@ -6,7 +6,7 @@ import './utils.dart';
 
 class JWT {
   /// Verify a token.
-  /// 
+  ///
   /// `key` must be
   /// - SecretKey with HS256 algorithm
   /// - PublicKey with RS256 algorithm
@@ -58,15 +58,15 @@ class JWT {
 
   /// Audience claim
   final String audience;
-  
+
   /// Subject claim
   final String subject;
-  
+
   /// Issuer claim
   final String issuer;
 
   /// Sign and generate a new token.
-  /// 
+  ///
   /// `key` must be
   /// - SecretKey with HS256 algorithm
   /// - PrivateKey with RS256 algorithm

@@ -1,3 +1,7 @@
+## 1.0.3
+
+- Formating for 'static analysis'
+
 ## 1.0.2
 
 - Docs & examples
