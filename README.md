@@ -53,4 +53,9 @@ try {
 ### Supported Algorithms
 
 - HS256 (HMAC / SHA256)
+- HS384 (HMAC / SHA384)
+- HS512 (HMAC / SHA512)
+
 - RS256 (RSA / SHA256)
+- RS384 (RSA / SHA384)
+- RS512 (RSA / SHA512)

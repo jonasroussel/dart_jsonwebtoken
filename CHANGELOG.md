@@ -1,3 +1,7 @@
+## 1.1.0
+
+- New algorithms
+
 ## 1.0.3
 
 - Formating for 'static analysis'

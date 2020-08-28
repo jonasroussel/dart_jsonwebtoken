@@ -7,15 +7,27 @@ import 'package:pointycastle/pointycastle.dart' hide PrivateKey, PublicKey;
 import 'package:rsa_pkcs/rsa_pkcs.dart' hide RSAPrivateKey, RSAPublicKey;
 
 abstract class JWTAlgorithm {
-  static const HS256 = HS256Algorithm();
-  static const RS256 = RS256Algorithm();
+  static const HS256 = HMACAlgorithm('HS256');
+  static const HS384 = HMACAlgorithm('HS384');
+  static const HS512 = HMACAlgorithm('HS512');
+  static const RS256 = RSAAlgorithm('RS256');
+  static const RS384 = RSAAlgorithm('RS384');
+  static const RS512 = RSAAlgorithm('RS512');
 
   static JWTAlgorithm fromName(String name) {
     switch (name) {
       case 'HS256':
         return JWTAlgorithm.HS256;
+      case 'HS384':
+        return JWTAlgorithm.HS384;
+      case 'HS512':
+        return JWTAlgorithm.HS512;
       case 'RS256':
         return JWTAlgorithm.RS256;
+      case 'RS384':
+        return JWTAlgorithm.RS384;
+      case 'RS512':
+        return JWTAlgorithm.RS512;
       default:
         throw JWTInvalidError('unknown algorithm');
     }
@@ -28,18 +40,20 @@ abstract class JWTAlgorithm {
   bool verify(Key key, List<int> body, List<int> signature);
 }
 
-class HS256Algorithm extends JWTAlgorithm {
-  const HS256Algorithm();
+class HMACAlgorithm extends JWTAlgorithm {
+  final String _name;
+
+  const HMACAlgorithm(this._name);
 
   @override
-  String get name => 'HS256';
+  String get name => _name;
 
   @override
   List<int> sign(Key key, List<int> body) {
     assert(key is SecretKey, 'key must be a SecretKey');
     final secretKey = key as SecretKey;
 
-    final hmac = Hmac(sha256, utf8.encode(secretKey.key));
+    final hmac = Hmac(_getHash(name), utf8.encode(secretKey.key));
     return hmac.convert(body).bytes;
   }
 
@@ -57,13 +71,28 @@ class HS256Algorithm extends JWTAlgorithm {
 
     return true;
   }
+
+  Hash _getHash(String name) {
+    switch (name) {
+      case 'HS256':
+        return sha256;
+      case 'HS384':
+        return sha384;
+      case 'HS512':
+        return sha512;
+      default:
+        throw ArgumentError.value(name, 'name', 'unknown hash name');
+    }
+  }
 }
 
-class RS256Algorithm extends JWTAlgorithm {
-  const RS256Algorithm();
+class RSAAlgorithm extends JWTAlgorithm {
+  final String _name;
+
+  const RSAAlgorithm(this._name);
 
   @override
-  String get name => 'RS256';
+  String get name => _name;
 
   @override
   List<int> sign(Key key, List<int> body) {
@@ -78,7 +107,7 @@ class RS256Algorithm extends JWTAlgorithm {
       throw JWTInvalidError('invalid private RSA key');
     }
 
-    final signer = Signer('SHA-256/RSA');
+    final signer = Signer('${_getHash(name)}/RSA');
     final params = ParametersWithRandom(
       PrivateKeyParameter<RSAPrivateKey>(
         RSAPrivateKey(
@@ -114,7 +143,7 @@ class RS256Algorithm extends JWTAlgorithm {
     }
 
     try {
-      final signer = Signer('SHA-256/RSA');
+      final signer = Signer('${_getHash(name)}/RSA');
       final params = ParametersWithRandom(
         PublicKeyParameter<RSAPublicKey>(
           RSAPublicKey(
@@ -130,6 +159,19 @@ class RS256Algorithm extends JWTAlgorithm {
       return signer.verifySignature(Uint8List.fromList(body), RSASignature(Uint8List.fromList(signature)));
     } catch (ex) {
       return false;
+    }
+  }
+
+  String _getHash(String name) {
+    switch (name) {
+      case 'RS256':
+        return 'SHA-256';
+      case 'RS384':
+        return 'SHA-384';
+      case 'RS512':
+        return 'SHA-512';
+      default:
+        throw ArgumentError.value(name, 'name', 'unknown hash name');
     }
   }
 }
