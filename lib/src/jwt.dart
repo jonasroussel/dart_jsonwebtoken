@@ -13,7 +13,8 @@ class JWT {
   static JWT verify(String token, Key key) {
     final parts = token.split('.');
 
-    final header = Map<String, dynamic>.from(jsonBase64.decode(base64Padded(parts[0])));
+    final rawHeader = jsonBase64.decode(base64Padded(parts[0]));
+    final header = Map<String, dynamic>.from(rawHeader);
 
     if (header['typ'] != 'JWT') throw JWTInvalidError('not a jwt');
 
@@ -28,7 +29,8 @@ class JWT {
       throw JWTInvalidError('invalid signature');
     }
 
-    final payload = Map<String, dynamic>.from(jsonBase64.decode(base64Padded(parts[1])));
+    final rawPayload = jsonBase64.decode(base64Padded(parts[1]));
+    final payload = Map<String, dynamic>.from(rawPayload);
 
     if (payload.containsKey('exp')) {
       final exp = DateTime.fromMillisecondsSinceEpoch(payload['exp'] * 1000);
@@ -79,13 +81,25 @@ class JWT {
     final header = {'alg': algorithm.name, 'typ': 'JWT'};
 
     if (!noTimestamp) payload['iat'] = secondsSinceEpoch(DateTime.now());
-    if (expiresIn != null) payload['exp'] = secondsSinceEpoch(DateTime.now().add(expiresIn));
+    if (expiresIn != null) {
+      payload['exp'] = secondsSinceEpoch(DateTime.now().add(expiresIn));
+    }
     if (audience != null) payload['aud'] = audience;
     if (subject != null) payload['sub'] = subject;
     if (issuer != null) payload['iss'] = issuer;
 
-    final body = base64Unpadded(jsonBase64.encode(header)) + '.' + base64Unpadded(jsonBase64.encode(payload));
-    final signature = base64Unpadded(base64Url.encode(algorithm.sign(key, utf8.encode(body))));
+    final b64Header = base64Unpadded(jsonBase64.encode(header));
+    final b64Payload = base64Unpadded(jsonBase64.encode(payload));
+
+    final body = '${b64Header}.${b64Payload}';
+    final signature = base64Unpadded(
+      base64Url.encode(
+        algorithm.sign(
+          key,
+          utf8.encode(body),
+        ),
+      ),
+    );
 
     return body + '.' + signature;
   }

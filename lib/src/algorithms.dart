@@ -156,7 +156,10 @@ class RSAAlgorithm extends JWTAlgorithm {
 
       signer.init(false, params);
 
-      return signer.verifySignature(Uint8List.fromList(body), RSASignature(Uint8List.fromList(signature)));
+      final msg = Uint8List.fromList(body);
+      final sign = RSASignature(Uint8List.fromList(signature));
+
+      return signer.verifySignature(msg, sign);
     } catch (ex) {
       return false;
     }
