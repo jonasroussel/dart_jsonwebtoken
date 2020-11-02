@@ -18,7 +18,7 @@ import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 ```dart
 // Create a json web token
 final jwt = JWT(
-  payload: {
+  {
     'id': 123,
     'server': {
       'id': '3e4fc296',
