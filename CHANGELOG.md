@@ -1,3 +1,9 @@
+## 1.2.0
+
+- Payload is now required
+- Payload is now dynamic and not restricted to an object
+- Dependencies updated
+
 ## 1.1.0
 
 - New algorithms

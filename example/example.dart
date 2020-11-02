@@ -1,13 +1,13 @@
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 
 // HMAC SHA-256 algorithm
-void hs256() {
+void main() {
   String token;
 
   /* Sign */ {
     // Create a json web token
     final jwt = JWT(
-      payload: {
+      {
         'id': 123,
         'server': {
           'id': '3e4fc296',
@@ -44,7 +44,7 @@ void rs256() {
   /* Sign */ {
     // Create a json web token
     final jwt = JWT(
-      payload: {
+      {
         'id': 123,
         'server': {
           'id': '3e4fc296',
