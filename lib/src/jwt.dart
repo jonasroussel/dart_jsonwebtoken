@@ -42,7 +42,8 @@ class JWT {
         final payload = Map<dynamic, dynamic>.from(rawPayload);
 
         if (payload.containsKey('exp')) {
-          final exp = DateTime.fromMillisecondsSinceEpoch(payload['exp'] * 1000);
+          final exp =
+              DateTime.fromMillisecondsSinceEpoch(payload['exp'] * 1000);
           if (exp.isBefore(DateTime.now())) {
             throw JWTExpiredError();
           }
@@ -119,7 +120,9 @@ class JWT {
 
     final b64Header = base64Unpadded(jsonBase64.encode(header));
     final b64Payload = base64Unpadded(
-      payload is String ? base64.encode(utf8.encode(payload)) : jsonBase64.encode(payload),
+      payload is String
+          ? base64.encode(utf8.encode(payload))
+          : jsonBase64.encode(payload),
     );
 
     final body = '${b64Header}.${b64Payload}';
