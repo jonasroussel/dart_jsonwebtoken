@@ -1,3 +1,7 @@
+## 1.2.1
+
+- Formating for 'static analysis'
+
 ## 1.2.0
 
 - Payload is now required
