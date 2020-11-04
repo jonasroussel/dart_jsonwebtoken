@@ -1,3 +1,7 @@
+## 1.3.0
+
+- Adding checks in `verify` function for `iss, sub, aud, iat, jti`
+
 ## 1.2.1
 
 - Formating for 'static analysis'

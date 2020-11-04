@@ -10,18 +10,27 @@ class JWT {
   /// `key` must be
   /// - SecretKey with HS256 algorithm
   /// - PublicKey with RS256 algorithm
-  static JWT verify(String token, Key key) {
+  static JWT verify(
+    String token,
+    Key key, {
+    bool checkHeaderType = true,
+    bool checkExpiresIn = true,
+    bool checkNotBefore = true,
+    Duration issueAt,
+    String audience,
+    String subject,
+    String issuer,
+    String jwtId,
+  }) {
     try {
       final parts = token.split('.');
 
-      final rawHeader = jsonBase64.decode(base64Padded(parts[0]));
-      final header = Map<String, dynamic>.from(rawHeader);
+      Map<String, dynamic> header = jsonBase64.decode(base64Padded(parts[0]));
 
-      if (header['typ'] != 'JWT') throw JWTInvalidError('not a jwt');
+      if (checkHeaderType && header['typ'] != 'JWT')
+        throw JWTInvalidError('not a jwt');
 
       final algorithm = JWTAlgorithm.fromName(header['alg']);
-
-      if (parts.length < 3) throw JWTInvalidError('jwt malformated');
 
       final body = utf8.encode(parts[0] + '.' + parts[1]);
       final signature = base64Url.decode(base64Padded(parts[2]));
@@ -30,23 +39,66 @@ class JWT {
         throw JWTInvalidError('invalid signature');
       }
 
-      dynamic rawPayload;
+      dynamic payload;
 
       try {
-        rawPayload = jsonBase64.decode(base64Padded(parts[1]));
+        payload = jsonBase64.decode(base64Padded(parts[1]));
       } catch (ex) {
-        rawPayload = utf8.decode(base64.decode(base64Padded(parts[1])));
+        payload = utf8.decode(base64.decode(base64Padded(parts[1])));
       }
 
-      if (rawPayload is Map) {
-        final payload = Map<dynamic, dynamic>.from(rawPayload);
-
-        if (payload.containsKey('exp')) {
+      if (payload is Map) {
+        // exp
+        if (checkExpiresIn && payload.containsKey('exp')) {
           final exp =
               DateTime.fromMillisecondsSinceEpoch(payload['exp'] * 1000);
           if (exp.isBefore(DateTime.now())) {
             throw JWTExpiredError();
           }
+        }
+
+        // nbf
+        if (checkNotBefore && payload.containsKey('nbf')) {
+          final nbf =
+              DateTime.fromMillisecondsSinceEpoch(payload['nbf'] * 1000);
+          if (nbf.isAfter(DateTime.now())) {
+            throw JWTNotActiveError();
+          }
+        }
+
+        // iat
+        if (issueAt != null) {
+          if (!payload.containsKey('iat'))
+            throw JWTInvalidError('invalid issue at');
+          final iat =
+              DateTime.fromMillisecondsSinceEpoch(payload['iat'] * 1000);
+          if (!iat.isAtSameMomentAs(DateTime.now())) {
+            throw JWTInvalidError('invalid issue at');
+          }
+        }
+
+        // aud
+        if (audience != null) {
+          if (!payload.containsKey('aud') || payload['aud'] != audience)
+            throw JWTInvalidError('invalid audience');
+        }
+
+        // sub
+        if (subject != null) {
+          if (!payload.containsKey('sub') || payload['sub'] != subject)
+            throw JWTInvalidError('invalid subject');
+        }
+
+        // iss
+        if (issuer != null) {
+          if (!payload.containsKey('iss') || payload['iss'] != issuer)
+            throw JWTInvalidError('invalid issuer');
+        }
+
+        // jti
+        if (jwtId != null) {
+          if (!payload.containsKey('jti') || payload['jti'] != jwtId)
+            throw JWTInvalidError('invalid jwt id');
         }
 
         return JWT(
@@ -57,8 +109,6 @@ class JWT {
           jwtId: payload.remove('jti'),
         );
       } else {
-        final payload = rawPayload;
-
         return JWT(payload);
       }
     } catch (ex) {
@@ -100,12 +150,12 @@ class JWT {
     JWTAlgorithm algorithm = JWTAlgorithm.HS256,
     Duration expiresIn,
     Duration notBefore,
-    bool noTimestamp = false,
+    bool noIssueAt = false,
   }) {
     final header = {'alg': algorithm.name, 'typ': 'JWT'};
 
     if (payload is Map) {
-      if (!noTimestamp) payload['iat'] = secondsSinceEpoch(DateTime.now());
+      if (!noIssueAt) payload['iat'] = secondsSinceEpoch(DateTime.now());
       if (expiresIn != null) {
         payload['exp'] = secondsSinceEpoch(DateTime.now().add(expiresIn));
       }

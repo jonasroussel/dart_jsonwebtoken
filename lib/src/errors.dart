@@ -13,3 +13,8 @@ class JWTInvalidError extends JWTError {
 class JWTExpiredError extends JWTError {
   JWTExpiredError() : super('jwt expired');
 }
+
+/// An error thrown when token is not active
+class JWTNotActiveError extends JWTError {
+  JWTNotActiveError() : super('jwt not active');
+}
