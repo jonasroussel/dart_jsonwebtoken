@@ -27,8 +27,9 @@ class JWT {
 
       Map<String, dynamic> header = jsonBase64.decode(base64Padded(parts[0]));
 
-      if (checkHeaderType && header['typ'] != 'JWT')
+      if (checkHeaderType && header['typ'] != 'JWT') {
         throw JWTInvalidError('not a jwt');
+      }
 
       final algorithm = JWTAlgorithm.fromName(header['alg']);
 
@@ -79,26 +80,30 @@ class JWT {
 
         // aud
         if (audience != null) {
-          if (!payload.containsKey('aud') || payload['aud'] != audience)
+          if (!payload.containsKey('aud') || payload['aud'] != audience) {
             throw JWTInvalidError('invalid audience');
+          }
         }
 
         // sub
         if (subject != null) {
-          if (!payload.containsKey('sub') || payload['sub'] != subject)
+          if (!payload.containsKey('sub') || payload['sub'] != subject) {
             throw JWTInvalidError('invalid subject');
+          }
         }
 
         // iss
         if (issuer != null) {
-          if (!payload.containsKey('iss') || payload['iss'] != issuer)
+          if (!payload.containsKey('iss') || payload['iss'] != issuer) {
             throw JWTInvalidError('invalid issuer');
+          }
         }
 
         // jti
         if (jwtId != null) {
-          if (!payload.containsKey('jti') || payload['jti'] != jwtId)
+          if (!payload.containsKey('jti') || payload['jti'] != jwtId) {
             throw JWTInvalidError('invalid jwt id');
+          }
         }
 
         return JWT(
