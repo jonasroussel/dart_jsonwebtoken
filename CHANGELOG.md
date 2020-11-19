@@ -1,10 +1,14 @@
+## 1.4.0
+
+- Implementing `throwUndefinedErrors` option in the `JWT.verify` method
+
 ## 1.3.1
 
 - Formating for 'static analysis'
 
 ## 1.3.0
 
-- Adding checks in `verify` function for `iss, sub, aud, iat, jti`
+- Adding checks in `JWT.verify` function for `iss, sub, aud, iat, jti`
 
 ## 1.2.1
 

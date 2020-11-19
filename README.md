@@ -1,7 +1,7 @@
-# JSON Web Token
+# JSON Web Token (JWT)
 [![pub package](https://img.shields.io/pub/v/dart_jsonwebtoken.svg)](https://pub.dev/packages/dart_jsonwebtoken)
 
-A dart implementation of the famous javascript library `jsonwebtoken`.
+A dart implementation of the famous javascript library `jsonwebtoken` (JWT).
 
 JSON Web Tokens are an open, industry standard RFC 7519 method for representing claims securely between two parties.
 https://jwt.io allows you to decode, verify and generate JWT.

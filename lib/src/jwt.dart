@@ -16,6 +16,7 @@ class JWT {
     bool checkHeaderType = true,
     bool checkExpiresIn = true,
     bool checkNotBefore = true,
+    bool throwUndefinedErrors = false,
     Duration issueAt,
     String audience,
     String subject,
@@ -69,8 +70,9 @@ class JWT {
 
         // iat
         if (issueAt != null) {
-          if (!payload.containsKey('iat'))
+          if (!payload.containsKey('iat')) {
             throw JWTInvalidError('invalid issue at');
+          }
           final iat =
               DateTime.fromMillisecondsSinceEpoch(payload['iat'] * 1000);
           if (!iat.isAtSameMomentAs(DateTime.now())) {
@@ -117,7 +119,11 @@ class JWT {
         return JWT(payload);
       }
     } catch (ex) {
-      throw JWTInvalidError('invalid token');
+      if (throwUndefinedErrors) {
+        throw ex;
+      } else {
+        throw JWTInvalidError('invalid token');
+      }
     }
   }
 
