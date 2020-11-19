@@ -22,7 +22,6 @@ class JWT {
     String issuer,
     String jwtId,
   }) {
-    try {
       final parts = token.split('.');
 
       Map<String, dynamic> header = jsonBase64.decode(base64Padded(parts[0]));
@@ -116,9 +115,6 @@ class JWT {
       } else {
         return JWT(payload);
       }
-    } catch (ex) {
-      throw JWTInvalidError('invalid token');
-    }
   }
 
   /// JSON Web Token
