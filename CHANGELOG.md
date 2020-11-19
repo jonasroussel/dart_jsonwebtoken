@@ -1,3 +1,7 @@
+## 1.4.1
+
+- Formating for 'static analysis'
+
 ## 1.4.0
 
 - Implementing `throwUndefinedErrors` option in the `JWT.verify` method

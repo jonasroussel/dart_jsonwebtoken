@@ -120,7 +120,7 @@ class JWT {
       }
     } catch (ex) {
       if (throwUndefinedErrors) {
-        throw ex;
+        rethrow;
       } else {
         throw JWTInvalidError('invalid token');
       }
