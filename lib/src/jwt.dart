@@ -166,12 +166,12 @@ class JWT {
     final header = {'alg': algorithm.name, 'typ': 'JWT'};
 
     if (payload is Map) {
-      if (!noIssueAt) payload['iat'] = secondsSinceEpoch(DateTime.now());
+      if (!noIssueAt) payload['iat'] = secondsSinceEpoch(DateTime.now()).toString();
       if (expiresIn != null) {
-        payload['exp'] = secondsSinceEpoch(DateTime.now().add(expiresIn));
+        payload['exp'] = secondsSinceEpoch(DateTime.now().add(expiresIn)).toString();
       }
       if (notBefore != null) {
-        payload['nbf'] = secondsSinceEpoch(DateTime.now().add(notBefore));
+        payload['nbf'] = secondsSinceEpoch(DateTime.now().add(notBefore)).toString();
       }
       if (audience != null) payload['aud'] = audience;
       if (subject != null) payload['sub'] = subject;
