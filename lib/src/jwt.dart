@@ -165,26 +165,37 @@ class JWT {
   }) {
     final header = {'alg': algorithm.name, 'typ': 'JWT'};
 
-    if (payload is Map) {
-      if (!noIssueAt) payload['iat'] = secondsSinceEpoch(DateTime.now());
-      if (expiresIn != null) {
-        payload['exp'] = secondsSinceEpoch(DateTime.now().add(expiresIn));
-      }
-      if (notBefore != null) {
-        payload['nbf'] = secondsSinceEpoch(DateTime.now().add(notBefore));
-      }
-      if (audience != null) payload['aud'] = audience;
-      if (subject != null) payload['sub'] = subject;
-      if (issuer != null) payload['iss'] = issuer;
-      if (jwtId != null) payload['jti'] = jwtId;
+    if (payload is Map<String, dynamic>) {
+      payload = Map<String, dynamic>.from(payload);
+
+      try {
+        if (!noIssueAt) payload['iat'] = secondsSinceEpoch(DateTime.now());
+        if (expiresIn != null) {
+          payload['exp'] = secondsSinceEpoch(DateTime.now().add(expiresIn));
+        }
+        if (notBefore != null) {
+          payload['nbf'] = secondsSinceEpoch(DateTime.now().add(notBefore));
+        }
+        if (audience != null) payload['aud'] = audience;
+        if (subject != null) payload['sub'] = subject;
+        if (issuer != null) payload['iss'] = issuer;
+        if (jwtId != null) payload['jti'] = jwtId;
+      } catch (ex) {}
     }
 
     final b64Header = base64Unpadded(jsonBase64.encode(header));
-    final b64Payload = base64Unpadded(
-      payload is String
-          ? base64.encode(utf8.encode(payload))
-          : jsonBase64.encode(payload),
-    );
+
+    String b64Payload;
+    try {
+      b64Payload = base64Unpadded(
+        payload is String
+            ? base64.encode(utf8.encode(payload))
+            : jsonBase64.encode(payload),
+      );
+    } catch (ex) {
+      throw JWTError(
+          'invalid payload json format (Map keys must be String type)');
+    }
 
     final body = '${b64Header}.${b64Payload}';
     final signature = base64Unpadded(

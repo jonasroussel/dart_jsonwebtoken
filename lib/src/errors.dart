@@ -2,9 +2,12 @@ class JWTError extends Error {
   JWTError(this.message);
 
   final String message;
+
+  @override
+  String toString() => 'JWTError: $message';
 }
 
-/// An error thrown when toke is invalid
+/// An error thrown when token is invalid
 class JWTInvalidError extends JWTError {
   JWTInvalidError(String message) : super(message);
 }

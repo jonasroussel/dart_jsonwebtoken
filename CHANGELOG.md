@@ -1,3 +1,8 @@
+## 1.5.0
+
+- Debuging `_TypeError issue on sign method` (#4)
+- Implementing `toString` in the `JWTError` class
+
 ## 1.4.1
 
 - Formating for 'static analysis'
