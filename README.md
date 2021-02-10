@@ -4,6 +4,7 @@
 A dart implementation of the famous javascript library `jsonwebtoken`.
 
 JSON Web Tokens are an open, industry standard RFC 7519 method for representing claims securely between two parties.
+
 https://jwt.io allows you to decode, verify and generate JWT.
 
 ## Usage
@@ -49,13 +50,16 @@ try {
 }
 ```
 
-
 ### Supported Algorithms
 
-- HS256 (HMAC / SHA256)
-- HS384 (HMAC / SHA384)
-- HS512 (HMAC / SHA512)
-
-- RS256 (RSA / SHA256)
-- RS384 (RSA / SHA384)
-- RS512 (RSA / SHA512)
+JWTAlgorithm | Digital Signature or MAC Algorithm
+-------------|-----------------------------------
+HS256 | HMAC using SHA-256 hash algorithm
+HS384 | HMAC using SHA-384 hash algorithm
+HS512 | HMAC using SHA-512 hash algorithm
+RS256 | RSASSA-PKCS1-v1_5 using SHA-256 hash algorithm
+RS384 | RSASSA-PKCS1-v1_5 using SHA-384 hash algorithm
+RS512 | RSASSA-PKCS1-v1_5 using SHA-512 hash algorithm
+ES256 | ECDSA using P-256 curve and SHA-256 hash algorithm
+ES384 | ECDSA using P-384 curve and SHA-384 hash algorithm
+ES512 | ECDSA using P-521 curve and SHA-512 hash algorithm

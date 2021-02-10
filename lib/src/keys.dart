@@ -1,24 +1,50 @@
+import 'package:pointycastle/pointycastle.dart' as pc;
+
+import 'parser.dart';
+
 abstract class Key {}
 
-/// For HS256 algorithm
+/// For HMAC algorithms
 class SecretKey extends Key {
   String key;
 
   SecretKey(this.key);
 }
 
-/// For RS256 algorithm, in sign method
-class PrivateKey extends Key {
-  String key;
-  String passphrase;
+/// For RSA algorithm, in sign method
+class RSAPrivateKey extends Key {
+  pc.RSAPrivateKey key;
 
-  PrivateKey(this.key, [this.passphrase = '']);
+  RSAPrivateKey(String pem) {
+    key = parseRSAPrivateKeyPEM(pem);
+  }
 }
 
-/// For RS256 algorithm, in verify method
-class PublicKey extends Key {
-  String key;
-  String passphrase;
+/// For RSA algorithm, in verify method
+class RSAPublicKey extends Key {
+  pc.RSAPublicKey key;
 
-  PublicKey(this.key, [this.passphrase = '']);
+  RSAPublicKey(String pem) {
+    key = parseRSAPublicKeyPEM(pem);
+  }
+}
+
+/// For ECDSA algorithm, in sign method
+class ECPrivateKey extends Key {
+  pc.ECPrivateKey key;
+  int size;
+
+  ECPrivateKey(String pem) {
+    key = parseECPrivateKeyPEM(pem);
+    size = (key.parameters.curve.fieldSize / 8).round();
+  }
+}
+
+/// For ECDSA algorithm, in verify method
+class ECPublicKey extends Key {
+  pc.ECPublicKey key;
+
+  ECPublicKey(String pem) {
+    key = parseECPublicKeyPEM(pem);
+  }
 }

@@ -2,18 +2,41 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
-import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
-import 'package:pointycastle/pointycastle.dart' hide PrivateKey, PublicKey;
-import 'package:rsa_pkcs/rsa_pkcs.dart' hide RSAPrivateKey, RSAPublicKey;
+import 'package:pointycastle/pointycastle.dart' as pc;
+
+import 'errors.dart';
+import 'keys.dart';
+import 'utils.dart';
 
 abstract class JWTAlgorithm {
-  static const HS256 = HMACAlgorithm('HS256');
-  static const HS384 = HMACAlgorithm('HS384');
-  static const HS512 = HMACAlgorithm('HS512');
-  static const RS256 = RSAAlgorithm('RS256');
-  static const RS384 = RSAAlgorithm('RS384');
-  static const RS512 = RSAAlgorithm('RS512');
+  /// HMAC using SHA-256 hash algorithm
+  static const HS256 = _HMACAlgorithm('HS256');
 
+  /// HMAC using SHA-384 hash algorithm
+  static const HS384 = _HMACAlgorithm('HS384');
+
+  /// HMAC using SHA-512 hash algorithm
+  static const HS512 = _HMACAlgorithm('HS512');
+
+  /// RSASSA-PKCS1-v1_5 using SHA-256 hash algorithm
+  static const RS256 = _RSAAlgorithm('RS256');
+
+  /// RSASSA-PKCS1-v1_5 using SHA-384 hash algorithm
+  static const RS384 = _RSAAlgorithm('RS384');
+
+  /// RSASSA-PKCS1-v1_5 using SHA-512 hash algorithm
+  static const RS512 = _RSAAlgorithm('RS512');
+
+  /// ECDSA using P-256 curve and SHA-256 hash algorithm
+  static const ES256 = _ECDSAAlgorithm('ES256');
+
+  /// ECDSA using P-384 curve and SHA-384 hash algorithm
+  static const ES384 = _ECDSAAlgorithm('ES384');
+
+  /// ECDSA using P-512 curve and SHA-512 hash algorithm
+  static const ES512 = _ECDSAAlgorithm('ES512');
+
+  /// Return the `JWTAlgorithm` from his string name
   static JWTAlgorithm fromName(String name) {
     switch (name) {
       case 'HS256':
@@ -28,6 +51,12 @@ abstract class JWTAlgorithm {
         return JWTAlgorithm.RS384;
       case 'RS512':
         return JWTAlgorithm.RS512;
+      case 'ES256':
+        return JWTAlgorithm.ES256;
+      case 'ES384':
+        return JWTAlgorithm.ES384;
+      case 'ES512':
+        return JWTAlgorithm.ES512;
       default:
         throw JWTInvalidError('unknown algorithm');
     }
@@ -35,30 +64,40 @@ abstract class JWTAlgorithm {
 
   const JWTAlgorithm();
 
+  /// `JWTAlgorithm` name
   String get name;
-  List<int> sign(Key key, List<int> body);
-  bool verify(Key key, List<int> body, List<int> signature);
+
+  /// Create a signature of the `body` with `key`
+  ///
+  /// return the signature as bytes
+  Uint8List sign(Key key, Uint8List body);
+
+  /// Verify the `signature` of `body` with `key`
+  ///
+  /// return `true` if the signature is correct `false` otherwise
+  bool verify(Key key, Uint8List body, Uint8List signature);
 }
 
-class HMACAlgorithm extends JWTAlgorithm {
+class _HMACAlgorithm extends JWTAlgorithm {
   final String _name;
 
-  const HMACAlgorithm(this._name);
+  const _HMACAlgorithm(this._name);
 
   @override
   String get name => _name;
 
   @override
-  List<int> sign(Key key, List<int> body) {
+  Uint8List sign(Key key, Uint8List body) {
     assert(key is SecretKey, 'key must be a SecretKey');
     final secretKey = key as SecretKey;
 
     final hmac = Hmac(_getHash(name), utf8.encode(secretKey.key));
+
     return hmac.convert(body).bytes;
   }
 
   @override
-  bool verify(Key key, List<int> body, List<int> signature) {
+  bool verify(Key key, Uint8List body, Uint8List signature) {
     assert(key is SecretKey, 'key must be a SecretKey');
 
     final actual = sign(key, body);
@@ -86,78 +125,44 @@ class HMACAlgorithm extends JWTAlgorithm {
   }
 }
 
-class RSAAlgorithm extends JWTAlgorithm {
+class _RSAAlgorithm extends JWTAlgorithm {
   final String _name;
 
-  const RSAAlgorithm(this._name);
+  const _RSAAlgorithm(this._name);
 
   @override
   String get name => _name;
 
   @override
-  List<int> sign(Key key, List<int> body) {
-    assert(key is PrivateKey, 'key must be a PrivateKey');
-    final privateKey = key as PrivateKey;
+  Uint8List sign(Key key, Uint8List body) {
+    assert(key is RSAPrivateKey, 'key must be a RSAPrivateKey');
+    final privateKey = key as RSAPrivateKey;
 
-    final parser = RSAPKCSParser();
-    RSAKeyPair pair;
-
-    pair = parser.parsePEM(privateKey.key, password: privateKey.passphrase);
-    if (pair.private == null) {
-      throw JWTInvalidError('invalid private RSA key');
-    }
-
-    final signer = Signer('${_getHash(name)}/RSA');
-    final params = ParametersWithRandom(
-      PrivateKeyParameter<RSAPrivateKey>(
-        RSAPrivateKey(
-          pair.private.modulus,
-          pair.private.privateExponent,
-          pair.private.prime1,
-          pair.private.prime2,
-        ),
-      ),
-      SecureRandom('AES/CTR/PRNG'),
-    );
+    final signer = pc.Signer('${_getHash(name)}/RSA');
+    final params = pc.PrivateKeyParameter<pc.RSAPrivateKey>(privateKey.key);
 
     signer.init(true, params);
 
-    RSASignature signature = signer.generateSignature(Uint8List.fromList(body));
+    pc.RSASignature signature = signer.generateSignature(
+      Uint8List.fromList(body),
+    );
 
-    return signature.bytes.toList(growable: false);
+    return signature.bytes;
   }
 
   @override
-  bool verify(Key key, List<int> body, List<int> signature) {
-    assert(key is PublicKey, 'key must be a PublicKey');
-    final publicKey = key as PublicKey;
-
-    final parser = RSAPKCSParser();
-    RSAKeyPair pair;
+  bool verify(Key key, Uint8List body, Uint8List signature) {
+    assert(key is RSAPublicKey, 'key must be a RSAPublicKey');
+    final publicKey = key as RSAPublicKey;
 
     try {
-      pair = parser.parsePEM(publicKey.key, password: publicKey.passphrase);
-      assert(pair.public != null);
-    } catch (ex) {
-      throw JWTInvalidError('invalid public RSA key');
-    }
-
-    try {
-      final signer = Signer('${_getHash(name)}/RSA');
-      final params = ParametersWithRandom(
-        PublicKeyParameter<RSAPublicKey>(
-          RSAPublicKey(
-            pair.public.modulus,
-            BigInt.from(pair.public.publicExponent),
-          ),
-        ),
-        SecureRandom('AES/CTR/PRNG'),
-      );
+      final signer = pc.Signer('${_getHash(name)}/RSA');
+      final params = pc.PublicKeyParameter<pc.RSAPublicKey>(publicKey.key);
 
       signer.init(false, params);
 
       final msg = Uint8List.fromList(body);
-      final sign = RSASignature(Uint8List.fromList(signature));
+      final sign = pc.RSASignature(Uint8List.fromList(signature));
 
       return signer.verifySignature(msg, sign);
     } catch (ex) {
@@ -172,6 +177,69 @@ class RSAAlgorithm extends JWTAlgorithm {
       case 'RS384':
         return 'SHA-384';
       case 'RS512':
+        return 'SHA-512';
+      default:
+        throw ArgumentError.value(name, 'name', 'unknown hash name');
+    }
+  }
+}
+
+class _ECDSAAlgorithm extends JWTAlgorithm {
+  final String _name;
+
+  const _ECDSAAlgorithm(this._name);
+
+  @override
+  String get name => _name;
+
+  @override
+  Uint8List sign(Key key, Uint8List body) {
+    assert(key is ECPrivateKey, 'key must be a ECPublicKey');
+    final privateKey = key as ECPrivateKey;
+
+    final signer = pc.Signer('${_getHash(name)}/DET-ECDSA');
+    final params = pc.PrivateKeyParameter<pc.ECPrivateKey>(privateKey.key);
+
+    signer.init(true, params);
+
+    pc.ECSignature signature = signer.generateSignature(
+      Uint8List.fromList(body),
+    );
+
+    final len = privateKey.size;
+    final bytes = Uint8List(len * 2);
+    bytes.setRange(0, len, bigIntToBytes(signature.r).toList().reversed);
+    bytes.setRange(len, len * 2, bigIntToBytes(signature.s).toList().reversed);
+
+    return bytes;
+  }
+
+  @override
+  bool verify(Key key, Uint8List body, Uint8List signature) {
+    assert(key is ECPublicKey, 'key must be a ECPublicKey');
+    final publicKey = key as ECPublicKey;
+
+    final signer = pc.Signer('${_getHash(name)}/DET-ECDSA');
+    final params = pc.PublicKeyParameter<pc.ECPublicKey>(publicKey.key);
+
+    signer.init(false, params);
+
+    final len = signature.length ~/ 2;
+    final sign = pc.ECSignature(
+      bigIntFromBytes(signature.sublist(0, len)),
+      bigIntFromBytes(signature.sublist(len)),
+    );
+
+    return signer.verifySignature(body, sign);
+  }
+
+  String _getHash(String name) {
+    switch (name) {
+      case 'ES256':
+        return 'SHA-256';
+      case 'ES384':
+        return 'SHA-384';
+      case 'ES512':
         return 'SHA-512';
       default:
         throw ArgumentError.value(name, 'name', 'unknown hash name');

@@ -1,3 +1,12 @@
+## 1.6.0
+
+- New ECDSA Algorithm (EC256, EC384, EC512)
+- ECPrivateKey and ECPublicKey, two new keys for ECDSA algorithm
+- PrivateKey is renamed in RSAPrivateKey
+- PublicKey is renamed in RSAPublicKey
+- Optimization of private & public keys parsing
+- `rsa_pkcs` & `cryptography` have been removed
+
 ## 1.5.0
 
 - Debuging `_TypeError issue on sign method` (#4)

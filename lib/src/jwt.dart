@@ -1,15 +1,17 @@
 import 'dart:convert';
 
-import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
-
-import './utils.dart';
+import 'algorithms.dart';
+import 'errors.dart';
+import 'keys.dart';
+import 'utils.dart';
 
 class JWT {
   /// Verify a token.
   ///
   /// `key` must be
-  /// - SecretKey with HS256 algorithm
-  /// - PublicKey with RS256 algorithm
+  /// - SecretKey with HMAC algorithm
+  /// - RSAPublicKey with RSA algorithm
+  /// - ECPublicKey with ECDSA algorithm
   static JWT verify(
     String token,
     Key key, {
@@ -52,8 +54,9 @@ class JWT {
       if (payload is Map) {
         // exp
         if (checkExpiresIn && payload.containsKey('exp')) {
-          final exp =
-              DateTime.fromMillisecondsSinceEpoch(payload['exp'] * 1000);
+          final exp = DateTime.fromMillisecondsSinceEpoch(
+            payload['exp'] * 1000,
+          );
           if (exp.isBefore(DateTime.now())) {
             throw JWTExpiredError();
           }
@@ -61,8 +64,9 @@ class JWT {
 
         // nbf
         if (checkNotBefore && payload.containsKey('nbf')) {
-          final nbf =
-              DateTime.fromMillisecondsSinceEpoch(payload['nbf'] * 1000);
+          final nbf = DateTime.fromMillisecondsSinceEpoch(
+            payload['nbf'] * 1000,
+          );
           if (nbf.isAfter(DateTime.now())) {
             throw JWTNotActiveError();
           }
@@ -73,8 +77,9 @@ class JWT {
           if (!payload.containsKey('iat')) {
             throw JWTInvalidError('invalid issue at');
           }
-          final iat =
-              DateTime.fromMillisecondsSinceEpoch(payload['iat'] * 1000);
+          final iat = DateTime.fromMillisecondsSinceEpoch(
+            payload['iat'] * 1000,
+          );
           if (!iat.isAtSameMomentAs(DateTime.now())) {
             throw JWTInvalidError('invalid issue at');
           }
@@ -154,8 +159,9 @@ class JWT {
   /// Sign and generate a new token.
   ///
   /// `key` must be
-  /// - SecretKey with HS256 algorithm
-  /// - PrivateKey with RS256 algorithm
+  /// - SecretKey with HMAC algorithm
+  /// - RSAPrivateKey with RSA algorithm
+  /// - ECPrivateKey with ECDSA algorithm
   String sign(
     Key key, {
     JWTAlgorithm algorithm = JWTAlgorithm.HS256,
@@ -194,7 +200,8 @@ class JWT {
       );
     } catch (ex) {
       throw JWTError(
-          'invalid payload json format (Map keys must be String type)');
+        'invalid payload json format (Map keys must be String type)',
+      );
     }
 
     final body = '${b64Header}.${b64Payload}';
