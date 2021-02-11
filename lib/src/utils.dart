@@ -74,7 +74,7 @@ BigInt decodeBigIntWithSign(int sign, List<int> bytes) {
 Uint8List bigIntToBytes(BigInt v) {
   final _b256 = BigInt.from(256);
 
-  List<int> bytes = List();
+  var bytes = <int>[];
 
   while (v.sign != 0) {
     bytes.add((v % _b256).toInt());

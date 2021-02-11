@@ -1,3 +1,7 @@
+## 1.6.2
+
+- Adding `analysis_options.yaml` to work with pedantic during development
+
 ## 1.6.1
 
 - Formating for 'static analysis'
