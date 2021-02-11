@@ -186,7 +186,9 @@ class JWT {
         if (subject != null) payload['sub'] = subject;
         if (issuer != null) payload['iss'] = issuer;
         if (jwtId != null) payload['jti'] = jwtId;
-      } catch (ex) {}
+      } catch (ex) {
+        assert(payload is Map);
+      }
     }
 
     final b64Header = base64Unpadded(jsonBase64.encode(header));

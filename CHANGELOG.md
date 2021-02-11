@@ -1,3 +1,7 @@
+## 1.6.1
+
+- Formating for 'static analysis'
+
 ## 1.6.0
 
 - New ECDSA Algorithm (EC256, EC384, EC512)

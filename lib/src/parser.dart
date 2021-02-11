@@ -35,7 +35,7 @@ const String _pkcs8ECPublicHeader = '-----BEGIN PUBLIC KEY-----';
 const String _pkcs8ECPublicFooter = '-----END PUBLIC KEY-----';
 
 // ECDSA Curves OID to DomainName
-const Map<String, String> _ecCurves = const {
+const Map<String, String> _ecCurves = {
   '1.2.840.10045.3.1.7': 'prime256v1', // P-256
   '1.3.132.0.10': 'secp256k1', // P-256
   '1.3.132.0.34': 'secp384r1', // P-384
