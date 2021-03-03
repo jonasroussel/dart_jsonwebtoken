@@ -23,3 +23,8 @@ class JWTExpiredError extends JWTError {
 class JWTNotActiveError extends JWTError {
   JWTNotActiveError() : super('jwt not active');
 }
+
+/// An error thrown when parsing failed
+class JWTParseError extends JWTError {
+  JWTParseError(String message) : super(message);
+}

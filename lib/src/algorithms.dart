@@ -93,7 +93,7 @@ class _HMACAlgorithm extends JWTAlgorithm {
 
     final hmac = Hmac(_getHash(name), utf8.encode(secretKey.key));
 
-    return hmac.convert(body).bytes;
+    return Uint8List.fromList(hmac.convert(body).bytes);
   }
 
   @override
@@ -143,9 +143,9 @@ class _RSAAlgorithm extends JWTAlgorithm {
 
     signer.init(true, params);
 
-    pc.RSASignature signature = signer.generateSignature(
+    final signature = signer.generateSignature(
       Uint8List.fromList(body),
-    );
+    ) as pc.RSASignature;
 
     return signature.bytes;
   }
@@ -202,9 +202,9 @@ class _ECDSAAlgorithm extends JWTAlgorithm {
 
     signer.init(true, params);
 
-    pc.ECSignature signature = signer.generateSignature(
+    final signature = signer.generateSignature(
       Uint8List.fromList(body),
-    );
+    ) as pc.ECSignature;
 
     final len = privateKey.size;
     final bytes = Uint8List(len * 2);

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'algorithms.dart';
 import 'errors.dart';
@@ -19,16 +20,19 @@ class JWT {
     bool checkExpiresIn = true,
     bool checkNotBefore = true,
     bool throwUndefinedErrors = false,
-    Duration issueAt,
-    String audience,
-    String subject,
-    String issuer,
-    String jwtId,
+    Duration? issueAt,
+    String? audience,
+    String? subject,
+    String? issuer,
+    String? jwtId,
   }) {
     try {
       final parts = token.split('.');
+      final header = jsonBase64.decode(base64Padded(parts[0]));
 
-      Map<String, dynamic> header = jsonBase64.decode(base64Padded(parts[0]));
+      if (header == null || header is! Map<String, dynamic>) {
+        throw JWTInvalidError('invalid header');
+      }
 
       if (checkHeaderType && header['typ'] != 'JWT') {
         throw JWTInvalidError('not a jwt');
@@ -39,7 +43,7 @@ class JWT {
       final body = utf8.encode(parts[0] + '.' + parts[1]);
       final signature = base64Url.decode(base64Padded(parts[2]));
 
-      if (!algorithm.verify(key, body, signature)) {
+      if (!algorithm.verify(key, Uint8List.fromList(body), signature)) {
         throw JWTInvalidError('invalid signature');
       }
 
@@ -145,16 +149,16 @@ class JWT {
   dynamic payload;
 
   /// Audience claim
-  String audience;
+  String? audience;
 
   /// Subject claim
-  String subject;
+  String? subject;
 
   /// Issuer claim
-  String issuer;
+  String? issuer;
 
   /// JWT Id claim
-  String jwtId;
+  String? jwtId;
 
   /// Sign and generate a new token.
   ///
@@ -165,8 +169,8 @@ class JWT {
   String sign(
     Key key, {
     JWTAlgorithm algorithm = JWTAlgorithm.HS256,
-    Duration expiresIn,
-    Duration notBefore,
+    Duration? expiresIn,
+    Duration? notBefore,
     bool noIssueAt = false,
   }) {
     final header = {'alg': algorithm.name, 'typ': 'JWT'};
@@ -211,7 +215,7 @@ class JWT {
       base64Url.encode(
         algorithm.sign(
           key,
-          utf8.encode(body),
+          Uint8List.fromList(utf8.encode(body)),
         ),
       ),
     );

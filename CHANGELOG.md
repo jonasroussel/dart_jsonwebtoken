@@ -1,3 +1,7 @@
+## 2.0.0-nullsafety.1
+
+- Null safety migration of this package
+
 ## 1.6.2
 
 - Adding `analysis_options.yaml` to work with pedantic during development
