@@ -93,7 +93,7 @@ RSAPublicKey _pkcs8RSAPublicKey(Uint8List bytes) {
   final seq = parser.nextObject() as ASN1Sequence;
 
   final keySeq = seq.elements[1] as ASN1BitString;
-  final keyParser = ASN1Parser(keySeq.stringValues);
+  final keyParser = ASN1Parser(keySeq.stringValues as Uint8List);
 
   final valuesSeq = keyParser.nextObject() as ASN1Sequence;
   final values = valuesSeq.elements.cast<ASN1Integer>();
@@ -115,7 +115,7 @@ ECPrivateKey _sec1ECPrivateKey(Uint8List bytes) {
   final paramsParser = ASN1Parser(params.valueBytes);
   final oid = (paramsParser.nextObject() as ASN1ObjectIdentifier)
       .objectIdentifierAsString;
-  final curve = _ecCurves[oid];
+  final curve = _ecCurves[oid]!;
 
   return ECPrivateKey(
     decodeBigInt(privateKey.valueBytes),
@@ -131,7 +131,7 @@ ECPrivateKey _pkcs8ECPrivateKey(Uint8List bytes) {
   final oidSeq = seq.elements[1] as ASN1Sequence;
   final oid =
       (oidSeq.elements[1] as ASN1ObjectIdentifier).objectIdentifierAsString;
-  final curve = _ecCurves[oid];
+  final curve = _ecCurves[oid]!;
 
   final privateKeyParser = ASN1Parser(seq.elements[2].valueBytes);
   final privateKeySeq = privateKeyParser.nextObject() as ASN1Sequence;
@@ -151,7 +151,7 @@ ECPublicKey _pkcs8ECPublicKey(Uint8List bytes) {
   final oidSeq = seq.elements[0] as ASN1Sequence;
   final oid =
       (oidSeq.elements[1] as ASN1ObjectIdentifier).objectIdentifierAsString;
-  final curve = _ecCurves[oid];
+  final curve = _ecCurves[oid]!;
 
   var publicKeyBytes = seq.elements[1].valueBytes;
   if (publicKeyBytes[0] == 0) {
@@ -167,9 +167,9 @@ ECPublicKey _pkcs8ECPublicKey(Uint8List bytes) {
 
   return ECPublicKey(
     ECPoint(
-      params.curve,
-      params.curve.fromBigInteger(bigX),
-      params.curve.fromBigInteger(bigY),
+      params.curve as ECCurve,
+      params.curve.fromBigInteger(bigX) as ECFieldElement,
+      params.curve.fromBigInteger(bigY) as ECFieldElement,
       compressed,
     ),
     params,
@@ -177,7 +177,7 @@ ECPublicKey _pkcs8ECPublicKey(Uint8List bytes) {
 }
 
 /// Parse RSA private key from pem string
-RSAPrivateKey parseRSAPrivateKeyPEM(String pem) {
+RSAPrivateKey? parseRSAPrivateKeyPEM(String pem) {
   if (pem.contains(_pkcs1RSAPrivateHeader) &&
       pem.contains(_pkcs1RSAPrivateFooter)) {
     final data = pem
@@ -204,7 +204,7 @@ RSAPrivateKey parseRSAPrivateKeyPEM(String pem) {
 }
 
 /// Parse RSA public key from pem string
-RSAPublicKey parseRSAPublicKeyPEM(String pem) {
+RSAPublicKey? parseRSAPublicKeyPEM(String pem) {
   if (pem.contains(_pkcs1RSAPublicHeader) &&
       pem.contains(_pkcs1RSAPublicFooter)) {
     final data = pem
@@ -231,7 +231,7 @@ RSAPublicKey parseRSAPublicKeyPEM(String pem) {
 }
 
 /// Parse ECDSA private key from pem string
-ECPrivateKey parseECPrivateKeyPEM(String pem) {
+ECPrivateKey? parseECPrivateKeyPEM(String pem) {
   if (pem.contains(_sec1ECPrivateHeader) &&
       pem.contains(_sec1ECPrivateFooter)) {
     final data = pem
@@ -258,7 +258,7 @@ ECPrivateKey parseECPrivateKeyPEM(String pem) {
 }
 
 /// Parse ECDSA public key from pem string
-ECPublicKey parseECPublicKeyPEM(String pem) {
+ECPublicKey? parseECPublicKeyPEM(String pem) {
   if (pem.contains(_pkcs8ECPublicHeader) &&
       pem.contains(_pkcs8ECPublicFooter)) {
     final data = pem

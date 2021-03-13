@@ -13,7 +13,7 @@ class SecretKey extends Key {
 
 /// For RSA algorithm, in sign method
 class RSAPrivateKey extends Key {
-  pc.RSAPrivateKey key;
+  pc.RSAPrivateKey? key;
 
   RSAPrivateKey(String pem) {
     key = parseRSAPrivateKeyPEM(pem);
@@ -22,7 +22,7 @@ class RSAPrivateKey extends Key {
 
 /// For RSA algorithm, in verify method
 class RSAPublicKey extends Key {
-  pc.RSAPublicKey key;
+  pc.RSAPublicKey? key;
 
   RSAPublicKey(String pem) {
     key = parseRSAPublicKeyPEM(pem);
@@ -31,18 +31,18 @@ class RSAPublicKey extends Key {
 
 /// For ECDSA algorithm, in sign method
 class ECPrivateKey extends Key {
-  pc.ECPrivateKey key;
-  int size;
+  pc.ECPrivateKey? key;
+  late int size;
 
   ECPrivateKey(String pem) {
     key = parseECPrivateKeyPEM(pem);
-    size = (key.parameters.curve.fieldSize / 8).round();
+    size = (key!.parameters.curve.fieldSize / 8).round();
   }
 }
 
 /// For ECDSA algorithm, in verify method
 class ECPublicKey extends Key {
-  pc.ECPublicKey key;
+  pc.ECPublicKey? key;
 
   ECPublicKey(String pem) {
     key = parseECPublicKeyPEM(pem);

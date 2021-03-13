@@ -19,16 +19,16 @@ class JWT {
     bool checkExpiresIn = true,
     bool checkNotBefore = true,
     bool throwUndefinedErrors = false,
-    Duration issueAt,
-    String audience,
-    String subject,
-    String issuer,
-    String jwtId,
+    Duration? issueAt,
+    String? audience,
+    String? subject,
+    String? issuer,
+    String? jwtId,
   }) {
     try {
       final parts = token.split('.');
 
-      Map<String, dynamic> header = jsonBase64.decode(base64Padded(parts[0]));
+      Map<String, dynamic> header = jsonBase64.decode(base64Padded(parts[0])) as Map<String, dynamic>;
 
       if (checkHeaderType && header['typ'] != 'JWT') {
         throw JWTInvalidError('not a jwt');
@@ -39,7 +39,7 @@ class JWT {
       final body = utf8.encode(parts[0] + '.' + parts[1]);
       final signature = base64Url.decode(base64Padded(parts[2]));
 
-      if (!algorithm.verify(key, body, signature)) {
+      if (!algorithm.verify(key, body as Uint8List, signature)) {
         throw JWTInvalidError('invalid signature');
       }
 
@@ -145,16 +145,16 @@ class JWT {
   dynamic payload;
 
   /// Audience claim
-  String audience;
+  String? audience;
 
   /// Subject claim
-  String subject;
+  String? subject;
 
   /// Issuer claim
-  String issuer;
+  String? issuer;
 
   /// JWT Id claim
-  String jwtId;
+  String? jwtId;
 
   /// Sign and generate a new token.
   ///
@@ -165,8 +165,8 @@ class JWT {
   String sign(
     Key key, {
     JWTAlgorithm algorithm = JWTAlgorithm.HS256,
-    Duration expiresIn,
-    Duration notBefore,
+    Duration? expiresIn,
+    Duration? notBefore,
     bool noIssueAt = false,
   }) {
     final header = {'alg': algorithm.name, 'typ': 'JWT'};
@@ -211,7 +211,7 @@ class JWT {
       base64Url.encode(
         algorithm.sign(
           key,
-          utf8.encode(body),
+          utf8.encode(body) as Uint8List,
         ),
       ),
     );

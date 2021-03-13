@@ -37,7 +37,7 @@ abstract class JWTAlgorithm {
   static const ES512 = _ECDSAAlgorithm('ES512');
 
   /// Return the `JWTAlgorithm` from his string name
-  static JWTAlgorithm fromName(String name) {
+  static JWTAlgorithm fromName(String? name) {
     switch (name) {
       case 'HS256':
         return JWTAlgorithm.HS256;
@@ -93,7 +93,7 @@ class _HMACAlgorithm extends JWTAlgorithm {
 
     final hmac = Hmac(_getHash(name), utf8.encode(secretKey.key));
 
-    return hmac.convert(body).bytes;
+    return hmac.convert(body).bytes as Uint8List;
   }
 
   @override
@@ -139,13 +139,13 @@ class _RSAAlgorithm extends JWTAlgorithm {
     final privateKey = key as RSAPrivateKey;
 
     final signer = pc.Signer('${_getHash(name)}/RSA');
-    final params = pc.PrivateKeyParameter<pc.RSAPrivateKey>(privateKey.key);
+    final params = pc.PrivateKeyParameter<pc.RSAPrivateKey>(privateKey.key!);
 
     signer.init(true, params);
 
     pc.RSASignature signature = signer.generateSignature(
       Uint8List.fromList(body),
-    );
+    ) as RSASignature;
 
     return signature.bytes;
   }
@@ -157,7 +157,7 @@ class _RSAAlgorithm extends JWTAlgorithm {
 
     try {
       final signer = pc.Signer('${_getHash(name)}/RSA');
-      final params = pc.PublicKeyParameter<pc.RSAPublicKey>(publicKey.key);
+      final params = pc.PublicKeyParameter<pc.RSAPublicKey>(publicKey.key!);
 
       signer.init(false, params);
 
@@ -198,13 +198,13 @@ class _ECDSAAlgorithm extends JWTAlgorithm {
     final privateKey = key as ECPrivateKey;
 
     final signer = pc.Signer('${_getHash(name)}/DET-ECDSA');
-    final params = pc.PrivateKeyParameter<pc.ECPrivateKey>(privateKey.key);
+    final params = pc.PrivateKeyParameter<pc.ECPrivateKey>(privateKey.key!);
 
     signer.init(true, params);
 
     pc.ECSignature signature = signer.generateSignature(
       Uint8List.fromList(body),
-    );
+    ) as ECSignature;
 
     final len = privateKey.size;
     final bytes = Uint8List(len * 2);
@@ -220,7 +220,7 @@ class _ECDSAAlgorithm extends JWTAlgorithm {
     final publicKey = key as ECPublicKey;
 
     final signer = pc.Signer('${_getHash(name)}/DET-ECDSA');
-    final params = pc.PublicKeyParameter<pc.ECPublicKey>(publicKey.key);
+    final params = pc.PublicKeyParameter<pc.ECPublicKey>(publicKey.key!);
 
     signer.init(false, params);
 
