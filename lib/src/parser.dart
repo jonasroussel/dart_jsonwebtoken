@@ -1,7 +1,8 @@
 import 'dart:typed_data';
 import 'dart:convert';
 
-import 'package:pointycastle/pointycastle.dart' hide ECPoint;
+import 'package:pointycastle/pointycastle.dart'
+    hide ECPoint, ECCurve, ECFieldElement;
 import 'package:pointycastle/ecc/ecc_fp.dart';
 
 import 'utils.dart';

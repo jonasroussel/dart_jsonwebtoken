@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'algorithms.dart';
 import 'errors.dart';
@@ -28,7 +29,8 @@ class JWT {
     try {
       final parts = token.split('.');
 
-      Map<String, dynamic> header = jsonBase64.decode(base64Padded(parts[0])) as Map<String, dynamic>;
+      final header =
+          jsonBase64.decode(base64Padded(parts[0])) as Map<String, dynamic>;
 
       if (checkHeaderType && header['typ'] != 'JWT') {
         throw JWTInvalidError('not a jwt');
@@ -206,7 +208,7 @@ class JWT {
       );
     }
 
-    final body = '${b64Header}.${b64Payload}';
+    final body = '$b64Header.$b64Payload';
     final signature = base64Unpadded(
       base64Url.encode(
         algorithm.sign(
