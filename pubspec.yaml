@@ -5,10 +5,10 @@ repository: https://github.com/jonasroussel/jsonwebtoken
 homepage: https://github.com/jonasroussel/jsonwebtoken#readme
 
 environment:
-  sdk: '>=2.12.0 <3.0.0'
+  sdk: ">=2.12.0 <3.0.0"
 
 dependencies:
-  crypto: ^2.1.5
+  crypto: ^3.0.0
   pointycastle: ^2.0.1
 
 dev_dependencies:
