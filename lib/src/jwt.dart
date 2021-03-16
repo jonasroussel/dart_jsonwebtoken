@@ -35,6 +35,10 @@ class JWT {
         throw JWTInvalidError('invalid header');
       }
 
+      if (checkHeaderType && header['typ'] != 'JWT') {
+        throw JWTInvalidError('not a jwt');
+      }
+
       final algorithm = JWTAlgorithm.fromName(header['alg']);
 
       final body = utf8.encode(parts[0] + '.' + parts[1]);
@@ -116,10 +120,10 @@ class JWT {
 
         return JWT(
           payload,
-          audience: payload['aud'],
-          issuer: payload['iss'],
-          subject: payload['sub'],
-          jwtId: payload['jti'],
+          audience: payload.remove('aud'),
+          issuer: payload.remove('iss'),
+          subject: payload.remove('sub'),
+          jwtId: payload.remove('jti'),
         );
       } else {
         return JWT(payload);
@@ -171,7 +175,7 @@ class JWT {
     Duration? notBefore,
     bool noIssueAt = false,
   }) {
-    final header = {'alg': algorithm.name};
+    final header = {'alg': algorithm.name, 'typ': 'JWT'};
 
     if (payload is Map<String, dynamic>) {
       payload = Map<String, dynamic>.from(payload);
