@@ -9,10 +9,8 @@ environment:
 
 dependencies:
   crypto: ^3.0.0
-  pointycastle:
-     git:
-        url: git@github.com:Tougee/pc-dart.git
-        ref: feature/eddsa
+  pointycastle: ^3.0.0-nullsafety.2
+  ed25519_edwards: ^0.1.0
 
 dev_dependencies:
   uuid: ^3.0.0

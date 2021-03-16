@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:pointycastle/pointycastle.dart' as pc;
-import 'package:pointycastle/signers/eddsa_signer.dart' as pc_signer;
+import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 
 import 'errors.dart';
 import 'keys.dart';
@@ -97,16 +97,7 @@ class _EdDSAAlgorithm extends JWTAlgorithm {
     assert(key is EdDSAPrivateKey, 'key must be a EdDSAPrivateKey');
     final privateKey = key as EdDSAPrivateKey;
 
-    final signer = pc_signer.EdDSASigner();
-    final params = pc.PrivateKeyParameter<pc.EdDSAPrivateKey>(privateKey.key);
-
-    signer.init(true, params);
-
-    final signature = signer.generateSignature(
-      Uint8List.fromList(body),
-    );
-
-    return signature.bytes;
+    return ed.sign(privateKey.key, body);
   }
 
   @override
@@ -115,15 +106,7 @@ class _EdDSAAlgorithm extends JWTAlgorithm {
     final publicKey = key as EdDSAPublicKey;
 
     try {
-      final signer = pc_signer.EdDSASigner();
-      final params = pc.PublicKeyParameter<pc.EdDSAPublicKey>(publicKey.key);
-
-      signer.init(false, params);
-
-      final msg = Uint8List.fromList(body);
-      final sign = pc.EdDSASignature(Uint8List.fromList(signature));
-
-      return signer.verifySignature(msg, sign);
+      return ed.verify(publicKey.key, body, signature);
     } catch (ex) {
       return false;
     }
