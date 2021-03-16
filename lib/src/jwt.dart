@@ -13,6 +13,7 @@ class JWT {
   /// - SecretKey with HMAC algorithm
   /// - RSAPublicKey with RSA algorithm
   /// - ECPublicKey with ECDSA algorithm
+  /// - EdDSAPublicKey with EdDSA algorithm
   static JWT verify(
     String token,
     Key key, {
@@ -32,10 +33,6 @@ class JWT {
 
       if (header == null || header is! Map<String, dynamic>) {
         throw JWTInvalidError('invalid header');
-      }
-
-      if (checkHeaderType && header['typ'] != 'JWT') {
-        throw JWTInvalidError('not a jwt');
       }
 
       final algorithm = JWTAlgorithm.fromName(header['alg']);
@@ -119,10 +116,10 @@ class JWT {
 
         return JWT(
           payload,
-          audience: payload.remove('aud'),
-          issuer: payload.remove('iss'),
-          subject: payload.remove('sub'),
-          jwtId: payload.remove('jti'),
+          audience: payload['aud'],
+          issuer: payload['iss'],
+          subject: payload['sub'],
+          jwtId: payload['jti'],
         );
       } else {
         return JWT(payload);
@@ -166,6 +163,7 @@ class JWT {
   /// - SecretKey with HMAC algorithm
   /// - RSAPrivateKey with RSA algorithm
   /// - ECPrivateKey with ECDSA algorithm
+  /// - EdDSAPrivateKey with EdDSA algorithm
   String sign(
     Key key, {
     JWTAlgorithm algorithm = JWTAlgorithm.HS256,
@@ -173,7 +171,7 @@ class JWT {
     Duration? notBefore,
     bool noIssueAt = false,
   }) {
-    final header = {'alg': algorithm.name, 'typ': 'JWT'};
+    final header = {'alg': algorithm.name};
 
     if (payload is Map<String, dynamic>) {
       payload = Map<String, dynamic>.from(payload);
@@ -210,7 +208,7 @@ class JWT {
       );
     }
 
-    final body = '${b64Header}.${b64Payload}';
+    final body = '$b64Header.$b64Payload';
     final signature = base64Unpadded(
       base64Url.encode(
         algorithm.sign(

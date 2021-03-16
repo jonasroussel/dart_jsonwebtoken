@@ -1,4 +1,7 @@
+import 'dart:typed_data';
+
 import 'package:pointycastle/pointycastle.dart' as pc;
+import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 
 import 'errors.dart';
 import 'parser.dart';
@@ -10,6 +13,24 @@ class SecretKey extends Key {
   String key;
 
   SecretKey(this.key);
+}
+
+/// For EdDSA algorithm, in sign method
+class EdDSAPrivateKey extends Key {
+  late pc.EdDSAPrivateKey key;
+
+  EdDSAPrivateKey(List<int> bytes) {
+    key = pc.EdDSAPrivateKey(ed.PrivateKey(bytes));
+  }
+}
+
+/// For EdDSA algorithm, in verify method
+class EdDSAPublicKey extends Key {
+  late pc.EdDSAPublicKey key;
+
+  EdDSAPublicKey(List<int> bytes) {
+    key = pc.EdDSAPublicKey(ed.PublicKey(bytes));
+  }
 }
 
 /// For RSA algorithm, in sign method

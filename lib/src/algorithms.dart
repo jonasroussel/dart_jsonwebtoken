@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:pointycastle/pointycastle.dart' as pc;
+import 'package:pointycastle/signers/eddsa_signer.dart' as pc_signer;
 
 import 'errors.dart';
 import 'keys.dart';
@@ -36,6 +37,9 @@ abstract class JWTAlgorithm {
   /// ECDSA using P-512 curve and SHA-512 hash algorithm
   static const ES512 = _ECDSAAlgorithm('ES512');
 
+  /// EdDSA using Ed25519 curve algorithm
+  static const Ed25519 = _EdDSAAlgorithm('EdDSA');
+
   /// Return the `JWTAlgorithm` from his string name
   static JWTAlgorithm fromName(String name) {
     switch (name) {
@@ -57,6 +61,8 @@ abstract class JWTAlgorithm {
         return JWTAlgorithm.ES384;
       case 'ES512':
         return JWTAlgorithm.ES512;
+      case 'EdDSA':
+        return JWTAlgorithm.Ed25519;
       default:
         throw JWTInvalidError('unknown algorithm');
     }
@@ -76,6 +82,52 @@ abstract class JWTAlgorithm {
   ///
   /// return `true` if the signature is correct `false` otherwise
   bool verify(Key key, Uint8List body, Uint8List signature);
+}
+
+class _EdDSAAlgorithm extends JWTAlgorithm {
+  final String _name;
+
+  const _EdDSAAlgorithm(this._name);
+
+  @override
+  String get name => _name;
+
+  @override
+  Uint8List sign(Key key, Uint8List body) {
+    assert(key is EdDSAPrivateKey, 'key must be a EdDSAPrivateKey');
+    final privateKey = key as EdDSAPrivateKey;
+
+    final signer = pc_signer.EdDSASigner();
+    final params = pc.PrivateKeyParameter<pc.EdDSAPrivateKey>(privateKey.key);
+
+    signer.init(true, params);
+
+    final signature = signer.generateSignature(
+      Uint8List.fromList(body),
+    );
+
+    return signature.bytes;
+  }
+
+  @override
+  bool verify(Key key, Uint8List body, Uint8List signature) {
+    assert(key is EdDSAPublicKey, 'key must be a EdDSAPublicKey');
+    final publicKey = key as EdDSAPublicKey;
+
+    try {
+      final signer = pc_signer.EdDSASigner();
+      final params = pc.PublicKeyParameter<pc.EdDSAPublicKey>(publicKey.key);
+
+      signer.init(false, params);
+
+      final msg = Uint8List.fromList(body);
+      final sign = pc.EdDSASignature(Uint8List.fromList(signature));
+
+      return signer.verifySignature(msg, sign);
+    } catch (ex) {
+      return false;
+    }
+  }
 }
 
 class _HMACAlgorithm extends JWTAlgorithm {
