@@ -13,6 +13,7 @@ class JWT {
   /// - SecretKey with HMAC algorithm
   /// - RSAPublicKey with RSA algorithm
   /// - ECPublicKey with ECDSA algorithm
+  /// - EdDSAPublicKey with EdDSA algorithm
   static JWT verify(
     String token,
     Key key, {
@@ -166,6 +167,7 @@ class JWT {
   /// - SecretKey with HMAC algorithm
   /// - RSAPrivateKey with RSA algorithm
   /// - ECPrivateKey with ECDSA algorithm
+  /// - EdDSAPrivateKey with EdDSA algorithm
   String sign(
     Key key, {
     JWTAlgorithm algorithm = JWTAlgorithm.HS256,
@@ -210,7 +212,7 @@ class JWT {
       );
     }
 
-    final body = '${b64Header}.${b64Payload}';
+    final body = '$b64Header.$b64Payload';
     final signature = base64Unpadded(
       base64Url.encode(
         algorithm.sign(

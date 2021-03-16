@@ -71,7 +71,7 @@ void rs256() {
     );
 
     // Sign it
-    final pem = File('rsa_private.pem').readAsStringSync();
+    final pem = File('./example/rsa_private.pem').readAsStringSync();
     final key = RSAPrivateKey(pem);
 
     token = jwt.sign(key, algorithm: JWTAlgorithm.RS256);
@@ -82,7 +82,7 @@ void rs256() {
   /* Verify */ {
     try {
       // Verify a token
-      final pem = File('rsa_public.pem').readAsStringSync();
+      final pem = File('./example/rsa_public.pem').readAsStringSync();
       final key = RSAPublicKey(pem);
 
       final jwt = JWT.verify(token, key);
@@ -114,7 +114,7 @@ void es256() {
     );
 
     // Sign it
-    final pem = File('ec_private.pem').readAsStringSync();
+    final pem = File('./example/ec_private.pem').readAsStringSync();
     final key = ECPrivateKey(pem);
 
     token = jwt.sign(key, algorithm: JWTAlgorithm.ES256);
@@ -125,7 +125,7 @@ void es256() {
   /* Verify */ {
     try {
       // Verify a token
-      final pem = File('ec_public.pem').readAsStringSync();
+      final pem = File('./example/ec_public.pem').readAsStringSync();
       final key = ECPublicKey(pem);
 
       final jwt = JWT.verify(token, key);
