@@ -1,3 +1,9 @@
+## 2.0.0-nullsafety.2
+
+- New EdDSA Algorithm (EdDSA)
+- EdDSAPrivateKey and EdDSAPublicKey, two new keys for EdDSA algorithm
+- `ed25519_edwards` package has been added
+
 ## 2.0.0-nullsafety.1
 
 - Null safety migration of this package

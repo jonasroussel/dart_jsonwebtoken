@@ -38,7 +38,7 @@ abstract class JWTAlgorithm {
   static const ES512 = _ECDSAAlgorithm('ES512');
 
   /// EdDSA using Ed25519 curve algorithm
-  static const Ed25519 = _EdDSAAlgorithm('EdDSA');
+  static const EdDSA = _EdDSAAlgorithm('EdDSA');
 
   /// Return the `JWTAlgorithm` from his string name
   static JWTAlgorithm fromName(String name) {
@@ -62,7 +62,7 @@ abstract class JWTAlgorithm {
       case 'ES512':
         return JWTAlgorithm.ES512;
       case 'EdDSA':
-        return JWTAlgorithm.Ed25519;
+        return JWTAlgorithm.EdDSA;
       default:
         throw JWTInvalidError('unknown algorithm');
     }

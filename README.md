@@ -63,3 +63,4 @@ RS512 | RSASSA-PKCS1-v1_5 using SHA-512 hash algorithm
 ES256 | ECDSA using P-256 curve and SHA-256 hash algorithm
 ES384 | ECDSA using P-384 curve and SHA-384 hash algorithm
 ES512 | ECDSA using P-521 curve and SHA-512 hash algorithm
+EdDSA | EdDSA using edwards25519 curve and SHA-512 hash algorithm
