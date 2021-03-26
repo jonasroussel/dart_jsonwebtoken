@@ -1,3 +1,7 @@
+## 2.0.1
+
+- Fixing `JWT.sign` to include `iat` & other attributes when payload is an empty Map
+
 ## 2.0.0
 
 - Stable release for null safety

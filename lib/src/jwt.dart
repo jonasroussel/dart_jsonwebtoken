@@ -177,10 +177,10 @@ class JWT {
   }) {
     final header = {'alg': algorithm.name, 'typ': 'JWT'};
 
-    if (payload is Map<String, dynamic>) {
-      payload = Map<String, dynamic>.from(payload);
-
+    if (payload is Map<String, dynamic> || payload is Map<dynamic, dynamic>) {
       try {
+        payload = Map<String, dynamic>.from(payload);
+
         if (!noIssueAt) payload['iat'] = secondsSinceEpoch(DateTime.now());
         if (expiresIn != null) {
           payload['exp'] = secondsSinceEpoch(DateTime.now().add(expiresIn));
@@ -193,7 +193,10 @@ class JWT {
         if (issuer != null) payload['iss'] = issuer;
         if (jwtId != null) payload['jti'] = jwtId;
       } catch (ex) {
-        assert(payload is Map);
+        assert(
+          payload is Map<String, dynamic>,
+          'If payload is a Map its must be a Map<String, dynamic>',
+        );
       }
     }
 
