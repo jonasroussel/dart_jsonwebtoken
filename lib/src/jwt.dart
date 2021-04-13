@@ -20,7 +20,6 @@ class JWT {
     bool checkHeaderType = true,
     bool checkExpiresIn = true,
     bool checkNotBefore = true,
-    bool throwUndefinedErrors = false,
     Duration? issueAt,
     String? audience,
     String? subject,
@@ -129,10 +128,10 @@ class JWT {
         return JWT(payload);
       }
     } catch (ex) {
-      if (throwUndefinedErrors) {
-        rethrow;
+      if (ex is Error) {
+        throw JWTUndefinedError(ex);
       } else {
-        throw JWTInvalidError('invalid token');
+        rethrow;
       }
     }
   }
@@ -175,56 +174,64 @@ class JWT {
     Duration? notBefore,
     bool noIssueAt = false,
   }) {
-    final header = {'alg': algorithm.name, 'typ': 'JWT'};
+    try {
+      final header = {'alg': algorithm.name, 'typ': 'JWT'};
 
-    if (payload is Map<String, dynamic> || payload is Map<dynamic, dynamic>) {
+      if (payload is Map<String, dynamic> || payload is Map<dynamic, dynamic>) {
+        try {
+          payload = Map<String, dynamic>.from(payload);
+
+          if (!noIssueAt) payload['iat'] = secondsSinceEpoch(DateTime.now());
+          if (expiresIn != null) {
+            payload['exp'] = secondsSinceEpoch(DateTime.now().add(expiresIn));
+          }
+          if (notBefore != null) {
+            payload['nbf'] = secondsSinceEpoch(DateTime.now().add(notBefore));
+          }
+          if (audience != null) payload['aud'] = audience;
+          if (subject != null) payload['sub'] = subject;
+          if (issuer != null) payload['iss'] = issuer;
+          if (jwtId != null) payload['jti'] = jwtId;
+        } catch (ex) {
+          assert(
+            payload is Map<String, dynamic>,
+            'If payload is a Map its must be a Map<String, dynamic>',
+          );
+        }
+      }
+
+      final b64Header = base64Unpadded(jsonBase64.encode(header));
+
+      String b64Payload;
       try {
-        payload = Map<String, dynamic>.from(payload);
-
-        if (!noIssueAt) payload['iat'] = secondsSinceEpoch(DateTime.now());
-        if (expiresIn != null) {
-          payload['exp'] = secondsSinceEpoch(DateTime.now().add(expiresIn));
-        }
-        if (notBefore != null) {
-          payload['nbf'] = secondsSinceEpoch(DateTime.now().add(notBefore));
-        }
-        if (audience != null) payload['aud'] = audience;
-        if (subject != null) payload['sub'] = subject;
-        if (issuer != null) payload['iss'] = issuer;
-        if (jwtId != null) payload['jti'] = jwtId;
+        b64Payload = base64Unpadded(
+          payload is String
+              ? base64.encode(utf8.encode(payload))
+              : jsonBase64.encode(payload),
+        );
       } catch (ex) {
-        assert(
-          payload is Map<String, dynamic>,
-          'If payload is a Map its must be a Map<String, dynamic>',
+        throw JWTError(
+          'invalid payload json format (Map keys must be String type)',
         );
       }
-    }
 
-    final b64Header = base64Unpadded(jsonBase64.encode(header));
-
-    String b64Payload;
-    try {
-      b64Payload = base64Unpadded(
-        payload is String
-            ? base64.encode(utf8.encode(payload))
-            : jsonBase64.encode(payload),
-      );
-    } catch (ex) {
-      throw JWTError(
-        'invalid payload json format (Map keys must be String type)',
-      );
-    }
-
-    final body = '$b64Header.$b64Payload';
-    final signature = base64Unpadded(
-      base64Url.encode(
-        algorithm.sign(
-          key,
-          Uint8List.fromList(utf8.encode(body)),
+      final body = '$b64Header.$b64Payload';
+      final signature = base64Unpadded(
+        base64Url.encode(
+          algorithm.sign(
+            key,
+            Uint8List.fromList(utf8.encode(body)),
+          ),
         ),
-      ),
-    );
+      );
 
-    return body + '.' + signature;
+      return body + '.' + signature;
+    } catch (ex) {
+      if (ex is Error) {
+        throw JWTUndefinedError(ex);
+      } else {
+        rethrow;
+      }
+    }
   }
 }
