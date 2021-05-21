@@ -1,3 +1,7 @@
+## 2.1.1
+
+- Fixing `_pkcs8ECPublicKey` to work with pointycastle 3.0.1
+
 ## 2.1.0
 
 - When an undefined error occur `JWTUndefinedError` is thrown containing the original error in `error` property (https://github.com/jonasroussel/jsonwebtoken/issues/9)

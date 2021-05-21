@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 import 'dart:convert';
 
-import 'package:pointycastle/pointycastle.dart' hide ECPoint, ECCurve;
-import 'package:pointycastle/ecc/ecc_fp.dart';
+import 'package:pointycastle/pointycastle.dart';
+import 'package:pointycastle/ecc/ecc_fp.dart' as ecc_fp;
 
 import 'utils.dart';
 
@@ -215,17 +215,12 @@ ECPublicKey? _pkcs8ECPublicKey(Uint8List bytes) {
   final bigX = decodeBigIntWithSign(1, x);
   final bigY = decodeBigIntWithSign(1, y);
   final params = ECDomainParameters(curve);
-  final ecCurve = ECCurve(
-    null,
-    params.curve.a?.toBigInteger(),
-    params.curve.b?.toBigInteger(),
-  );
 
   return ECPublicKey(
-    ECPoint(
-      ecCurve,
-      ecCurve.fromBigInteger(bigX),
-      ecCurve.fromBigInteger(bigY),
+    ecc_fp.ECPoint(
+      params.curve as ecc_fp.ECCurve,
+      params.curve.fromBigInteger(bigX) as ecc_fp.ECFieldElement?,
+      params.curve.fromBigInteger(bigY) as ecc_fp.ECFieldElement?,
       compressed,
     ),
     params,

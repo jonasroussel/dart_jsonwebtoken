@@ -9,6 +9,9 @@ pubspec.lock
 # Conventional directory for build outputs
 build/
 
+# VSCode
+.vscode/
+
 # Directory created by dartdoc
 doc/api/
 
