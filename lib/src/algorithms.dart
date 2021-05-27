@@ -3,8 +3,8 @@ import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:pointycastle/pointycastle.dart' as pc;
-import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 
+import 'ed25519/export.dart' as ed;
 import 'errors.dart';
 import 'keys.dart';
 import 'utils.dart';
@@ -76,12 +76,12 @@ abstract class JWTAlgorithm {
   /// Create a signature of the `body` with `key`
   ///
   /// return the signature as bytes
-  Uint8List sign(Key key, Uint8List body);
+  Uint8List sign(JWTKey key, Uint8List body);
 
   /// Verify the `signature` of `body` with `key`
   ///
   /// return `true` if the signature is correct `false` otherwise
-  bool verify(Key key, Uint8List body, Uint8List signature);
+  bool verify(JWTKey key, Uint8List body, Uint8List signature);
 }
 
 class _EdDSAAlgorithm extends JWTAlgorithm {
@@ -93,7 +93,7 @@ class _EdDSAAlgorithm extends JWTAlgorithm {
   String get name => _name;
 
   @override
-  Uint8List sign(Key key, Uint8List body) {
+  Uint8List sign(JWTKey key, Uint8List body) {
     assert(key is EdDSAPrivateKey, 'key must be a EdDSAPrivateKey');
     final privateKey = key as EdDSAPrivateKey;
 
@@ -101,7 +101,7 @@ class _EdDSAAlgorithm extends JWTAlgorithm {
   }
 
   @override
-  bool verify(Key key, Uint8List body, Uint8List signature) {
+  bool verify(JWTKey key, Uint8List body, Uint8List signature) {
     assert(key is EdDSAPublicKey, 'key must be a EdDSAPublicKey');
     final publicKey = key as EdDSAPublicKey;
 
@@ -122,7 +122,7 @@ class _HMACAlgorithm extends JWTAlgorithm {
   String get name => _name;
 
   @override
-  Uint8List sign(Key key, Uint8List body) {
+  Uint8List sign(JWTKey key, Uint8List body) {
     assert(key is SecretKey, 'key must be a SecretKey');
     final secretKey = key as SecretKey;
 
@@ -132,7 +132,7 @@ class _HMACAlgorithm extends JWTAlgorithm {
   }
 
   @override
-  bool verify(Key key, Uint8List body, Uint8List signature) {
+  bool verify(JWTKey key, Uint8List body, Uint8List signature) {
     assert(key is SecretKey, 'key must be a SecretKey');
 
     final actual = sign(key, body);
@@ -169,7 +169,7 @@ class _RSAAlgorithm extends JWTAlgorithm {
   String get name => _name;
 
   @override
-  Uint8List sign(Key key, Uint8List body) {
+  Uint8List sign(JWTKey key, Uint8List body) {
     assert(key is RSAPrivateKey, 'key must be a RSAPrivateKey');
     final privateKey = key as RSAPrivateKey;
 
@@ -186,7 +186,7 @@ class _RSAAlgorithm extends JWTAlgorithm {
   }
 
   @override
-  bool verify(Key key, Uint8List body, Uint8List signature) {
+  bool verify(JWTKey key, Uint8List body, Uint8List signature) {
     assert(key is RSAPublicKey, 'key must be a RSAPublicKey');
     final publicKey = key as RSAPublicKey;
 
@@ -228,7 +228,7 @@ class _ECDSAAlgorithm extends JWTAlgorithm {
   String get name => _name;
 
   @override
-  Uint8List sign(Key key, Uint8List body) {
+  Uint8List sign(JWTKey key, Uint8List body) {
     assert(key is ECPrivateKey, 'key must be a ECPublicKey');
     final privateKey = key as ECPrivateKey;
 
@@ -250,7 +250,7 @@ class _ECDSAAlgorithm extends JWTAlgorithm {
   }
 
   @override
-  bool verify(Key key, Uint8List body, Uint8List signature) {
+  bool verify(JWTKey key, Uint8List body, Uint8List signature) {
     assert(key is ECPublicKey, 'key must be a ECPublicKey');
     final publicKey = key as ECPublicKey;
 

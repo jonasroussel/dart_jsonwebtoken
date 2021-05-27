@@ -1,20 +1,20 @@
 import 'package:pointycastle/pointycastle.dart' as pc;
-import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 
+import 'ed25519/export.dart' as ed;
 import 'errors.dart';
 import 'parser.dart';
 
-abstract class Key {}
+abstract class JWTKey {}
 
 /// For HMAC algorithms
-class SecretKey extends Key {
+class SecretKey extends JWTKey {
   String key;
 
   SecretKey(this.key);
 }
 
 /// For EdDSA algorithm, in sign method
-class EdDSAPrivateKey extends Key {
+class EdDSAPrivateKey extends JWTKey {
   late ed.PrivateKey key;
 
   EdDSAPrivateKey(List<int> bytes) {
@@ -23,7 +23,7 @@ class EdDSAPrivateKey extends Key {
 }
 
 /// For EdDSA algorithm, in verify method
-class EdDSAPublicKey extends Key {
+class EdDSAPublicKey extends JWTKey {
   late ed.PublicKey key;
 
   EdDSAPublicKey(List<int> bytes) {
@@ -32,7 +32,7 @@ class EdDSAPublicKey extends Key {
 }
 
 /// For RSA algorithm, in sign method
-class RSAPrivateKey extends Key {
+class RSAPrivateKey extends JWTKey {
   late pc.RSAPrivateKey key;
 
   RSAPrivateKey(String pem) {
@@ -43,7 +43,7 @@ class RSAPrivateKey extends Key {
 }
 
 /// For RSA algorithm, in verify method
-class RSAPublicKey extends Key {
+class RSAPublicKey extends JWTKey {
   late pc.RSAPublicKey key;
 
   RSAPublicKey(String pem) {
@@ -54,7 +54,7 @@ class RSAPublicKey extends Key {
 }
 
 /// For ECDSA algorithm, in sign method
-class ECPrivateKey extends Key {
+class ECPrivateKey extends JWTKey {
   late pc.ECPrivateKey key;
   late int size;
 
@@ -73,7 +73,7 @@ class ECPrivateKey extends Key {
 }
 
 /// For ECDSA algorithm, in verify method
-class ECPublicKey extends Key {
+class ECPublicKey extends JWTKey {
   late pc.ECPublicKey key;
 
   ECPublicKey(String pem) {

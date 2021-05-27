@@ -16,7 +16,7 @@ class JWT {
   /// - EdDSAPublicKey with EdDSA algorithm
   static JWT verify(
     String token,
-    Key key, {
+    JWTKey key, {
     bool checkHeaderType = true,
     bool checkExpiresIn = true,
     bool checkNotBefore = true,
@@ -168,7 +168,7 @@ class JWT {
   /// - ECPrivateKey with ECDSA algorithm
   /// - EdDSAPrivateKey with EdDSA algorithm
   String sign(
-    Key key, {
+    JWTKey key, {
     JWTAlgorithm algorithm = JWTAlgorithm.HS256,
     Duration? expiresIn,
     Duration? notBefore,

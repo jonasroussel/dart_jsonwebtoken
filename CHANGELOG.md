@@ -1,3 +1,8 @@
+## 2.2.0
+
+- Fixing EdDSA incompatibility's with flutter web (https://github.com/jonasroussel/jsonwebtoken/issues/11)
+- Dependencies: `ed25519_edwards` have been removed, `convert` & `collection` have been added
+
 ## 2.1.1
 
 - Fixing `_pkcs8ECPublicKey` to work with pointycastle 3.0.1
