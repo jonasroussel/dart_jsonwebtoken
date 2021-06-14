@@ -119,6 +119,7 @@ class JWT {
 
         return JWT(
           payload,
+          header: header,
           audience: payload.remove('aud'),
           issuer: payload.remove('iss'),
           subject: payload.remove('sub'),
@@ -143,6 +144,7 @@ class JWT {
     this.subject,
     this.issuer,
     this.jwtId,
+    this.header,
   });
 
   /// Custom claims
@@ -160,6 +162,9 @@ class JWT {
   /// JWT Id claim
   String? jwtId;
 
+  /// JWT header
+  Map<String, dynamic>? header;
+
   /// Sign and generate a new token.
   ///
   /// `key` must be
@@ -175,7 +180,8 @@ class JWT {
     bool noIssueAt = false,
   }) {
     try {
-      final header = {'alg': algorithm.name, 'typ': 'JWT'};
+      header ??= {};
+      header!.addAll({'alg': algorithm.name, 'typ': 'JWT'});
 
       if (payload is Map<String, dynamic> || payload is Map<dynamic, dynamic>) {
         try {

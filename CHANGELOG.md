@@ -1,6 +1,10 @@
+## 2.3.0
+
+- Adding `header` in JWT class (you can now set your custom header)
+
 ## 2.2.0
 
-- Fixing EdDSA incompatibility's with flutter web (https://github.com/jonasroussel/jsonwebtoken/issues/11)
+- Fixing EdDSA incompatibility's with flutter web (https://github.com/jonasroussel/dart_jsonwebtoken/issues/11)
 - Dependencies: `ed25519_edwards` have been removed, `convert` & `collection` have been added
 
 ## 2.1.1
@@ -9,7 +13,7 @@
 
 ## 2.1.0
 
-- When an undefined error occur `JWTUndefinedError` is thrown containing the original error in `error` property (https://github.com/jonasroussel/jsonwebtoken/issues/9)
+- When an undefined error occur `JWTUndefinedError` is thrown containing the original error in `error` property (https://github.com/jonasroussel/dart_jsonwebtoken/issues/9)
 - **BREAKING CHANGE**: `jwt.verify` no longer support `throwUndefinedErrors` parameter
 
 ## 2.0.1

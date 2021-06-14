@@ -30,7 +30,7 @@ void hs256() {
           'loc': 'euw-2',
         }
       },
-      issuer: 'https://github.com/jonasroussel/jsonwebtoken',
+      issuer: 'https://github.com/jonasroussel/dart_jsonwebtoken',
     );
 
     // Sign it
@@ -67,7 +67,7 @@ void rs256() {
           'loc': 'euw-2',
         }
       },
-      issuer: 'https://github.com/jonasroussel/jsonwebtoken',
+      issuer: 'https://github.com/jonasroussel/dart_jsonwebtoken',
     );
 
     // Sign it
@@ -110,7 +110,7 @@ void es256() {
           'loc': 'euw-2',
         }
       },
-      issuer: 'https://github.com/jonasroussel/jsonwebtoken',
+      issuer: 'https://github.com/jonasroussel/dart_jsonwebtoken',
     );
 
     // Sign it

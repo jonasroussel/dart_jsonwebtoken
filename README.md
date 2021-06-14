@@ -26,7 +26,7 @@ final jwt = JWT(
       'loc': 'euw-2',
     }
   },
-  issuer: 'https://github.com/jonasroussel/jsonwebtoken',
+  issuer: 'https://github.com/jonasroussel/dart_jsonwebtoken',
 );
 
 // Sign it (default with HS256 algorithm)
