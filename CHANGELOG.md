@@ -1,3 +1,8 @@
+## 2.3.1
+
+- Fix the `pointycastle` dependency, `v3.1.3` is incompatible with flutter web (dart2js)
+  (https://github.com/jonasroussel/dart_jsonwebtoken/issues/14)
+
 ## 2.3.0
 
 - Adding `header` in JWT class (you can now set your custom header)
