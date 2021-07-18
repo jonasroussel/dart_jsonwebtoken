@@ -1,3 +1,7 @@
+## 2.3.2
+
+- Some badges on `README.md` (Thanks to https://github.com/bruno-garcia/badges.bar)
+
 ## 2.3.1
 
 - Fix the `pointycastle` dependency, `v3.1.3` is incompatible with flutter web (dart2js)

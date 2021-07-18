@@ -1,5 +1,9 @@
 # JSON Web Token (JWT)
-[![pub package](https://img.shields.io/pub/v/dart_jsonwebtoken.svg)](https://pub.dev/packages/dart_jsonwebtoken)
+
+[![pub version](https://img.shields.io/pub/v/dart_jsonwebtoken.svg)](https://pub.dev/packages/dart_jsonwebtoken)
+[![likes](https://badges.bar/dart_jsonwebtoken/likes)](https://pub.dev/packages/dart_jsonwebtoken/score)
+[![popularity](https://badges.bar/dart_jsonwebtoken/popularity)](https://pub.dev/packages/dart_jsonwebtoken/score)
+[![pub points](https://badges.bar/dart_jsonwebtoken/pub%20points)](https://pub.dev/packages/dart_jsonwebtoken/score)
 
 A dart implementation of the famous javascript library `jsonwebtoken`.
 
@@ -10,6 +14,7 @@ https://jwt.io allows you to decode, verify and generate JWT.
 ## Usage
 
 ### Import
+
 ```dart
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 ```
@@ -52,15 +57,15 @@ try {
 
 ### Supported Algorithms
 
-JWTAlgorithm | Digital Signature or MAC Algorithm
--------------|-----------------------------------
-HS256 | HMAC using SHA-256 hash algorithm
-HS384 | HMAC using SHA-384 hash algorithm
-HS512 | HMAC using SHA-512 hash algorithm
-RS256 | RSASSA-PKCS1-v1_5 using SHA-256 hash algorithm
-RS384 | RSASSA-PKCS1-v1_5 using SHA-384 hash algorithm
-RS512 | RSASSA-PKCS1-v1_5 using SHA-512 hash algorithm
-ES256 | ECDSA using P-256 curve and SHA-256 hash algorithm
-ES384 | ECDSA using P-384 curve and SHA-384 hash algorithm
-ES512 | ECDSA using P-521 curve and SHA-512 hash algorithm
-EdDSA | EdDSA using ed25519 curve and SHA-512 hash algorithm
+| JWTAlgorithm | Digital Signature or MAC Algorithm                   |
+| ------------ | ---------------------------------------------------- |
+| HS256        | HMAC using SHA-256 hash algorithm                    |
+| HS384        | HMAC using SHA-384 hash algorithm                    |
+| HS512        | HMAC using SHA-512 hash algorithm                    |
+| RS256        | RSASSA-PKCS1-v1_5 using SHA-256 hash algorithm       |
+| RS384        | RSASSA-PKCS1-v1_5 using SHA-384 hash algorithm       |
+| RS512        | RSASSA-PKCS1-v1_5 using SHA-512 hash algorithm       |
+| ES256        | ECDSA using P-256 curve and SHA-256 hash algorithm   |
+| ES384        | ECDSA using P-384 curve and SHA-384 hash algorithm   |
+| ES512        | ECDSA using P-521 curve and SHA-512 hash algorithm   |
+| EdDSA        | EdDSA using ed25519 curve and SHA-512 hash algorithm |
