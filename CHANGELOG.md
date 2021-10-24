@@ -1,3 +1,8 @@
+## 2.4.0
+
+- **BREAKING CHANGE**: `JWT.audience` is now an instance of the `Audience` class, to handle multiple audience entries and can be used like list. You can always use a single entry by calling `Audience.one('...')` factory and the `.first` getter
+- Upgrading `pointycastle` dependency to `3.3.4`
+
 ## 2.3.2
 
 - Some badges on `README.md` (Thanks to https://github.com/bruno-garcia/badges.bar)
