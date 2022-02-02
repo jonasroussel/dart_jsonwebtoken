@@ -94,13 +94,16 @@ class JWT {
 
         // aud
         if (audience != null) {
-          if (!payload.containsKey('aud')) {
+          if (payload.containsKey('aud')) {
             if (payload['aud'] is String && payload['aud'] != audience.first) {
               throw JWTInvalidError('invalid audience');
             } else if (payload['aud'] is List &&
                 !ListEquality().equals(payload['aud'], audience)) {
               throw JWTInvalidError('invalid audience');
             }
+          }
+          else{
+            throw JWTInvalidError('invalid audience');
           }
         }
 
