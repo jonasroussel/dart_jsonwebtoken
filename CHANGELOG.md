@@ -1,3 +1,7 @@
+## 2.4.1
+
+- Fix : https://github.com/jonasroussel/dart_jsonwebtoken/issues/19
+
 ## 2.4.0
 
 - **BREAKING CHANGE**: `JWT.audience` is now an instance of the `Audience` class, to handle multiple audience entries and can be used like list. You can always use a single entry by calling `Audience.one('...')` factory and the `.first` getter
