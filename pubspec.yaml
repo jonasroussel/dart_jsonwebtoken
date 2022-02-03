@@ -7,6 +7,12 @@ homepage: https://github.com/jonasroussel/dart_jsonwebtoken#readme
 environment:
   sdk: '>=2.12.0 <3.0.0'
 
+false_secrets:
+ - /example/ec_private.pem
+ - /example/ec_public.pem
+ - /example/rsa_private.pem
+ - /example/rsa_public.pem
+
 dependencies:
   crypto: ^3.0.1
   pointycastle: ^3.5.0
