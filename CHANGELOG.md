@@ -1,3 +1,7 @@
+## 2.4.2
+
+- Formating for 'static analysis'
+
 ## 2.4.1
 
 - Fix : https://github.com/jonasroussel/dart_jsonwebtoken/issues/19

@@ -33,12 +33,12 @@ void fieldElementFullCopy(FieldElement src, FieldElement dest) {
 
 var zero = FieldElement();
 
-void FeZero(FieldElement fe) {
+void feZero(FieldElement fe) {
   fieldElementFullCopy(zero, fe);
 }
 
 void FeOne(FieldElement fe) {
-  FeZero(fe);
+  feZero(fe);
   fe[0] = 1;
 }
 
@@ -816,7 +816,7 @@ class ProjectiveGroupElement {
   FieldElement Z = FieldElement();
 
   void Zero() {
-    FeZero(X);
+    feZero(X);
     FeOne(Y);
     FeOne(Z);
   }
@@ -855,10 +855,10 @@ class ExtendedGroupElement {
   FieldElement T = FieldElement();
 
   void Zero() {
-    FeZero(X);
+    feZero(X);
     FeOne(Y);
     FeOne(Z);
-    FeZero(T);
+    feZero(T);
   }
 
   void Double(CompletedGroupElement r) {
@@ -927,7 +927,7 @@ class ExtendedGroupElement {
       if (FeIsNonZero(check) == 1) {
         return false;
       }
-      FeMul(X, X, SqrtM1);
+      FeMul(X, X, sqrtM1);
 
       FeToBytes(tmpX, X);
       for (var i = 0; i < tmp2.length; i++) {
@@ -981,7 +981,7 @@ class PreComputedGroupElement {
   void Zero() {
     FeOne(yPlusX);
     FeOne(yMinusX);
-    FeZero(xy2d);
+    feZero(xy2d);
   }
 }
 

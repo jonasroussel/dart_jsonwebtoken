@@ -27,8 +27,8 @@ var d2 = FieldElement.fromList([
   9444199,
 ]);
 
-/// SqrtM1 is the square-root of -1 in the field.
-var SqrtM1 = FieldElement.fromList([
+/// sqrtM1 is the square-root of -1 in the field.
+var sqrtM1 = FieldElement.fromList([
   -32595792,
   -7943725,
   9377950,
