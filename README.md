@@ -19,19 +19,26 @@ https://jwt.io allows you to decode, verify and generate JWT.
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 ```
 
-### Sign
+### Creating & signing a JWT
 
 ```dart
 // Create a json web token
+// Pass the payload to be sent in the form of a map
 final jwt = JWT(
+  
+  // Payload
   {
     'id': 123,
+    
     'server': {
       'id': '3e4fc296',
       'loc': 'euw-2',
     }
+    
   },
+  
   issuer: 'https://github.com/jonasroussel/dart_jsonwebtoken',
+  
 );
 
 // Sign it (default with HS256 algorithm)
@@ -40,7 +47,7 @@ token = jwt.sign(SecretKey('secret passphrase'));
 print('Signed token: $token\n');
 ```
 
-### Verify
+### Check if the JWT made is correct.
 
 ```dart
 try {
@@ -48,16 +55,21 @@ try {
   final jwt = JWT.verify(token, SecretKey('secret passphrase'));
 
   print('Payload: ${jwt.payload}');
+  
 } on JWTExpiredError {
+
   print('jwt expired');
+  
 } on JWTError catch (ex) {
+
   print(ex.message); // ex: invalid signature
+  
 }
 ```
 
 ### Supported Algorithms
 
-| JWTAlgorithm | Digital Signature or MAC Algorithm                   |
+| JWT Algorithms | Digital Signature or MAC Algorithm                   |
 | ------------ | ---------------------------------------------------- |
 | HS256        | HMAC using SHA-256 hash algorithm                    |
 | HS384        | HMAC using SHA-384 hash algorithm                    |
