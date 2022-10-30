@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:pointycastle/pointycastle.dart' as pc;
 
-import 'ed25519/export.dart' as ed;
+import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 import 'errors.dart';
 import 'keys.dart';
 import 'utils.dart';
