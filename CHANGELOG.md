@@ -1,3 +1,7 @@
+## 2.5.0
+
+- https://github.com/jonasroussel/dart_jsonwebtoken/commit/12348776259ccec70ccf62856ec0245f49ebe951
+
 ## 2.4.2
 
 - Formating for 'static analysis'
