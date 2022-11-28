@@ -1,3 +1,7 @@
+## 2.5.0+1
+
+- Fix Flutter compatibility issue: `downgrade` dependency collection to `1.16.0`
+
 ## 2.5.0
 
 - https://github.com/jonasroussel/dart_jsonwebtoken/commit/12348776259ccec70ccf62856ec0245f49ebe951
