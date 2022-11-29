@@ -101,8 +101,7 @@ class JWT {
                 !ListEquality().equals(payload['aud'], audience)) {
               throw JWTInvalidError('invalid audience');
             }
-          }
-          else{
+          } else {
             throw JWTInvalidError('invalid audience');
           }
         }
