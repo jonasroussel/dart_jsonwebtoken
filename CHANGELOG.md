@@ -1,4 +1,4 @@
-## 2.5.0+1
+## 2.5.1
 
 - Fix Flutter compatibility issue: `downgrade` dependency collection to `1.16.0`
 
