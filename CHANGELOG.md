@@ -1,3 +1,8 @@
+## 2.6.0
+
+- Adding a `JWT.decode` method to simply decode a token without checking its signature
+- The `JWT.verify` method do not remove extra token infos (`iss`, `aud`, ...) anymore
+
 ## 2.5.1
 
 - Fix Flutter compatibility issue: `downgrade` dependency collection to `1.16.0`

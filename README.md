@@ -64,6 +64,13 @@ try {
 }
 ```
 
+### You can also, decode the token without checking its signature
+```dart
+final jwt = JWT.decode(token);
+
+print('Payload: ${jwt.payload}');
+```
+
 ### Supported Algorithms
 
 | JWT Algorithms | Digital Signature or MAC Algorithm                   |

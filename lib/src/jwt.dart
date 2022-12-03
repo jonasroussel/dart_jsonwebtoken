@@ -130,13 +130,44 @@ class JWT {
         return JWT(
           payload,
           header: header,
-          audience: _parseAud(payload.remove('aud')),
-          issuer: payload.remove('iss'),
-          subject: payload.remove('sub'),
-          jwtId: payload.remove('jti'),
+          audience: _parseAud(payload['aud']),
+          issuer: payload['iss'],
+          subject: payload['sub'],
+          jwtId: payload['jti'],
         );
       } else {
         return JWT(payload);
+      }
+    } catch (ex) {
+      if (ex is Error) {
+        throw JWTUndefinedError(ex);
+      } else {
+        rethrow;
+      }
+    }
+  }
+
+  /// Decode a token without checking its signature
+  static JWT decode(String token) {
+    try {
+      final parts = token.split('.');
+      var header = jsonBase64.decode(base64Padded(parts[0]));
+
+      dynamic payload;
+
+      try {
+        payload = jsonBase64.decode(base64Padded(parts[1]));
+      } catch (ex) {
+        payload = utf8.decode(base64.decode(base64Padded(parts[1])));
+      }
+
+      if (header == null || header is! Map<String, dynamic>) {
+        return JWT(payload);
+      } else {
+        return JWT(
+          payload,
+          header: header,
+        );
       }
     } catch (ex) {
       if (ex is Error) {
