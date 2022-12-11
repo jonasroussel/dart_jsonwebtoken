@@ -139,9 +139,7 @@ class JWT {
         return JWT(payload);
       }
     } catch (ex) {
-      if (ex is JWTError) {
-        rethrow;
-      } else if (ex is Error) {
+      if (ex is Error && ex is! JWTError) {
         throw JWTUndefinedError(ex);
       } else {
         rethrow;
@@ -203,7 +201,7 @@ class JWT {
         );
       }
     } catch (ex) {
-      if (ex is Error) {
+      if (ex is Error && ex is! JWTError) {
         throw JWTUndefinedError(ex);
       } else {
         rethrow;
@@ -316,7 +314,7 @@ class JWT {
 
       return body + '.' + signature;
     } catch (ex) {
-      if (ex is Error) {
+      if (ex is Error && ex is! JWTError) {
         throw JWTUndefinedError(ex);
       } else {
         rethrow;
