@@ -139,7 +139,9 @@ class JWT {
         return JWT(payload);
       }
     } catch (ex) {
-      if (ex is Error) {
+      if (ex is JWTError) {
+        rethrow;
+      } else if (ex is Error) {
         throw JWTUndefinedError(ex);
       } else {
         rethrow;

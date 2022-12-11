@@ -1,3 +1,7 @@
+## 2.6.2
+
+- Fix rethrow of JWTError exceptions for the method `verify`. Before this change every exception thrown by `verify` always returned JWTUndefinedError
+
 ## 2.6.1
 
 - Adding a `try` version of `decode`, `verify` and `sign`, that simply returns `null` instead of throwing errors
