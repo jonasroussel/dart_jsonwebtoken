@@ -1,3 +1,7 @@
+## 2.6.1
+
+- Adding a `try` version of `decode`, `verify` and `sign`, that simply returns `null` instead of throwing errors
+
 ## 2.6.0
 
 - Adding a `JWT.decode` method to simply decode a token without checking its signature

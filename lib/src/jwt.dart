@@ -147,6 +147,37 @@ class JWT {
     }
   }
 
+  /// Exactly like `verify`, just return null instead of throwing errors.
+  static JWT? tryVerify(
+    String token,
+    JWTKey key, {
+    bool checkHeaderType = true,
+    bool checkExpiresIn = true,
+    bool checkNotBefore = true,
+    Duration? issueAt,
+    Audience? audience,
+    String? subject,
+    String? issuer,
+    String? jwtId,
+  }) {
+    try {
+      return verify(
+        token,
+        key,
+        checkHeaderType: checkHeaderType,
+        checkExpiresIn: checkExpiresIn,
+        checkNotBefore: checkNotBefore,
+        issueAt: issueAt,
+        audience: audience,
+        subject: subject,
+        issuer: issuer,
+        jwtId: jwtId,
+      );
+    } catch (ex) {
+      return null;
+    }
+  }
+
   /// Decode a token without checking its signature
   static JWT decode(String token) {
     try {
@@ -175,6 +206,15 @@ class JWT {
       } else {
         rethrow;
       }
+    }
+  }
+
+  /// Exactly like `decode`, just return `null` instead of throwing errors.
+  static JWT? tryDecode(String token) {
+    try {
+      return decode(token);
+    } catch (ex) {
+      return null;
     }
   }
 
@@ -279,6 +319,27 @@ class JWT {
       } else {
         rethrow;
       }
+    }
+  }
+
+  /// Exactly like `sign`, just return `null` instead of throwing errors.
+  String? trySign(
+    JWTKey key, {
+    JWTAlgorithm algorithm = JWTAlgorithm.HS256,
+    Duration? expiresIn,
+    Duration? notBefore,
+    bool noIssueAt = false,
+  }) {
+    try {
+      return sign(
+        key,
+        algorithm: algorithm,
+        expiresIn: expiresIn,
+        notBefore: notBefore,
+        noIssueAt: noIssueAt,
+      );
+    } catch (ex) {
+      return null;
     }
   }
 
