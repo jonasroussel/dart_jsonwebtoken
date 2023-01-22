@@ -13,24 +13,6 @@ class SecretKey extends JWTKey {
   SecretKey(this.key);
 }
 
-/// For EdDSA algorithm, in sign method
-class EdDSAPrivateKey extends JWTKey {
-  late ed.PrivateKey key;
-
-  EdDSAPrivateKey(List<int> bytes) {
-    key = ed.PrivateKey(bytes);
-  }
-}
-
-/// For EdDSA algorithm, in verify method
-class EdDSAPublicKey extends JWTKey {
-  late ed.PublicKey key;
-
-  EdDSAPublicKey(List<int> bytes) {
-    key = ed.PublicKey(bytes);
-  }
-}
-
 /// For RSA algorithm, in sign method
 class RSAPrivateKey extends JWTKey {
   late pc.RSAPrivateKey key;
@@ -40,6 +22,9 @@ class RSAPrivateKey extends JWTKey {
     if (_key == null) throw JWTParseError('RSAPrivateKey is invalid');
     key = _key;
   }
+
+  RSAPrivateKey.raw(pc.RSAPrivateKey _key) : key = _key;
+  RSAPrivateKey.clone(RSAPrivateKey _key) : key = _key.key;
 }
 
 /// For RSA algorithm, in verify method
@@ -51,6 +36,9 @@ class RSAPublicKey extends JWTKey {
     if (_key == null) throw JWTParseError('RSAPublicKey is invalid');
     key = _key;
   }
+
+  RSAPublicKey.raw(pc.RSAPublicKey _key) : key = _key;
+  RSAPublicKey.clone(RSAPublicKey _key) : key = _key.key;
 }
 
 /// For ECDSA algorithm, in sign method
@@ -70,6 +58,9 @@ class ECPrivateKey extends JWTKey {
     key = _key;
     size = (_params.curve.fieldSize / 8).round();
   }
+
+  ECPrivateKey.raw(pc.ECPrivateKey _key) : key = _key;
+  ECPrivateKey.clone(ECPrivateKey _key) : key = _key.key;
 }
 
 /// For ECDSA algorithm, in verify method
@@ -80,5 +71,26 @@ class ECPublicKey extends JWTKey {
     final _key = parseECPublicKeyPEM(pem);
     if (_key == null) throw JWTParseError('ECPublicKey is invalid');
     key = _key;
+  }
+
+  ECPublicKey.raw(pc.ECPublicKey _key) : key = _key;
+  ECPublicKey.clone(ECPublicKey _key) : key = _key.key;
+}
+
+/// For EdDSA algorithm, in sign method
+class EdDSAPrivateKey extends JWTKey {
+  late ed.PrivateKey key;
+
+  EdDSAPrivateKey(List<int> bytes) {
+    key = ed.PrivateKey(bytes);
+  }
+}
+
+/// For EdDSA algorithm, in verify method
+class EdDSAPublicKey extends JWTKey {
+  late ed.PublicKey key;
+
+  EdDSAPublicKey(List<int> bytes) {
+    key = ed.PublicKey(bytes);
   }
 }

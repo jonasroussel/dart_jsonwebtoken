@@ -1,3 +1,7 @@
+## 2.6.3
+
+- Adding a `.raw` and `.clone` constructor to `JWTKey` (execpt `SecretKey` of course)
+
 ## 2.6.2
 
 - Fix rethrow of JWTError exceptions for the method `verify`. Before this change every exception thrown by `verify` always returned JWTUndefinedError
