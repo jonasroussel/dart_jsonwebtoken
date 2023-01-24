@@ -59,8 +59,19 @@ class ECPrivateKey extends JWTKey {
     size = (_params.curve.fieldSize / 8).round();
   }
 
-  ECPrivateKey.raw(pc.ECPrivateKey _key) : key = _key;
-  ECPrivateKey.clone(ECPrivateKey _key) : key = _key.key;
+  ECPrivateKey.raw(pc.ECPrivateKey _key) {
+    final _params = _key.parameters;
+
+    if (_params == null) {
+      throw JWTParseError('ECPrivateKey parameters are invalid');
+    }
+
+    key = _key;
+    size = (_params.curve.fieldSize / 8).round();
+  }
+  ECPrivateKey.clone(ECPrivateKey _key)
+      : key = _key.key,
+        size = _key.size;
 }
 
 /// For ECDSA algorithm, in verify method
