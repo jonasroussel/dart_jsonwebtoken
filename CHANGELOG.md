@@ -1,3 +1,7 @@
+## 2.7.1
+
+- Migrating from `pedantic` to `lints`
+
 ## 2.7.0
 
 - `parsing.dart` has been replaced by more accurate CryptoUtils functions `https://github.com/Ephenodrom/Dart-Basic-Utils`

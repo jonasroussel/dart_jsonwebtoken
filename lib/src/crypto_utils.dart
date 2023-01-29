@@ -511,7 +511,7 @@ class CryptoUtils {
         .map((line) => line.trim())
         .where((line) => line.isNotEmpty)
         .toList();
-    var base64;
+    String base64;
     if (checkHeader) {
       if (lines.length < 2 ||
           !lines.first.startsWith('-----BEGIN') ||
@@ -541,7 +541,7 @@ class CryptoUtils {
   static RSAPublicKey rsaPublicKeyFromDERBytes(Uint8List bytes) {
     var asn1Parser = ASN1Parser(bytes);
     var topLevelSeq = asn1Parser.nextObject() as ASN1Sequence;
-    var publicKeySeq;
+    ASN1Sequence publicKeySeq;
     if (topLevelSeq.elements![1].runtimeType == ASN1BitString) {
       var publicKeyBitString = topLevelSeq.elements![1] as ASN1BitString;
 
@@ -696,8 +696,8 @@ class CryptoUtils {
       {bool pkcs8 = false}) {
     var asn1Parser = ASN1Parser(bytes);
     var topLevelSeq = asn1Parser.nextObject() as ASN1Sequence;
-    var curveName;
-    var x;
+    String? curveName;
+    Uint8List x;
     if (pkcs8) {
       // Parse the PKCS8 format
       var innerSeq = topLevelSeq.elements!.elementAt(1) as ASN1Sequence;
@@ -735,7 +735,7 @@ class CryptoUtils {
       x = privateKeyAsOctetString.valueBytes!;
     }
 
-    return ECPrivateKey(osp2i(x), ECDomainParameters(curveName));
+    return ECPrivateKey(osp2i(x), ECDomainParameters(curveName!));
   }
 
   ///
@@ -751,7 +751,7 @@ class CryptoUtils {
     var algorithmIdentifierSequence = topLevelSeq.elements![0] as ASN1Sequence;
     var curveNameOi = algorithmIdentifierSequence.elements!.elementAt(1)
         as ASN1ObjectIdentifier;
-    var curveName;
+    String? curveName;
     var data = ObjectIdentifiers.getIdentifierByIdentifier(
         curveNameOi.objectIdentifierAsString);
     if (data != null) {
@@ -772,7 +772,7 @@ class CryptoUtils {
     }
     var x = pubBytes.sublist(1, (pubBytes.length / 2).round());
     var y = pubBytes.sublist(1 + x.length, pubBytes.length);
-    var params = ECDomainParameters(curveName);
+    var params = ECDomainParameters(curveName!);
     var bigX = decodeBigIntWithSign(1, x);
     var bigY = decodeBigIntWithSign(1, y);
     var pubKey = ECPublicKey(
