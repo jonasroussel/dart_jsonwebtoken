@@ -2,7 +2,7 @@ import 'package:pointycastle/pointycastle.dart' as pc;
 
 import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 import 'errors.dart';
-import 'parser.dart';
+import 'crypto_utils.dart';
 
 abstract class JWTKey {}
 
@@ -18,9 +18,11 @@ class RSAPrivateKey extends JWTKey {
   late pc.RSAPrivateKey key;
 
   RSAPrivateKey(String pem) {
-    final _key = parseRSAPrivateKeyPEM(pem);
-    if (_key == null) throw JWTParseError('RSAPrivateKey is invalid');
-    key = _key;
+    if (pem.startsWith(CryptoUtils.BEGIN_RSA_PRIVATE_KEY)) {
+      key = CryptoUtils.rsaPrivateKeyFromPemPkcs1(pem);
+    } else {
+      key = CryptoUtils.rsaPrivateKeyFromPem(pem);
+    }
   }
 
   RSAPrivateKey.raw(pc.RSAPrivateKey _key) : key = _key;
@@ -32,9 +34,11 @@ class RSAPublicKey extends JWTKey {
   late pc.RSAPublicKey key;
 
   RSAPublicKey(String pem) {
-    final _key = parseRSAPublicKeyPEM(pem);
-    if (_key == null) throw JWTParseError('RSAPublicKey is invalid');
-    key = _key;
+    if (pem.startsWith(CryptoUtils.BEGIN_RSA_PUBLIC_KEY)) {
+      key = CryptoUtils.rsaPublicKeyFromPemPkcs1(pem);
+    } else {
+      key = CryptoUtils.rsaPublicKeyFromPem(pem);
+    }
   }
 
   RSAPublicKey.raw(pc.RSAPublicKey _key) : key = _key;
@@ -47,10 +51,9 @@ class ECPrivateKey extends JWTKey {
   late int size;
 
   ECPrivateKey(String pem) {
-    final _key = parseECPrivateKeyPEM(pem);
-    final _params = _key?.parameters;
+    final _key = CryptoUtils.ecPrivateKeyFromPem(pem);
+    final _params = _key.parameters;
 
-    if (_key == null) throw JWTParseError('ECPrivateKey is invalid');
     if (_params == null) {
       throw JWTParseError('ECPrivateKey parameters are invalid');
     }
@@ -79,9 +82,7 @@ class ECPublicKey extends JWTKey {
   late pc.ECPublicKey key;
 
   ECPublicKey(String pem) {
-    final _key = parseECPublicKeyPEM(pem);
-    if (_key == null) throw JWTParseError('ECPublicKey is invalid');
-    key = _key;
+    key = CryptoUtils.ecPublicKeyFromPem(pem);
   }
 
   ECPublicKey.raw(pc.ECPublicKey _key) : key = _key;

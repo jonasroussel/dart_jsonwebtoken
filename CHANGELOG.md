@@ -1,3 +1,8 @@
+## 2.7.0
+
+- `parsing.dart` has been replaced by more accurate CryptoUtils functions `https://github.com/Ephenodrom/Dart-Basic-Utils`
+- Fixing `_ECDSAAlgorithm.sign` method that did not filling the gap in the ECDSA curve signatures
+
 ## 2.6.4
 
 - Fixing `ECPrivateKey.raw` initialize `size`

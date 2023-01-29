@@ -49,4 +49,7 @@ class JWTUndefinedError extends JWTError {
 
   @override
   String toString() => 'JWTUndefinedError: $message';
+
+  @override
+  StackTrace? get stackTrace => error.stackTrace;
 }

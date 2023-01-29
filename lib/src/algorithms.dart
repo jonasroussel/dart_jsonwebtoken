@@ -241,10 +241,21 @@ class _ECDSAAlgorithm extends JWTAlgorithm {
       Uint8List.fromList(body),
     ) as pc.ECSignature;
 
+    final rBytes = bigIntToBytes(signature.r).toList();
+    while (rBytes.length < 32) {
+      rBytes.add(0);
+    }
+
+    final sBytes = bigIntToBytes(signature.s).toList();
+    while (sBytes.length < 32) {
+      sBytes.add(0);
+    }
+
     final len = privateKey.size;
     final bytes = Uint8List(len * 2);
-    bytes.setRange(0, len, bigIntToBytes(signature.r).toList().reversed);
-    bytes.setRange(len, len * 2, bigIntToBytes(signature.s).toList().reversed);
+
+    bytes.setRange(0, len, rBytes.reversed);
+    bytes.setRange(len, len * 2, sBytes.reversed);
 
     return bytes;
   }
