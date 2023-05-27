@@ -1,3 +1,8 @@
+## 2.8.0
+
+- **BREAKING CHANGE**: Renaming all JWT...Error to JWT...Exception (https://github.com/jonasroussel/dart_jsonwebtoken/pull/42)
+- Fixing assert message (https://github.com/jonasroussel/dart_jsonwebtoken/pull/42)
+
 ## 2.7.1
 
 - Migrating from `pedantic` to `lints`

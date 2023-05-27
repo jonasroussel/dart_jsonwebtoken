@@ -5,7 +5,7 @@ import 'package:crypto/crypto.dart';
 import 'package:pointycastle/pointycastle.dart' as pc;
 
 import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
-import 'errors.dart';
+import 'exceptions.dart';
 import 'keys.dart';
 import 'utils.dart';
 
@@ -64,7 +64,7 @@ abstract class JWTAlgorithm {
       case 'EdDSA':
         return JWTAlgorithm.EdDSA;
       default:
-        throw JWTInvalidError('unknown algorithm');
+        throw JWTInvalidException('unknown algorithm');
     }
   }
 

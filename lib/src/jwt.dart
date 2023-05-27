@@ -5,7 +5,7 @@ import 'dart:typed_data';
 import 'package:collection/collection.dart';
 
 import 'algorithms.dart';
-import 'errors.dart';
+import 'exceptions.dart';
 import 'keys.dart';
 import 'utils.dart';
 
@@ -34,11 +34,11 @@ class JWT {
       final header = jsonBase64.decode(base64Padded(parts[0]));
 
       if (header == null || header is! Map<String, dynamic>) {
-        throw JWTInvalidError('invalid header');
+        throw JWTInvalidException('invalid header');
       }
 
       if (checkHeaderType && header['typ'] != 'JWT') {
-        throw JWTInvalidError('not a jwt');
+        throw JWTInvalidException('not a jwt');
       }
 
       final algorithm = JWTAlgorithm.fromName(header['alg']);
@@ -47,7 +47,7 @@ class JWT {
       final signature = base64Url.decode(base64Padded(parts[2]));
 
       if (!algorithm.verify(key, Uint8List.fromList(body), signature)) {
-        throw JWTInvalidError('invalid signature');
+        throw JWTInvalidException('invalid signature');
       }
 
       dynamic payload;
@@ -65,7 +65,7 @@ class JWT {
             payload['exp'] * 1000,
           );
           if (exp.isBefore(DateTime.now())) {
-            throw JWTExpiredError();
+            throw JWTExpiredException();
           }
         }
 
@@ -75,20 +75,20 @@ class JWT {
             payload['nbf'] * 1000,
           );
           if (nbf.isAfter(DateTime.now())) {
-            throw JWTNotActiveError();
+            throw JWTNotActiveException();
           }
         }
 
         // iat
         if (issueAt != null) {
           if (!payload.containsKey('iat')) {
-            throw JWTInvalidError('invalid issue at');
+            throw JWTInvalidException('invalid issue at');
           }
           final iat = DateTime.fromMillisecondsSinceEpoch(
             payload['iat'] * 1000,
           );
           if (!iat.isAtSameMomentAs(DateTime.now())) {
-            throw JWTInvalidError('invalid issue at');
+            throw JWTInvalidException('invalid issue at');
           }
         }
 
@@ -96,34 +96,34 @@ class JWT {
         if (audience != null) {
           if (payload.containsKey('aud')) {
             if (payload['aud'] is String && payload['aud'] != audience.first) {
-              throw JWTInvalidError('invalid audience');
+              throw JWTInvalidException('invalid audience');
             } else if (payload['aud'] is List &&
                 !ListEquality().equals(payload['aud'], audience)) {
-              throw JWTInvalidError('invalid audience');
+              throw JWTInvalidException('invalid audience');
             }
           } else {
-            throw JWTInvalidError('invalid audience');
+            throw JWTInvalidException('invalid audience');
           }
         }
 
         // sub
         if (subject != null) {
           if (!payload.containsKey('sub') || payload['sub'] != subject) {
-            throw JWTInvalidError('invalid subject');
+            throw JWTInvalidException('invalid subject');
           }
         }
 
         // iss
         if (issuer != null) {
           if (!payload.containsKey('iss') || payload['iss'] != issuer) {
-            throw JWTInvalidError('invalid issuer');
+            throw JWTInvalidException('invalid issuer');
           }
         }
 
         // jti
         if (jwtId != null) {
           if (!payload.containsKey('jti') || payload['jti'] != jwtId) {
-            throw JWTInvalidError('invalid jwt id');
+            throw JWTInvalidException('invalid jwt id');
           }
         }
 
@@ -138,16 +138,16 @@ class JWT {
       } else {
         return JWT(payload);
       }
-    } catch (ex) {
-      if (ex is Error && ex is! JWTError) {
-        throw JWTUndefinedError(ex);
+    } catch (ex, stackTrace) {
+      if (ex is Exception && ex is! JWTException) {
+        throw JWTUndefinedException(ex, stackTrace);
       } else {
         rethrow;
       }
     }
   }
 
-  /// Exactly like `verify`, just return null instead of throwing errors.
+  /// Exactly like `verify`, just return null instead of throwing exceptions.
   static JWT? tryVerify(
     String token,
     JWTKey key, {
@@ -200,16 +200,16 @@ class JWT {
           header: header,
         );
       }
-    } catch (ex) {
-      if (ex is Error && ex is! JWTError) {
-        throw JWTUndefinedError(ex);
+    } catch (ex, stackTrace) {
+      if (ex is Exception && ex is! JWTException) {
+        throw JWTUndefinedException(ex, stackTrace);
       } else {
         rethrow;
       }
     }
   }
 
-  /// Exactly like `decode`, just return `null` instead of throwing errors.
+  /// Exactly like `decode`, just return `null` instead of throwing exceptions.
   static JWT? tryDecode(String token) {
     try {
       return decode(token);
@@ -297,7 +297,7 @@ class JWT {
               : jsonBase64.encode(payload),
         );
       } catch (ex) {
-        throw JWTError(
+        throw JWTException(
           'invalid payload json format (Map keys must be String type)',
         );
       }
@@ -313,16 +313,16 @@ class JWT {
       );
 
       return body + '.' + signature;
-    } catch (ex) {
-      if (ex is Error && ex is! JWTError) {
-        throw JWTUndefinedError(ex);
+    } catch (ex, stackTrace) {
+      if (ex is Exception && ex is! JWTException) {
+        throw JWTUndefinedException(ex, stackTrace);
       } else {
         rethrow;
       }
     }
   }
 
-  /// Exactly like `sign`, just return `null` instead of throwing errors.
+  /// Exactly like `sign`, just return `null` instead of throwing exceptions.
   String? trySign(
     JWTKey key, {
     JWTAlgorithm algorithm = JWTAlgorithm.HS256,

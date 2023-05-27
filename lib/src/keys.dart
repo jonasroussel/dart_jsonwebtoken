@@ -1,7 +1,7 @@
 import 'package:pointycastle/pointycastle.dart' as pc;
 
 import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
-import 'errors.dart';
+import 'exceptions.dart';
 import 'crypto_utils.dart';
 
 abstract class JWTKey {}
@@ -55,7 +55,7 @@ class ECPrivateKey extends JWTKey {
     final _params = _key.parameters;
 
     if (_params == null) {
-      throw JWTParseError('ECPrivateKey parameters are invalid');
+      throw JWTParseException('ECPrivateKey parameters are invalid');
     }
 
     key = _key;
@@ -66,7 +66,7 @@ class ECPrivateKey extends JWTKey {
     final _params = _key.parameters;
 
     if (_params == null) {
-      throw JWTParseError('ECPrivateKey parameters are invalid');
+      throw JWTParseException('ECPrivateKey parameters are invalid');
     }
 
     key = _key;

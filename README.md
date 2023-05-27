@@ -52,15 +52,10 @@ try {
   final jwt = JWT.verify(token, SecretKey('secret passphrase'));
 
   print('Payload: ${jwt.payload}');
-
-} on JWTExpiredError {
-
+} on JWTExpiredException {
   print('jwt expired');
-
-} on JWTError catch (ex) {
-
+} on JWTException catch (ex) {
   print(ex.message); // ex: invalid signature
-
 }
 ```
 
