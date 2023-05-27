@@ -229,7 +229,7 @@ class _ECDSAAlgorithm extends JWTAlgorithm {
 
   @override
   Uint8List sign(JWTKey key, Uint8List body) {
-    assert(key is ECPrivateKey, 'key must be a ECPublicKey');
+    assert(key is ECPrivateKey, 'key must be a ECPrivateKey');
     final privateKey = key as ECPrivateKey;
 
     final signer = pc.Signer('${_getHash(name)}/DET-ECDSA');
