@@ -14,10 +14,10 @@ false_secrets:
   - /example/rsa_public.pem
 
 dependencies:
-  crypto: ^3.0.2
-  pointycastle: ^3.6.2
+  crypto: ^3.0.3
+  pointycastle: ^3.7.3
   convert: ^3.1.1
-  collection: ^1.16.0
+  collection: ^1.17.2
   ed25519_edwards: ^0.3.1
 
 dev_dependencies:

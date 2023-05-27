@@ -1,6 +1,11 @@
+## 2.8.1
+
+- Updating dependencies
+- Fixing `CHANGELOG.md`
+
 ## 2.8.0
 
-- **BREAKING CHANGE**: Renaming all JWT...Error to JWT...Exception (https://github.com/jonasroussel/dart_jsonwebtoken/pull/42)
+- **BREAKING CHANGE**: Replacing all JWTError by JWTException that is more accurate (https://github.com/jonasroussel/dart_jsonwebtoken/issues/39)
 - Fixing assert message (https://github.com/jonasroussel/dart_jsonwebtoken/pull/42)
 
 ## 2.7.1
