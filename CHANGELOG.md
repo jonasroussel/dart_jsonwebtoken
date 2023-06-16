@@ -1,3 +1,7 @@
+## 2.8.2
+
+- Downgraing `collection` to 1.7.1 to be compatible with flutter_test
+
 ## 2.8.1
 
 - Updating dependencies
