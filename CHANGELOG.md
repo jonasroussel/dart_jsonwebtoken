@@ -1,3 +1,8 @@
+## 2.9.0
+
+- Adding `basic_utils` package to handle PEM & key parsing
+- A lot of new class factory to create `Keys` (e.g. `RSAPublicKey.cert` and `.bytes`)
+
 ## 2.8.2
 
 - Downgraing `collection` to 1.7.1 to be compatible with flutter_test
