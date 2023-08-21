@@ -1,3 +1,7 @@
+## 2.9.1
+
+- Adding a new class factory `ECPublicKey.cert`
+
 ## 2.9.0
 
 - Adding `basic_utils` package to handle PEM & key parsing

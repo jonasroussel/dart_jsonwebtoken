@@ -116,6 +116,15 @@ class ECPublicKey extends JWTKey {
   ECPublicKey.clone(ECPublicKey _key) : key = _key.key;
   ECPublicKey.bytes(Uint8List bytes)
       : key = CryptoUtils.ecPublicKeyFromDerBytes(bytes);
+  ECPublicKey.cert(String pem) {
+    final x509 = X509Utils.x509CertificateFromPem(pem);
+    final bytes = x509.tbsCertificate?.subjectPublicKeyInfo.bytes;
+    if (bytes == null) {
+      throw JWTParseException('x509 Certificate parsing failed');
+    }
+
+    key = CryptoUtils.ecPublicKeyFromDerBytes(hexToUint8List(bytes));
+  }
 }
 
 /// For EdDSA algorithm, in sign method
