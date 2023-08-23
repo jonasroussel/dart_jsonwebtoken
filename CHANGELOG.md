@@ -1,3 +1,10 @@
+## 2.10.0
+
+- New ECDSA algorithm (ES256K)
+- New RSA algorithm with PSS padding (PS256, PS384, PS512)
+- README.md improved
+- example/example.dart improved
+
 ## 2.9.1
 
 - Adding a new class factory `ECPublicKey.cert`
@@ -127,7 +134,7 @@
 
 ## 1.6.0
 
-- New ECDSA Algorithm (EC256, EC384, EC512)
+- New ECDSA Algorithm (ES256, ES384, ES512)
 - ECPrivateKey and ECPublicKey, two new keys for ECDSA algorithm
 - PrivateKey is renamed in RSAPrivateKey
 - PublicKey is renamed in RSAPublicKey

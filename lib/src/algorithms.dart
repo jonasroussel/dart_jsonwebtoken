@@ -1,10 +1,11 @@
 import 'dart:convert';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
+import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 import 'package:pointycastle/pointycastle.dart' as pc;
 
-import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 import 'exceptions.dart';
 import 'keys.dart';
 import 'utils.dart';
@@ -18,6 +19,15 @@ abstract class JWTAlgorithm {
 
   /// HMAC using SHA-512 hash algorithm
   static const HS512 = _HMACAlgorithm('HS512');
+
+  /// RSASSA-PSS using SHA-256 hash algorithm
+  static const PS256 = _RSAAlgorithm('PS256');
+
+  /// RSASSA-PSS using SHA-384 hash algorithm
+  static const PS384 = _RSAAlgorithm('PS384');
+
+  /// RSASSA-PSS using SHA-512 hash algorithm
+  static const PS512 = _RSAAlgorithm('PS512');
 
   /// RSASSA-PKCS1-v1_5 using SHA-256 hash algorithm
   static const RS256 = _RSAAlgorithm('RS256');
@@ -36,6 +46,9 @@ abstract class JWTAlgorithm {
 
   /// ECDSA using P-512 curve and SHA-512 hash algorithm
   static const ES512 = _ECDSAAlgorithm('ES512');
+
+  /// ECDSA using secp256k1 curve and SHA-256 hash algorithm
+  static const ES256K = _ECDSAAlgorithm('ES256K');
 
   /// EdDSA using Ed25519 curve algorithm
   static const EdDSA = _EdDSAAlgorithm('EdDSA');
@@ -61,8 +74,16 @@ abstract class JWTAlgorithm {
         return JWTAlgorithm.ES384;
       case 'ES512':
         return JWTAlgorithm.ES512;
+      case 'ES256K':
+        return JWTAlgorithm.ES256K;
       case 'EdDSA':
         return JWTAlgorithm.EdDSA;
+      case 'PS256':
+        return JWTAlgorithm.PS256;
+      case 'PS384':
+        return JWTAlgorithm.PS384;
+      case 'PS512':
+        return JWTAlgorithm.PS512;
       default:
         throw JWTInvalidException('unknown algorithm');
     }
@@ -173,16 +194,33 @@ class _RSAAlgorithm extends JWTAlgorithm {
     assert(key is RSAPrivateKey, 'key must be a RSAPrivateKey');
     final privateKey = key as RSAPrivateKey;
 
-    final signer = pc.Signer('${_getHash(name)}/RSA');
-    final params = pc.PrivateKeyParameter<pc.RSAPrivateKey>(privateKey.key);
+    final algorithm = _getAlgorithm(name);
+
+    final signer = pc.Signer('${_getHash(name)}/${algorithm}');
+    pc.CipherParameters params = pc.PrivateKeyParameter<pc.RSAPrivateKey>(
+      privateKey.key,
+    );
+
+    if (algorithm == 'PSS') {
+      final random = Random.secure();
+      final salt =
+          Uint8List.fromList(List.generate(32, (_) => random.nextInt(256)));
+
+      params = pc.ParametersWithSalt(
+        params,
+        salt,
+      );
+    }
 
     signer.init(true, params);
 
-    final signature = signer.generateSignature(
-      Uint8List.fromList(body),
-    ) as pc.RSASignature;
+    final signature = signer.generateSignature(Uint8List.fromList(body));
 
-    return signature.bytes;
+    if (signature is pc.PSSSignature) {
+      return signature.bytes;
+    } else {
+      return (signature as pc.RSASignature).bytes;
+    }
   }
 
   @override
@@ -191,13 +229,32 @@ class _RSAAlgorithm extends JWTAlgorithm {
     final publicKey = key as RSAPublicKey;
 
     try {
-      final signer = pc.Signer('${_getHash(name)}/RSA');
-      final params = pc.PublicKeyParameter<pc.RSAPublicKey>(publicKey.key);
+      final algorithm = _getAlgorithm(name);
+
+      final signer = pc.Signer('${_getHash(name)}/${algorithm}');
+      pc.CipherParameters params = pc.PublicKeyParameter<pc.RSAPublicKey>(
+        publicKey.key,
+      );
+
+      if (algorithm == 'PSS') {
+        final secureRandom = pc.SecureRandom('Fortuna');
+        final random = Random.secure();
+        final seed = List.generate(32, (_) => random.nextInt(256));
+        secureRandom.seed(pc.KeyParameter(Uint8List.fromList(seed)));
+
+        params = pc.ParametersWithSaltConfiguration(
+          params,
+          secureRandom,
+          32,
+        );
+      }
 
       signer.init(false, params);
 
       final msg = Uint8List.fromList(body);
-      final sign = pc.RSASignature(Uint8List.fromList(signature));
+      final sign = algorithm == 'PSS'
+          ? pc.PSSSignature(Uint8List.fromList(signature))
+          : pc.RSASignature(Uint8List.fromList(signature));
 
       return signer.verifySignature(msg, sign);
     } catch (ex) {
@@ -208,13 +265,31 @@ class _RSAAlgorithm extends JWTAlgorithm {
   String _getHash(String name) {
     switch (name) {
       case 'RS256':
+      case 'PS256':
         return 'SHA-256';
       case 'RS384':
+      case 'PS384':
         return 'SHA-384';
       case 'RS512':
+      case 'PS512':
         return 'SHA-512';
       default:
         throw ArgumentError.value(name, 'name', 'unknown hash name');
+    }
+  }
+
+  String _getAlgorithm(String name) {
+    switch (name) {
+      case 'RS256':
+      case 'RS384':
+      case 'RS512':
+        return 'RSA';
+      case 'PS256':
+      case 'PS384':
+      case 'PS512':
+        return 'PSS';
+      default:
+        throw ArgumentError.value(name, 'name', 'unknown algorithm name');
     }
   }
 }
@@ -282,6 +357,7 @@ class _ECDSAAlgorithm extends JWTAlgorithm {
   String _getHash(String name) {
     switch (name) {
       case 'ES256':
+      case 'ES256K':
         return 'SHA-256';
       case 'ES384':
         return 'SHA-384';
