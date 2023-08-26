@@ -7,7 +7,7 @@ import 'package:collection/collection.dart';
 import 'algorithms.dart';
 import 'exceptions.dart';
 import 'keys.dart';
-import 'utils.dart';
+import 'helpers.dart';
 
 class JWT {
   /// Verify a token.

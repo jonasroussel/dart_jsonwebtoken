@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'dart:typed_data';
 
 final jsonBase64 = json.fuse(utf8.fuse(base64Url));
@@ -90,18 +89,11 @@ BigInt bigIntFromBytes(Uint8List bytes) {
   return bytes.fold(BigInt.zero, (a, b) => a * _b256 + BigInt.from(b));
 }
 
-Uint8List hexToUint8List(String hex) {
-  if (hex.length % 2 != 0) {
-    throw 'Odd number of hex digits';
+List<String> chunkString(String s, int chunkSize) {
+  var chunked = <String>[];
+  for (var i = 0; i < s.length; i += chunkSize) {
+    var end = (i + chunkSize < s.length) ? i + chunkSize : s.length;
+    chunked.add(s.substring(i, end));
   }
-  var l = hex.length ~/ 2;
-  var result = Uint8List(l);
-  for (var i = 0; i < l; ++i) {
-    var x = int.parse(hex.substring(2 * i, 2 * (i + 1)), radix: 16);
-    if (x.isNaN) {
-      throw 'Expected hex string';
-    }
-    result[i] = x;
-  }
-  return result;
+  return chunked;
 }

@@ -1,11 +1,10 @@
 import 'dart:typed_data';
 
-import 'package:basic_utils/basic_utils.dart';
-import 'package:dart_jsonwebtoken/src/utils.dart';
 import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 import 'package:pointycastle/pointycastle.dart' as pc;
 
 import 'exceptions.dart';
+import 'key_parser.dart';
 
 abstract class JWTKey {}
 
@@ -21,17 +20,15 @@ class RSAPrivateKey extends JWTKey {
   late pc.RSAPrivateKey key;
 
   RSAPrivateKey(String pem) {
-    if (pem.startsWith(CryptoUtils.BEGIN_RSA_PRIVATE_KEY)) {
-      key = CryptoUtils.rsaPrivateKeyFromPemPkcs1(pem);
-    } else {
-      key = CryptoUtils.rsaPrivateKeyFromPem(pem);
-    }
+    key = KeyParser.rsaPrivateKeyFromPEM(
+      pem,
+      pkcs1: pem.startsWith(KeyParser.BEGIN_RSA_PRIVATE_KEY),
+    );
   }
 
   RSAPrivateKey.raw(pc.RSAPrivateKey _key) : key = _key;
   RSAPrivateKey.clone(RSAPrivateKey _key) : key = _key.key;
-  RSAPrivateKey.bytes(Uint8List bytes)
-      : key = CryptoUtils.rsaPrivateKeyFromDERBytes(bytes);
+  RSAPrivateKey.bytes(Uint8List bytes) : key = KeyParser.rsaPrivateKey(bytes);
 }
 
 /// For RSA algorithm, in verify method
@@ -39,34 +36,25 @@ class RSAPublicKey extends JWTKey {
   late pc.RSAPublicKey key;
 
   RSAPublicKey(String pem) {
-    if (pem.startsWith(CryptoUtils.BEGIN_RSA_PUBLIC_KEY)) {
-      key = CryptoUtils.rsaPublicKeyFromPemPkcs1(pem);
-    } else {
-      key = CryptoUtils.rsaPublicKeyFromPem(pem);
-    }
+    key = KeyParser.rsaPublicKeyFromPEM(
+      pem,
+      pkcs1: pem.startsWith(KeyParser.BEGIN_RSA_PUBLIC_KEY),
+    );
   }
 
   RSAPublicKey.raw(pc.RSAPublicKey _key) : key = _key;
   RSAPublicKey.clone(RSAPublicKey _key) : key = _key.key;
   RSAPublicKey.bytes(Uint8List bytes) {
     try {
-      key = CryptoUtils.rsaPublicKeyFromDERBytesPkcs1(bytes);
+      key = KeyParser.rsaPublicKey(bytes);
     } catch (_) {
-      key = CryptoUtils.rsaPublicKeyFromDERBytes(bytes);
+      key = KeyParser.rsaPublicKeyPKCS1(bytes);
     }
   }
   RSAPublicKey.cert(String pem) {
-    final x509 = X509Utils.x509CertificateFromPem(pem);
-    final bytes = x509.tbsCertificate?.subjectPublicKeyInfo.bytes;
-    if (bytes == null) {
-      throw JWTParseException('x509 Certificate parsing failed');
-    }
+    final bytes = KeyParser.publicKeyBytesFromCertificate(pem);
 
-    try {
-      key = CryptoUtils.rsaPublicKeyFromDERBytesPkcs1(hexToUint8List(bytes));
-    } catch (_) {
-      key = CryptoUtils.rsaPublicKeyFromDERBytes(hexToUint8List(bytes));
-    }
+    key = RSAPublicKey.bytes(bytes).key;
   }
 }
 
@@ -76,7 +64,10 @@ class ECPrivateKey extends JWTKey {
   late int size;
 
   ECPrivateKey(String pem) {
-    final _key = CryptoUtils.ecPrivateKeyFromPem(pem);
+    final _key = KeyParser.ecPrivateKeyFromPEM(
+      pem,
+      pkcs1: pem.startsWith(KeyParser.BEGIN_EC_PRIVATE_KEY),
+    );
     final _params = _key.parameters;
 
     if (_params == null) {
@@ -100,8 +91,7 @@ class ECPrivateKey extends JWTKey {
   ECPrivateKey.clone(ECPrivateKey _key)
       : key = _key.key,
         size = _key.size;
-  ECPrivateKey.bytes(Uint8List bytes)
-      : key = CryptoUtils.ecPrivateKeyFromDerBytes(bytes);
+  ECPrivateKey.bytes(Uint8List bytes) : key = KeyParser.ecPrivateKey(bytes);
 }
 
 /// For ECDSA algorithm, in verify method
@@ -109,21 +99,16 @@ class ECPublicKey extends JWTKey {
   late pc.ECPublicKey key;
 
   ECPublicKey(String pem) {
-    key = CryptoUtils.ecPublicKeyFromPem(pem);
+    key = KeyParser.ecPublicKeyFromPEM(pem);
   }
 
   ECPublicKey.raw(pc.ECPublicKey _key) : key = _key;
   ECPublicKey.clone(ECPublicKey _key) : key = _key.key;
-  ECPublicKey.bytes(Uint8List bytes)
-      : key = CryptoUtils.ecPublicKeyFromDerBytes(bytes);
+  ECPublicKey.bytes(Uint8List bytes) : key = KeyParser.ecPublicKey(bytes);
   ECPublicKey.cert(String pem) {
-    final x509 = X509Utils.x509CertificateFromPem(pem);
-    final bytes = x509.tbsCertificate?.subjectPublicKeyInfo.bytes;
-    if (bytes == null) {
-      throw JWTParseException('x509 Certificate parsing failed');
-    }
+    final bytes = KeyParser.publicKeyBytesFromCertificate(pem);
 
-    key = CryptoUtils.ecPublicKeyFromDerBytes(hexToUint8List(bytes));
+    key = ECPublicKey.bytes(bytes).key;
   }
 }
 

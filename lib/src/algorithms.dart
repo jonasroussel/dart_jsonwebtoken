@@ -8,7 +8,7 @@ import 'package:pointycastle/pointycastle.dart' as pc;
 
 import 'exceptions.dart';
 import 'keys.dart';
-import 'utils.dart';
+import 'helpers.dart';
 
 abstract class JWTAlgorithm {
   /// HMAC using SHA-256 hash algorithm

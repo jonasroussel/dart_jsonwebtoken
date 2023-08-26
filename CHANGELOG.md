@@ -1,3 +1,9 @@
+## 2.11.0
+
+- Removing `basic_utils` package that was incompatible with flutter web
+- Moving utils to `helpers.dart` and key parsing functions into `key_parser.dart`
+- Adding some new examples in `example/example.dart`
+
 ## 2.10.0
 
 - New ECDSA algorithm (ES256K)
