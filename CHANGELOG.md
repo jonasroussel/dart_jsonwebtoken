@@ -1,3 +1,9 @@
+## 2.12.0
+
+- **NEW:** tests have been added
+- **NEW:** publish & test CI
+- Making all `JWTAlgorithm` classes public (mainly to be mocked in tests)
+
 ## 2.11.0
 
 - Removing `basic_utils` package that was incompatible with flutter web
