@@ -12,46 +12,46 @@ import 'helpers.dart';
 
 abstract class JWTAlgorithm {
   /// HMAC using SHA-256 hash algorithm
-  static const HS256 = _HMACAlgorithm('HS256');
+  static const HS256 = HMACAlgorithm('HS256');
 
   /// HMAC using SHA-384 hash algorithm
-  static const HS384 = _HMACAlgorithm('HS384');
+  static const HS384 = HMACAlgorithm('HS384');
 
   /// HMAC using SHA-512 hash algorithm
-  static const HS512 = _HMACAlgorithm('HS512');
+  static const HS512 = HMACAlgorithm('HS512');
 
   /// RSASSA-PSS using SHA-256 hash algorithm
-  static const PS256 = _RSAAlgorithm('PS256');
+  static const PS256 = RSAAlgorithm('PS256', null);
 
   /// RSASSA-PSS using SHA-384 hash algorithm
-  static const PS384 = _RSAAlgorithm('PS384');
+  static const PS384 = RSAAlgorithm('PS384', null);
 
   /// RSASSA-PSS using SHA-512 hash algorithm
-  static const PS512 = _RSAAlgorithm('PS512');
+  static const PS512 = RSAAlgorithm('PS512', null);
 
   /// RSASSA-PKCS1-v1_5 using SHA-256 hash algorithm
-  static const RS256 = _RSAAlgorithm('RS256');
+  static const RS256 = RSAAlgorithm('RS256', null);
 
   /// RSASSA-PKCS1-v1_5 using SHA-384 hash algorithm
-  static const RS384 = _RSAAlgorithm('RS384');
+  static const RS384 = RSAAlgorithm('RS384', null);
 
   /// RSASSA-PKCS1-v1_5 using SHA-512 hash algorithm
-  static const RS512 = _RSAAlgorithm('RS512');
+  static const RS512 = RSAAlgorithm('RS512', null);
 
   /// ECDSA using P-256 curve and SHA-256 hash algorithm
-  static const ES256 = _ECDSAAlgorithm('ES256');
+  static const ES256 = ECDSAAlgorithm('ES256');
 
   /// ECDSA using P-384 curve and SHA-384 hash algorithm
-  static const ES384 = _ECDSAAlgorithm('ES384');
+  static const ES384 = ECDSAAlgorithm('ES384');
 
   /// ECDSA using P-512 curve and SHA-512 hash algorithm
-  static const ES512 = _ECDSAAlgorithm('ES512');
+  static const ES512 = ECDSAAlgorithm('ES512');
 
   /// ECDSA using secp256k1 curve and SHA-256 hash algorithm
-  static const ES256K = _ECDSAAlgorithm('ES256K');
+  static const ES256K = ECDSAAlgorithm('ES256K');
 
   /// EdDSA using Ed25519 curve algorithm
-  static const EdDSA = _EdDSAAlgorithm('EdDSA');
+  static const EdDSA = EdDSAAlgorithm('EdDSA');
 
   /// Return the `JWTAlgorithm` from his string name
   static JWTAlgorithm fromName(String name) {
@@ -105,10 +105,10 @@ abstract class JWTAlgorithm {
   bool verify(JWTKey key, Uint8List body, Uint8List signature);
 }
 
-class _EdDSAAlgorithm extends JWTAlgorithm {
+class EdDSAAlgorithm extends JWTAlgorithm {
   final String _name;
 
-  const _EdDSAAlgorithm(this._name);
+  const EdDSAAlgorithm(this._name);
 
   @override
   String get name => _name;
@@ -134,10 +134,10 @@ class _EdDSAAlgorithm extends JWTAlgorithm {
   }
 }
 
-class _HMACAlgorithm extends JWTAlgorithm {
+class HMACAlgorithm extends JWTAlgorithm {
   final String _name;
 
-  const _HMACAlgorithm(this._name);
+  const HMACAlgorithm(this._name);
 
   @override
   String get name => _name;
@@ -181,10 +181,11 @@ class _HMACAlgorithm extends JWTAlgorithm {
   }
 }
 
-class _RSAAlgorithm extends JWTAlgorithm {
+class RSAAlgorithm extends JWTAlgorithm {
   final String _name;
+  final Random? _random;
 
-  const _RSAAlgorithm(this._name);
+  const RSAAlgorithm(this._name, this._random);
 
   @override
   String get name => _name;
@@ -202,9 +203,10 @@ class _RSAAlgorithm extends JWTAlgorithm {
     );
 
     if (algorithm == 'PSS') {
-      final random = Random.secure();
-      final salt =
-          Uint8List.fromList(List.generate(32, (_) => random.nextInt(256)));
+      final random = _random ?? Random.secure();
+      final salt = Uint8List.fromList(
+        List.generate(32, (_) => random.nextInt(256)),
+      );
 
       params = pc.ParametersWithSalt(
         params,
@@ -294,10 +296,10 @@ class _RSAAlgorithm extends JWTAlgorithm {
   }
 }
 
-class _ECDSAAlgorithm extends JWTAlgorithm {
+class ECDSAAlgorithm extends JWTAlgorithm {
   final String _name;
 
-  const _ECDSAAlgorithm(this._name);
+  const ECDSAAlgorithm(this._name);
 
   @override
   String get name => _name;

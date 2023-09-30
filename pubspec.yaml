@@ -9,6 +9,7 @@ environment:
 
 false_secrets:
   - /example/*.pem
+  - /test/*
 
 dependencies:
   crypto: ^3.0.3
@@ -19,3 +20,4 @@ dependencies:
 
 dev_dependencies:
   lints: ^2.1.1
+  test: ^1.24.6
