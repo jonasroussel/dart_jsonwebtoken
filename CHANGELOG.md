@@ -1,3 +1,7 @@
+## 2.12.1
+
+- Fixing issue with custom headers (https://github.com/jonasroussel/dart_jsonwebtoken/issues/48)
+
 ## 2.12.0
 
 - **NEW:** tests have been added

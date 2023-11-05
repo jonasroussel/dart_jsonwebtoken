@@ -261,9 +261,6 @@ class JWT {
     bool noIssueAt = false,
   }) {
     try {
-      header ??= {};
-      header!.addAll({'alg': algorithm.name, 'typ': 'JWT'});
-
       if (payload is Map<String, dynamic> || payload is Map<dynamic, dynamic>) {
         try {
           payload = Map<String, dynamic>.from(payload);
@@ -287,7 +284,11 @@ class JWT {
         }
       }
 
-      final b64Header = base64Unpadded(jsonBase64.encode(header));
+      final tokenHeader = Map.from(header ?? {});
+      tokenHeader.putIfAbsent('alg', () => algorithm.name);
+      tokenHeader.putIfAbsent('typ', () => 'JWT');
+
+      final b64Header = base64Unpadded(jsonBase64.encode(tokenHeader));
 
       String b64Payload;
       try {
