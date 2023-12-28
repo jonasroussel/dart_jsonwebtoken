@@ -2,12 +2,13 @@ import 'dart:collection';
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:clock/clock.dart';
 import 'package:collection/collection.dart';
 
 import 'algorithms.dart';
 import 'exceptions.dart';
-import 'keys.dart';
 import 'helpers.dart';
+import 'keys.dart';
 
 class JWT {
   /// Verify a token.
@@ -64,7 +65,7 @@ class JWT {
           final exp = DateTime.fromMillisecondsSinceEpoch(
             payload['exp'] * 1000,
           );
-          if (exp.isBefore(DateTime.now())) {
+          if (exp.isBefore(clock.now())) {
             throw JWTExpiredException();
           }
         }
@@ -74,7 +75,7 @@ class JWT {
           final nbf = DateTime.fromMillisecondsSinceEpoch(
             payload['nbf'] * 1000,
           );
-          if (nbf.isAfter(DateTime.now())) {
+          if (nbf.isAfter(clock.now())) {
             throw JWTNotActiveException();
           }
         }
@@ -87,7 +88,7 @@ class JWT {
           final iat = DateTime.fromMillisecondsSinceEpoch(
             payload['iat'] * 1000,
           );
-          if (!iat.isAtSameMomentAs(DateTime.now())) {
+          if (!iat.isAtSameMomentAs(clock.now())) {
             throw JWTInvalidException('invalid issue at');
           }
         }
@@ -265,12 +266,12 @@ class JWT {
         try {
           payload = Map<String, dynamic>.from(payload);
 
-          if (!noIssueAt) payload['iat'] = secondsSinceEpoch(DateTime.now());
+          if (!noIssueAt) payload['iat'] = secondsSinceEpoch(clock.now());
           if (expiresIn != null) {
-            payload['exp'] = secondsSinceEpoch(DateTime.now().add(expiresIn));
+            payload['exp'] = secondsSinceEpoch(clock.now().add(expiresIn));
           }
           if (notBefore != null) {
-            payload['nbf'] = secondsSinceEpoch(DateTime.now().add(notBefore));
+            payload['nbf'] = secondsSinceEpoch(clock.now().add(notBefore));
           }
           if (audience != null) payload['aud'] = audience!.toJson();
           if (subject != null) payload['sub'] = subject;
