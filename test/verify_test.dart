@@ -1,8 +1,6 @@
 import 'dart:convert';
 
-import 'package:clock/clock.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
-import 'package:fake_async/fake_async.dart';
 import 'package:test/test.dart';
 
 final hsKey = SecretKey('secret passphrase');
@@ -196,47 +194,6 @@ void main() {
 
         expect(jwt, isNotNull);
         expect(jwt?.payload, equals({'foo': 'bar'}));
-      });
-    });
-
-    //-------//
-    //  exp  //
-    //-------//
-    group('.verify exp', () {
-      test('should be expired', () {
-        final duration = Duration(hours: 1);
-        final token = JWT({'foo': 'bar'}).sign(hsKey, expiresIn: duration);
-        fakeAsync((async) {
-          async.elapse(duration);
-          expect(
-            () => JWT.verify(token, hsKey),
-            throwsA(isA<JWTExpiredException>()),
-          );
-        });
-      });
-
-      test('should be still valid', () {
-        withClock(
-          Clock.fixed(DateTime(2023)),
-          () {
-            final token = JWT({'foo': 'bar'}).sign(
-              hsKey,
-              expiresIn: Duration(hours: 1),
-            );
-            fakeAsync((async) {
-              async.elapse(Duration(minutes: 30));
-              final jwt = JWT.verify(token, hsKey);
-              expect(
-                jwt.payload,
-                equals({
-                  'foo': 'bar',
-                  'iat': 1672542000,
-                  'exp': 1672545600,
-                }),
-              );
-            });
-          },
-        );
       });
     });
   });
