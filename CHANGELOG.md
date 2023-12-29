@@ -1,3 +1,7 @@
+## 2.12.2
+
+- Add testable date times (https://github.com/jonasroussel/dart_jsonwebtoken/issues/50)
+
 ## 2.12.1
 
 - Fixing issue with custom headers (https://github.com/jonasroussel/dart_jsonwebtoken/issues/48)
