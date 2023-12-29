@@ -25,6 +25,9 @@ void main() {
       });
 
       test('should be still valid', () {
+        final iat = DateTime(2023);
+        final exp = DateTime(2023).add(Duration(hours: 1));
+
         withClock(
           Clock.fixed(DateTime(2023)),
           () {
@@ -37,8 +40,8 @@ void main() {
                 JWT.verify(token, hsKey).payload,
                 equals({
                   'foo': 'bar',
-                  'iat': DateTime(2023).millisecondsSinceEpoch ~/ 1000,
-                  'exp': DateTime(2023).add(Duration(hours: 1)).millisecondsSinceEpoch ~/ 1000,
+                  'iat': iat.millisecondsSinceEpoch ~/ 1000,
+                  'exp': exp.millisecondsSinceEpoch ~/ 1000,
                 }),
               );
             });
