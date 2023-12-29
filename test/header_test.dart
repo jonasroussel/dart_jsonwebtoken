@@ -37,8 +37,8 @@ void main() {
                 JWT.verify(token, hsKey).payload,
                 equals({
                   'foo': 'bar',
-                  'iat': 1672527600,
-                  'exp': 1672531200,
+                  'iat': DateTime(2023).millisecondsSinceEpoch ~/ 1000,
+                  'exp': DateTime(2023).add(Duration(hours: 1)).millisecondsSinceEpoch ~/ 1000,
                 }),
               );
             });
