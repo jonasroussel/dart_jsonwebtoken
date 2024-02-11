@@ -1,3 +1,7 @@
+## 2.13.0
+
+- Fix invalid ECDSA signature for keys that are not a multiple of 8 (e.g. secp521r1) (https://github.com/jonasroussel/dart_jsonwebtoken/issues/51) 
+
 ## 2.12.2
 
 - Add testable date times (https://github.com/jonasroussel/dart_jsonwebtoken/issues/50)

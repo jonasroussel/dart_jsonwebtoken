@@ -331,8 +331,8 @@ class ECDSAAlgorithm extends JWTAlgorithm {
     final len = privateKey.size;
     final bytes = Uint8List(len * 2);
 
-    bytes.setRange(0, len, rBytes.reversed);
-    bytes.setRange(len, len * 2, sBytes.reversed);
+    bytes.setRange(len - rBytes.length, len, rBytes.reversed);
+    bytes.setRange((len * 2) - sBytes.length, len * 2, sBytes.reversed);
 
     return bytes;
   }

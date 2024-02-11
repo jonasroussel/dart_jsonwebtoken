@@ -75,7 +75,7 @@ class ECPrivateKey extends JWTKey {
     }
 
     key = _key;
-    size = (_params.curve.fieldSize / 8).round();
+    size = (_params.curve.fieldSize / 8).ceil();
   }
 
   ECPrivateKey.raw(pc.ECPrivateKey _key) {
@@ -86,7 +86,7 @@ class ECPrivateKey extends JWTKey {
     }
 
     key = _key;
-    size = (_params.curve.fieldSize / 8).round();
+    size = (_params.curve.fieldSize / 8).ceil();
   }
   ECPrivateKey.clone(ECPrivateKey _key)
       : key = _key.key,
