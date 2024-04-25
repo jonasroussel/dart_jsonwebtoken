@@ -1,6 +1,11 @@
+## 2.14.0
+
+- Add support for base64 encoded secrets (https://github.com/jonasroussel/dart_jsonwebtoken/pull/54)
+- Fix `exp`, `nbf` and `iat` checks by casting the value to `int`
+
 ## 2.13.0
 
-- Fix invalid ECDSA signature for keys that are not a multiple of 8 (e.g. secp521r1) (https://github.com/jonasroussel/dart_jsonwebtoken/issues/51) 
+- Fix invalid ECDSA signature for keys that are not a multiple of 8 (e.g. secp521r1) (https://github.com/jonasroussel/dart_jsonwebtoken/issues/51)
 
 ## 2.12.2
 

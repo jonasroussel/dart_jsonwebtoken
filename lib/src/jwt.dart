@@ -63,7 +63,7 @@ class JWT {
         // exp
         if (checkExpiresIn && payload.containsKey('exp')) {
           final exp = DateTime.fromMillisecondsSinceEpoch(
-            payload['exp'] * 1000,
+            (payload['exp'] * 1000).toInt(),
           );
           if (exp.isBefore(clock.now())) {
             throw JWTExpiredException();
@@ -73,7 +73,7 @@ class JWT {
         // nbf
         if (checkNotBefore && payload.containsKey('nbf')) {
           final nbf = DateTime.fromMillisecondsSinceEpoch(
-            payload['nbf'] * 1000,
+            (payload['nbf'] * 1000).toInt(),
           );
           if (nbf.isAfter(clock.now())) {
             throw JWTNotActiveException();
@@ -86,7 +86,7 @@ class JWT {
             throw JWTInvalidException('invalid issue at');
           }
           final iat = DateTime.fromMillisecondsSinceEpoch(
-            payload['iat'] * 1000,
+            (payload['iat'] * 1000).toInt(),
           );
           if (!iat.isAtSameMomentAs(clock.now())) {
             throw JWTInvalidException('invalid issue at');
