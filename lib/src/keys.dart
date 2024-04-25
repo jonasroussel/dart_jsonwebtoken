@@ -11,8 +11,9 @@ abstract class JWTKey {}
 /// For HMAC algorithms
 class SecretKey extends JWTKey {
   String key;
+  bool isBase64Encoded;
 
-  SecretKey(this.key);
+  SecretKey(this.key, {this.isBase64Encoded = false});
 }
 
 /// For RSA algorithm, in sign method

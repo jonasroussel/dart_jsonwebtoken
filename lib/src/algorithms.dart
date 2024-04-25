@@ -147,7 +147,12 @@ class HMACAlgorithm extends JWTAlgorithm {
     assert(key is SecretKey, 'key must be a SecretKey');
     final secretKey = key as SecretKey;
 
-    final hmac = Hmac(_getHash(name), utf8.encode(secretKey.key));
+    final hmac = Hmac(
+      _getHash(name),
+      secretKey.isBase64Encoded
+          ? base64Decode(secretKey.key)
+          : utf8.encode(secretKey.key),
+    );
 
     return Uint8List.fromList(hmac.convert(body).bytes);
   }
