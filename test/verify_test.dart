@@ -27,6 +27,62 @@ final edKey = EdDSAPublicKey(
 
 void main() {
   group('Verify a JWT', () {
+    group('Claims', () {
+      group('iat', () {
+        final oneMinuteAgo = DateTime.now().subtract(Duration(minutes: 1));
+        test('exact issueAt passes validation', () {
+          final jwt = JWT(
+            {
+              'foo': 'bar',
+              'iat': oneMinuteAgo.millisecondsSinceEpoch ~/ 1000,
+            },
+          );
+          final verified = JWT.tryVerify(
+            jwt.sign(hsKey, noIssueAt: true),
+            hsKey,
+            issueAt:
+                Duration(seconds: oneMinuteAgo.millisecondsSinceEpoch ~/ 1000),
+          );
+          expect(verified, isNotNull);
+        });
+        test('expired issueAt fails validation', () {
+          final jwt = JWT(
+            {
+              'foo': 'bar',
+              'iat': oneMinuteAgo
+                      .subtract(Duration(seconds: 1))
+                      .millisecondsSinceEpoch ~/
+                  1000,
+            },
+          );
+          final verified = JWT.tryVerify(
+            jwt.sign(hsKey, noIssueAt: true),
+            hsKey,
+            issueAt:
+                Duration(seconds: oneMinuteAgo.millisecondsSinceEpoch ~/ 1000),
+          );
+          expect(verified, isNull);
+        });
+        test('fresher issueAt passes validation', () {
+          final jwt = JWT(
+            {
+              'foo': 'bar',
+              'iat': oneMinuteAgo
+                      .add(Duration(seconds: 1))
+                      .millisecondsSinceEpoch ~/
+                  1000,
+            },
+          );
+          final verified = JWT.tryVerify(
+            jwt.sign(hsKey, noIssueAt: true),
+            hsKey,
+            issueAt:
+                Duration(seconds: oneMinuteAgo.millisecondsSinceEpoch ~/ 1000),
+          );
+          expect(verified, isNotNull);
+        });
+      });
+    });
     //------//
     // HMAC //
     //------//
