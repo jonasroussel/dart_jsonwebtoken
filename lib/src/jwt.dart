@@ -18,6 +18,11 @@ class JWT {
   /// - RSAPublicKey with RSA algorithm
   /// - ECPublicKey with ECDSA algorithm
   /// - EdDSAPublicKey with EdDSA algorithm
+  ///
+  /// [issueAt] allows to verify that the token wasn't issued too long ago. The
+  /// value is a timestamp (number of seconds since epoch) that is compared to
+  /// the value of the 'iat' claim. Verification fails if the 'iat' claim is
+  /// before [issueAt].
   static JWT verify(
     String token,
     JWTKey key, {
@@ -88,8 +93,11 @@ class JWT {
           final iat = DateTime.fromMillisecondsSinceEpoch(
             (payload['iat'] * 1000).toInt(),
           );
-          if (!iat.isAtSameMomentAs(clock.now())) {
-            throw JWTInvalidException('invalid issue at');
+          final issueAtTime =
+              DateTime.fromMillisecondsSinceEpoch(issueAt.inMilliseconds);
+          // Verify that the token isn't expired
+          if (iat.isBefore(issueAtTime)) {
+            throw JWTInvalidException('expired issue at');
           }
         }
 
