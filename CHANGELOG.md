@@ -1,3 +1,7 @@
+## 2.14.1
+
+- Fix `iat` claim verification (https://github.com/jonasroussel/dart_jsonwebtoken/pull/57)
+
 ## 2.14.0
 
 - Add support for base64 encoded secrets (https://github.com/jonasroussel/dart_jsonwebtoken/pull/54)
