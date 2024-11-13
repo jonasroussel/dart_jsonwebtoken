@@ -208,9 +208,23 @@ class RSAAlgorithm extends JWTAlgorithm {
     );
 
     if (algorithm == 'PSS') {
+      int byteValue = 32;
       final random = _random ?? Random.secure();
+      switch (name) {
+        case 'PS256':
+          byteValue = 32;
+          break;
+        case 'PS384':
+          byteValue = 48;
+          break;
+        case 'PS512':
+          byteValue = 64;
+          break;
+        default:
+          byteValue = 32;
+      }
       final salt = Uint8List.fromList(
-        List.generate(32, (_) => random.nextInt(256)),
+        List.generate(byteValue, (_) => random.nextInt(256)),
       );
 
       params = pc.ParametersWithSalt(
@@ -244,15 +258,29 @@ class RSAAlgorithm extends JWTAlgorithm {
       );
 
       if (algorithm == 'PSS') {
+        int byteValue = 32;
         final secureRandom = pc.SecureRandom('Fortuna');
         final random = Random.secure();
-        final seed = List.generate(32, (_) => random.nextInt(256));
+        switch (algorithm) {
+          case 'PS256':
+            byteValue = 34;
+            break;
+          case 'PS384':
+            byteValue = 48;
+            break;
+          case 'PS512':
+            byteValue = 64;
+            break;
+          default:
+            byteValue = 34;
+        }
+        final seed = List.generate(byteValue, (_) => random.nextInt(256));
         secureRandom.seed(pc.KeyParameter(Uint8List.fromList(seed)));
 
         params = pc.ParametersWithSaltConfiguration(
           params,
           secureRandom,
-          32,
+          byteValue,
         );
       }
 
