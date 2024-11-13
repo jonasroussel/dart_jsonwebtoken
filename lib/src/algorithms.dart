@@ -263,7 +263,7 @@ class RSAAlgorithm extends JWTAlgorithm {
         final random = Random.secure();
         switch (algorithm) {
           case 'PS256':
-            byteValue = 34;
+            byteValue = 32;
             break;
           case 'PS384':
             byteValue = 48;
@@ -272,7 +272,7 @@ class RSAAlgorithm extends JWTAlgorithm {
             byteValue = 64;
             break;
           default:
-            byteValue = 34;
+            byteValue = 32;
         }
         final seed = List.generate(byteValue, (_) => random.nextInt(256));
         secureRandom.seed(pc.KeyParameter(Uint8List.fromList(seed)));
