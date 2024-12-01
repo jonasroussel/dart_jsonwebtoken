@@ -1,3 +1,7 @@
+## 2.14.2
+
+- Ensure `sub`, `iss`, `jti` are strings (https://github.com/jonasroussel/dart_jsonwebtoken/pull/62)
+
 ## 2.14.1
 
 - Fix `iat` claim verification (https://github.com/jonasroussel/dart_jsonwebtoken/pull/57)
