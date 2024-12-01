@@ -142,7 +142,7 @@ class JWT {
           audience: _parseAud(payload['aud']),
           issuer: payload['iss']?.toString(),
           subject: payload['sub']?.toString(),
-          jwtId: payload['jti'],
+          jwtId: payload['jti']?.toString(),
         );
       } else {
         return JWT(payload);
