@@ -218,7 +218,7 @@ void main() {
       test('.verify PS384', () {
         final token = 'eyJhbGciOiJQUzM4NCIsInR5cCI6IkpXVCJ9' +
             '.eyJmb28iOiJiYXIifQ' +
-            '.KVuzcv9rBYCcQMPPjis1sAuYy4jSrustwT-gRqx1P0P1Q43ku-f3tXcFluYUJO6r6gVzV_OmsffxSGgk7QEc8SFqoAWO25QaGYAKqjqeKUL-57d8NQSFLSEdJhrNZ1z6jQoTmkVxgKi5EqDV0DbAt4d6yBd8I2QFLS9G1QNa3XtziwJezrVS-Z6ccIesoZwzczebiHnEmG8DPDcv5Y8Jb_nnmY2w8AQ_wVU1AkiUkTEZ1lDzYB_YUxCzUzSmqrLHIAHsUoV5lt3-hzOJl9Mp5f4ik0QtqQ76NaUZoXrVnTaMpES1bHwpGZcJQEu3igzm6RjI8-kkfcpUsG4Nwsx4TQ';
+            '.PhknpMzuv34E_6T5wl7aLu3jRh0meVdYZzvfCdWhZAPYYYcFKQYmW2PbUYUQ-uzw45y9_bwElKiGD0hcW8fXuZBcx4lg3EX96mE7AzjYBVIS-lK2Xyd8KcC2sx7PjRlfSL_BQOXCNz3JmGNPJCaioMOTl0ha-jFsV_9mgUiK_--TQpU731ebIYaM4XS8rJxW-zthrGlgutAs2vGyLLgOOkome_ELBd6tcI3ip-Q58wK603PDnYo3FtyP_JfL4vtuRwQs9BEU0Y3Awfm0cuQaXf52sdQTTnwm0_E_dn-sPT8Q8F3UpPoOGPhFncxXpr2vUk_6_X_fdOxtkOVsPunxg-h9eVzfZEldrec-DRAKcyKHrycOuk8HBhcyCFjvw0Mjhe9g6urH-LBZQ1Hikwrzcp0B-xa9uQ801EtuanQGOqTPM1zqEmhQGJLIDtqaen9RD7gK18f0fqnWbIKUMEfkMQRm3tEmLy8HX2P0C3H64Qq3iXPTtk8lX_e1nN20WEyo';
 
         final jwt = JWT.tryVerify(token, rsaKey);
 
@@ -228,7 +228,7 @@ void main() {
       test('.verify PS512', () {
         final token = 'eyJhbGciOiJQUzUxMiIsInR5cCI6IkpXVCJ9' +
             '.eyJmb28iOiJiYXIifQ' +
-            '.Pfgxx9l4863v2pEs4uZgR6WJ9HHu0hPO9I6JkiSSJ8idsl9hpW6iuHmVvRskvbqVxKcZi1EQZ_9p-JDRB5JZCVn73BRencZiV_MDc0pDwOqd8Y7RmYiG_V_yfE_djJIpk9vEcpSJuC3Ow6uesNthcyG1CRU41f_qbUaNdg4AYucpvVxEKVzwss94Iq4bqIFy56pKl6HfwZZx1ShlefrbIPVpZgE4TPGwoR2GxMc0zuMAea3skHhRC02TZNiFZJ6zqBUolNrWxIoXNFyeLnjZgi6IHJ0jClym54HT8r_hOnf6j5J8M0j7xUmUZD7WDSdLw0pJU8VsCBtgec5Bk9HQiQ';
+            '.W5mq7RcMNnedPPjid7Rmt4TTBrZbIVwNdvhQvhzlraTlFc7cGfOK8vj_ZooqWkbaixD9pt1MNv18Tfi-Z7kgbHbM-1jwC558DCdkMsSNZbsMoqV6DjyJV0QvZ9kAdce-Nkowjj-aUhQcSk86tUFCYG-ekEoRcNsuyXu6sWxeKJORWofzfgNP_oVaSSMn_l-IVizc1H8uTEoYO7G6hzoyobzyROqn5fu4RosxfHPcYVP6fSxdLt2UZExfb-zOqyplVOYwh25fOoiPFz97-wwjXqy2c2QNgxLysHaNQ4VImU55fRKxRe4NHzyDMjExxdZZ0y1z3OVNt29a5ARWOrtXCfDYy8r7sDhFQb7eAblrLnFkTN4Te7MPwGKzMLS2auFHPL5A3dAXAQchHEcESVWYGyQFTYr1GD2IioOsLqDDtyHQKEz9rDzMnitTWd3qMxbl4P6zklsm9_VV9Mrza3zwtVh6yCE5J7F0ZewVKg_0HA2S077slLfoJFUsM-BJ_hhM';
 
         final jwt = JWT.tryVerify(token, rsaKey);
 
