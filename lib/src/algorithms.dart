@@ -261,7 +261,7 @@ class RSAAlgorithm extends JWTAlgorithm {
         int byteValue = 32;
         final secureRandom = pc.SecureRandom('Fortuna');
         final random = Random.secure();
-        switch (algorithm) {
+        switch (name) {
           case 'PS256':
             byteValue = 32;
             break;
