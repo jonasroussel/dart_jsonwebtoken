@@ -208,23 +208,9 @@ class RSAAlgorithm extends JWTAlgorithm {
     );
 
     if (algorithm == 'PSS') {
-      int byteValue = 32;
       final random = _random ?? Random.secure();
-      switch (name) {
-        case 'PS256':
-          byteValue = 32;
-          break;
-        case 'PS384':
-          byteValue = 48;
-          break;
-        case 'PS512':
-          byteValue = 64;
-          break;
-        default:
-          byteValue = 32;
-      }
       final salt = Uint8List.fromList(
-        List.generate(byteValue, (_) => random.nextInt(256)),
+        List.generate(_getSaltLength(name), (_) => random.nextInt(256)),
       );
 
       params = pc.ParametersWithSalt(
@@ -258,29 +244,10 @@ class RSAAlgorithm extends JWTAlgorithm {
       );
 
       if (algorithm == 'PSS') {
-        int byteValue = 32;
-        final secureRandom = pc.SecureRandom('Fortuna');
-        final random = Random.secure();
-        switch (name) {
-          case 'PS256':
-            byteValue = 32;
-            break;
-          case 'PS384':
-            byteValue = 48;
-            break;
-          case 'PS512':
-            byteValue = 64;
-            break;
-          default:
-            byteValue = 32;
-        }
-        final seed = List.generate(byteValue, (_) => random.nextInt(256));
-        secureRandom.seed(pc.KeyParameter(Uint8List.fromList(seed)));
-
         params = pc.ParametersWithSaltConfiguration(
           params,
-          secureRandom,
-          byteValue,
+          pc.SecureRandom('Fortuna'),
+          _getSaltLength(name),
         );
       }
 
@@ -293,6 +260,7 @@ class RSAAlgorithm extends JWTAlgorithm {
 
       return signer.verifySignature(msg, sign);
     } catch (ex) {
+      print(ex);
       return false;
     }
   }
@@ -325,6 +293,19 @@ class RSAAlgorithm extends JWTAlgorithm {
         return 'PSS';
       default:
         throw ArgumentError.value(name, 'name', 'unknown algorithm name');
+    }
+  }
+
+  int _getSaltLength(String name) {
+    switch (name) {
+      case 'PS256':
+        return 32;
+      case 'PS384':
+        return 48;
+      case 'PS512':
+        return 64;
+      default:
+        return 32;
     }
   }
 }
