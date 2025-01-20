@@ -1,3 +1,7 @@
+## 2.15.0
+
+- Added support for PSS alogrithm varations (https://github.com/jonasroussel/dart_jsonwebtoken/pull/59)
+
 ## 2.14.2
 
 - Ensure `sub`, `iss`, `jti` are strings (https://github.com/jonasroussel/dart_jsonwebtoken/pull/62)
