@@ -260,7 +260,6 @@ class RSAAlgorithm extends JWTAlgorithm {
 
       return signer.verifySignature(msg, sign);
     } catch (ex) {
-      print(ex);
       return false;
     }
   }
