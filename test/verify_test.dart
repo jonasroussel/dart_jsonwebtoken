@@ -25,6 +25,9 @@ MCowBQYDK2VwAyEAEi7MNW0Q9T83UA3Rw+8DbspMgqeuxCqa2wXaWS+tHqY=
 
 void main() {
   group('Verify a JWT', () {
+    //--------//
+    // Claims //
+    //--------//
     group('Claims', () {
       group('iat', () {
         final oneMinuteAgo = DateTime.now().subtract(Duration(minutes: 1));
@@ -81,6 +84,7 @@ void main() {
         });
       });
     });
+
     //------//
     // HMAC //
     //------//

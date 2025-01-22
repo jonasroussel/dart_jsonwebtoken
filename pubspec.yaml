@@ -1,6 +1,6 @@
 name: dart_jsonwebtoken
 description: A dart implementation of the famous javascript library 'jsonwebtoken' (JWT).
-version: 2.15.0
+version: 2.16.0
 repository: https://github.com/jonasroussel/dart_jsonwebtoken
 homepage: https://github.com/jonasroussel/dart_jsonwebtoken#readme
 
@@ -10,6 +10,7 @@ environment:
 false_secrets:
   - /example/*.pem
   - /test/*
+  - /README.md
 
 dependencies:
   crypto: ^3.0.3

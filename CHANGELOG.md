@@ -1,3 +1,7 @@
+## 2.16.0
+
+- Add support of PEM parsing for EdDSA keys with `EdDSAPrivateKey.fromPem` and `EdDSAPublicKey.fromPem`
+
 ## 2.15.0
 
 - Added support for PSS alogrithm varations (https://github.com/jonasroussel/dart_jsonwebtoken/pull/59)
