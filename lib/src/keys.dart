@@ -115,18 +115,19 @@ class ECPublicKey extends JWTKey {
 
 /// For EdDSA algorithm, in sign method
 class EdDSAPrivateKey extends JWTKey {
-  late ed.PrivateKey key;
+  ed.PrivateKey key;
 
-  EdDSAPrivateKey(List<int> bytes) {
-    key = ed.PrivateKey(bytes);
-  }
+  EdDSAPrivateKey(List<int> bytes) : key = ed.PrivateKey(bytes);
+
+  EdDSAPrivateKey.fromPEM(String pem)
+      : key = KeyParser.edPrivateKeyFromPEM(pem);
 }
 
 /// For EdDSA algorithm, in verify method
 class EdDSAPublicKey extends JWTKey {
-  late ed.PublicKey key;
+  ed.PublicKey key;
 
-  EdDSAPublicKey(List<int> bytes) {
-    key = ed.PublicKey(bytes);
-  }
+  EdDSAPublicKey(List<int> bytes) : key = ed.PublicKey(bytes);
+
+  EdDSAPublicKey.fromPEM(String pem) : key = KeyParser.edPublicKeyFromPEM(pem);
 }

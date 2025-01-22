@@ -2,15 +2,17 @@
 
 [![pub version](https://img.shields.io/pub/v/dart_jsonwebtoken.svg)](https://pub.dev/packages/dart_jsonwebtoken)
 
-A dart implementation of the famous javascript library `jsonwebtoken`.
+An easy to use JSON Web Token implementation in Dart (all algorithms supported).
 
 JSON Web Tokens are an open, industry standard RFC 7519 method for representing claims securely between two parties.
 
-https://jwt.io allows you to decode, verify and generate JWT.
+`dart_jsonwebtoken` allows you to sign, decode and verify JWT.
 
 ## Examples
 
 Check out the [Example File](https://github.com/jonasroussel/dart_jsonwebtoken/blob/main/example/example.dart) for a full example code of all the differents algorithms.
+
+You can also check out the [jwt.io](https://jwt.io) website for more information.
 
 ## Usage
 
@@ -110,9 +112,16 @@ MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEEVs/o5+uQbTjL3chynL4wXgUg2R9
 ''');
 
 
-// EdDSA (PEM parsing is not available for EdDSA keys)
-final edPrivKey = EdDSAPrivateKey([1, 42, 12, 84, ...]);
-final edPubKey = EdDSAPublicKey([1, 42, 12, 84, ...]);
+// EdDSA
+final edPrivKey = EdDSAPrivateKey.fromPEM('''-----BEGIN PRIVATE KEY-----
+MC4CAQAwBQYDK2VwBCIEICXCjBHvjArjXquUI5jo3x5SHI4ofZA2azwJ39IC/Qct
+-----END PRIVATE KEY-----
+''');
+
+final edPubKey = EdDSAPublicKey.fromPEM('''-----BEGIN PUBLIC KEY-----
+MCowBQYDK2VwAyEAEi7MNW0Q9T83UA3Rw+8DbspMgqeuxCqa2wXaWS+tHqY=
+-----END PUBLIC KEY-----
+''');
 ```
 
 ### Supported Algorithms

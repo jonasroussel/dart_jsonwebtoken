@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:test/test.dart';
 
@@ -21,9 +19,9 @@ final secp256kKey = ECPublicKey('''-----BEGIN PUBLIC KEY-----
 MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAE0aELkvG/Xeo5y6o0WXRAjlediLptGz7Q
 8zjDmpGFXkKBYZ6IiL7JJ2TkcHzd83bmeUeGX33RGTYFPXs5t/VBnw==
 -----END PUBLIC KEY-----''');
-final edKey = EdDSAPublicKey(
-  base64Decode('11qYAYKxCrfVS/7TyWQHOg7hcvPapiMlrwIaaPcHURo='),
-);
+final edKey = EdDSAPublicKey.fromPEM('''-----BEGIN PUBLIC KEY-----
+MCowBQYDK2VwAyEAEi7MNW0Q9T83UA3Rw+8DbspMgqeuxCqa2wXaWS+tHqY=
+-----END PUBLIC KEY-----''');
 
 void main() {
   group('Verify a JWT', () {
@@ -244,7 +242,7 @@ void main() {
       test('.verify EdDSA', () {
         final token = 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9' +
             '.eyJmb28iOiJiYXIifQ' +
-            '.8tRIxs_o_isQItc2FtzA34Ah-EEvBj7Fw6lKh2tD53IOx5CinBM36yIGo2TDHNmm-ElATCdnMisUKt_UJ5pTAg';
+            '.6Bw5vvdpJ_kgDwidU1l7aagtKCD9-QIJxrz44HXxtc6OJoOmImNko0dgXYpTtXhcEuX7vamSR5JPfGP1Q9d9DA';
 
         final jwt = JWT.tryVerify(token, edKey);
 

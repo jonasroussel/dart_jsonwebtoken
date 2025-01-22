@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:math';
 
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
@@ -43,12 +42,9 @@ MHQCAQEEINCRiJnNDnzfo2So2tWY4AIuzeC2ZBp/hmMDcZz3Fh45oAcGBSuBBAAK
 oUQDQgAE0aELkvG/Xeo5y6o0WXRAjlediLptGz7Q8zjDmpGFXkKBYZ6IiL7JJ2Tk
 cHzd83bmeUeGX33RGTYFPXs5t/VBnw==
 -----END EC PRIVATE KEY-----''');
-final edKey = EdDSAPrivateKey(
-  base64Decode(
-    'nWGxne/9WmC6hEr0kuwsxERJxWl7MmkZcDusAxyuf2DXWpgBgrEKt9VL/' +
-        'tPJZAc6DuFy89qmIyWvAhpo9wdRGg==',
-  ),
-);
+final edKey = EdDSAPrivateKey.fromPEM('''-----BEGIN PRIVATE KEY-----
+MC4CAQAwBQYDK2VwBCIEICXCjBHvjArjXquUI5jo3x5SHI4ofZA2azwJ39IC/Qct
+-----END PRIVATE KEY-----''');
 
 class MockRSAAlgorithm extends RSAAlgorithm {
   MockRSAAlgorithm(String name) : super(name, Random(42));
@@ -218,7 +214,7 @@ void main() {
 
         final expectedToken = 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9' +
             '.eyJmb28iOiJiYXIifQ' +
-            '.8tRIxs_o_isQItc2FtzA34Ah-EEvBj7Fw6lKh2tD53IOx5CinBM36yIGo2TDHNmm-ElATCdnMisUKt_UJ5pTAg';
+            '.6Bw5vvdpJ_kgDwidU1l7aagtKCD9-QIJxrz44HXxtc6OJoOmImNko0dgXYpTtXhcEuX7vamSR5JPfGP1Q9d9DA';
 
         expect(token, equals(expectedToken));
       });

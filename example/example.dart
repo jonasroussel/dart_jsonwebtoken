@@ -26,6 +26,10 @@ void main() {
   print('----- RSA Certificate -----');
   rsaCert();
   print('---------------------------\n');
+
+  print('----- EdDSA -----');
+  eddsa();
+  print('-----------------\n');
 }
 
 // HMAC SHA-256 algorithm
@@ -268,6 +272,48 @@ void rsaCert() {
       // Verify a token
       final pem = File('./example/rsa_certificate.pem').readAsStringSync();
       final key = RSAPublicKey.cert(pem);
+
+      final jwt = JWT.verify(token, key);
+
+      print('Payload: ${jwt.payload}');
+    } on JWTExpiredException {
+      print('jwt expired');
+    } on JWTException catch (ex) {
+      print(ex.message); // ex: invalid signature
+    }
+  }
+}
+
+void eddsa() {
+  String token;
+
+  /* Sign */ {
+    // Create a json web token
+    final jwt = JWT(
+      {
+        'id': 123,
+        'server': {
+          'id': '3e4fc296',
+          'loc': 'euw-2',
+        }
+      },
+      issuer: 'https://github.com/jonasroussel/dart_jsonwebtoken',
+    );
+
+    // Sign it
+    final privPem = File('./example/eddsa_private.pem').readAsStringSync();
+    final key = EdDSAPrivateKey.fromPEM(privPem);
+
+    token = jwt.sign(key, algorithm: JWTAlgorithm.EdDSA);
+
+    print('Signed token: $token\n');
+  }
+
+  /* Verify */ {
+    try {
+      // Verify a token
+      final pem = File('./example/eddsa_public.pem').readAsStringSync();
+      final key = EdDSAPublicKey.fromPEM(pem);
 
       final jwt = JWT.verify(token, key);
 
