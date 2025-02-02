@@ -188,6 +188,9 @@ class JWT {
   }
 
   /// Decode a token without checking its signature
+  /// 
+  /// This also sets [JWT.audience], [JWT.subject], [JWT.issuer], and
+  /// [JWT.jwtId] even though they are not verified. Use with caution.
   static JWT decode(String token) {
     try {
       final parts = token.split('.');
@@ -207,6 +210,10 @@ class JWT {
         return JWT(
           payload,
           header: header,
+          audience: _parseAud(payload['aud']),
+          issuer: payload['iss']?.toString(),
+          subject: payload['sub']?.toString(),
+          jwtId: payload['jti']?.toString(),
         );
       }
     } catch (ex, stackTrace) {
