@@ -1,3 +1,7 @@
+## 2.17.0
+
+- Parse standard parameters when using `JWT.decode` (https://github.com/jonasroussel/dart_jsonwebtoken/pull/64)
+
 ## 2.16.0
 
 - Add support of PEM parsing for EdDSA keys with `EdDSAPrivateKey.fromPem` and `EdDSAPublicKey.fromPem`
