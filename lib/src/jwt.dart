@@ -61,7 +61,7 @@ class JWT {
       try {
         payload = jsonBase64.decode(base64Padded(parts[1]));
       } catch (ex) {
-        payload = utf8.decode(base64.decode(base64Padded(parts[1])));
+        payload = utf8.decode(base64Url.decode(base64Padded(parts[1])));
       }
 
       if (payload is Map) {
@@ -201,7 +201,7 @@ class JWT {
       try {
         payload = jsonBase64.decode(base64Padded(parts[1]));
       } catch (ex) {
-        payload = utf8.decode(base64.decode(base64Padded(parts[1])));
+        payload = utf8.decode(base64Url.decode(base64Padded(parts[1])));
       }
 
       final audiance = _parseAud(payload['aud']);
@@ -311,7 +311,7 @@ class JWT {
       try {
         b64Payload = base64Unpadded(
           payload is String
-              ? base64.encode(utf8.encode(payload))
+              ? base64Url.encode(utf8.encode(payload))
               : jsonBase64.encode(payload),
         );
       } catch (ex) {
