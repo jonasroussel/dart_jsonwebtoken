@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:clock/clock.dart';
+
 import 'algorithms.dart';
 
 final jsonBase64 = json.fuse(utf8.fuse(base64Url));
@@ -22,6 +24,10 @@ String base64Padded(String value) {
     default:
       return value;
   }
+}
+
+DateTime timeNowUTC() {
+  return clock.now().toUtc();
 }
 
 int secondsSinceEpoch(DateTime time) {
