@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
@@ -7,8 +6,8 @@ import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 import 'package:pointycastle/pointycastle.dart' as pc;
 
 import 'exceptions.dart';
-import 'keys.dart';
 import 'helpers.dart';
+import 'keys.dart';
 
 abstract class JWTAlgorithm {
   /// HMAC using SHA-256 hash algorithm
@@ -147,17 +146,7 @@ class HMACAlgorithm extends JWTAlgorithm {
     assert(key is SecretKey, 'key must be a SecretKey');
     final secretKey = key as SecretKey;
 
-    Uint8List keyBytes;
-
-    if (secretKey.isBase64Encoded) {
-      if (RegExp(r'-|_+').hasMatch(secretKey.key)) {
-        keyBytes = base64Url.decode(secretKey.key);
-      } else {
-        keyBytes = base64.decode(secretKey.key);
-      }
-    } else {
-      keyBytes = utf8.encode(secretKey.key);
-    }
+    final keyBytes = decodeHMACSecret(secretKey.key, secretKey.isBase64Encoded);
 
     final hmac = Hmac(
       _getHash(name),
