@@ -1,6 +1,10 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:clock/clock.dart';
+
+import 'algorithms.dart';
+
 final jsonBase64 = json.fuse(utf8.fuse(base64Url));
 
 String base64Unpadded(String value) {
@@ -20,6 +24,10 @@ String base64Padded(String value) {
     default:
       return value;
   }
+}
+
+DateTime timeNowUTC() {
+  return clock.now().toUtc();
 }
 
 int secondsSinceEpoch(DateTime time) {
@@ -96,4 +104,49 @@ List<String> chunkString(String s, int chunkSize) {
     chunked.add(s.substring(i, end));
   }
   return chunked;
+}
+
+Uint8List decodeHMACSecret(String secret, bool isBase64Encoded) {
+  if (isBase64Encoded) {
+    if (RegExp(r'-|_+').hasMatch(secret)) {
+      return base64Url.decode(secret);
+    } else {
+      return base64.decode(secret);
+    }
+  } else {
+    return utf8.encode(secret);
+  }
+}
+
+String curveOpenSSLToNIST(String curveName) {
+  switch (curveName) {
+    case "prime256v1":
+    case "secp256r1":
+      return "P-256";
+    case "secp384r1":
+      return "P-384";
+    case "secp521r1":
+      return "P-521";
+    case "secp192r1":
+      return "P-192";
+    case "secp224r1":
+      return "P-224";
+    default:
+      return curveName; // Return the original name if not found
+  }
+}
+
+ECDSAAlgorithm? ecCurveToAlgorithm(String curveName) {
+  switch (curveName) {
+    case "P-256":
+      return JWTAlgorithm.ES256;
+    case "P-384":
+      return JWTAlgorithm.ES384;
+    case "P-521":
+      return JWTAlgorithm.ES512;
+    case "secp256k1":
+      return JWTAlgorithm.ES256K;
+    default:
+      return null;
+  }
 }

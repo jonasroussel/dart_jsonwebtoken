@@ -2,7 +2,6 @@ import 'dart:collection';
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:clock/clock.dart';
 import 'package:collection/collection.dart';
 
 import 'algorithms.dart';
@@ -20,9 +19,9 @@ class JWT {
   /// - EdDSAPublicKey with EdDSA algorithm
   ///
   /// [issueAt] allows to verify that the token wasn't issued too long ago. The
-  /// value is a timestamp (number of seconds since epoch) that is compared to
-  /// the value of the 'iat' claim. Verification fails if the 'iat' claim is
-  /// before [issueAt].
+  /// value is a timestamp (number of seconds since epoch) in UTC if
+  /// [issueAtUtc] is true, it is compared to the value of the 'iat' claim.
+  /// Verification fails if the 'iat' claim is before [issueAt].
   static JWT verify(
     String token,
     JWTKey key, {
@@ -30,6 +29,7 @@ class JWT {
     bool checkExpiresIn = true,
     bool checkNotBefore = true,
     Duration? issueAt,
+    bool issueAtUtc = true,
     Audience? audience,
     String? subject,
     String? issuer,
@@ -61,7 +61,7 @@ class JWT {
       try {
         payload = jsonBase64.decode(base64Padded(parts[1]));
       } catch (ex) {
-        payload = utf8.decode(base64.decode(base64Padded(parts[1])));
+        payload = utf8.decode(base64Url.decode(base64Padded(parts[1])));
       }
 
       if (payload is Map) {
@@ -69,8 +69,9 @@ class JWT {
         if (checkExpiresIn && payload.containsKey('exp')) {
           final exp = DateTime.fromMillisecondsSinceEpoch(
             (payload['exp'] * 1000).toInt(),
+            isUtc: true,
           );
-          if (exp.isBefore(clock.now())) {
+          if (exp.isBefore(timeNowUTC())) {
             throw JWTExpiredException();
           }
         }
@@ -79,8 +80,9 @@ class JWT {
         if (checkNotBefore && payload.containsKey('nbf')) {
           final nbf = DateTime.fromMillisecondsSinceEpoch(
             (payload['nbf'] * 1000).toInt(),
+            isUtc: true,
           );
-          if (nbf.isAfter(clock.now())) {
+          if (nbf.isAfter(timeNowUTC())) {
             throw JWTNotActiveException();
           }
         }
@@ -92,9 +94,12 @@ class JWT {
           }
           final iat = DateTime.fromMillisecondsSinceEpoch(
             (payload['iat'] * 1000).toInt(),
+            isUtc: true,
           );
-          final issueAtTime =
-              DateTime.fromMillisecondsSinceEpoch(issueAt.inMilliseconds);
+          final issueAtTime = DateTime.fromMillisecondsSinceEpoch(
+            issueAt.inMilliseconds,
+            isUtc: issueAtUtc,
+          );
           // Verify that the token isn't expired
           if (iat.isBefore(issueAtTime)) {
             throw JWTInvalidException('expired issue at');
@@ -201,7 +206,7 @@ class JWT {
       try {
         payload = jsonBase64.decode(base64Padded(parts[1]));
       } catch (ex) {
-        payload = utf8.decode(base64.decode(base64Padded(parts[1])));
+        payload = utf8.decode(base64Url.decode(base64Padded(parts[1])));
       }
 
       final audiance = _parseAud(payload['aud']);
@@ -282,12 +287,14 @@ class JWT {
         try {
           payload = Map<String, dynamic>.from(payload);
 
-          if (!noIssueAt) payload['iat'] = secondsSinceEpoch(clock.now());
+          if (!noIssueAt) {
+            payload['iat'] = secondsSinceEpoch(timeNowUTC());
+          }
           if (expiresIn != null) {
-            payload['exp'] = secondsSinceEpoch(clock.now().add(expiresIn));
+            payload['exp'] = secondsSinceEpoch(timeNowUTC().add(expiresIn));
           }
           if (notBefore != null) {
-            payload['nbf'] = secondsSinceEpoch(clock.now().add(notBefore));
+            payload['nbf'] = secondsSinceEpoch(timeNowUTC().add(notBefore));
           }
           if (audience != null) payload['aud'] = audience!.toJson();
           if (subject != null) payload['sub'] = subject;
@@ -311,7 +318,7 @@ class JWT {
       try {
         b64Payload = base64Unpadded(
           payload is String
-              ? base64.encode(utf8.encode(payload))
+              ? base64Url.encode(utf8.encode(payload))
               : jsonBase64.encode(payload),
         );
       } catch (ex) {

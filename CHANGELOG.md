@@ -1,3 +1,11 @@
+## 3.0.0
+
+- Possible **BREAKING CHANGE**: `exp`, `nbf` and `iat` are now following the JWT RFC for NumericDate by only using UTC DateTime
+- Add JWK (JSON Web Key) conversion methods to key classes (`toJWK()`)
+- Fix HMAC secret auto detect if base64 is url or not
+- Fix base64Url instead of base64 for string payloads JWT
+- Add header tests for `exp`, `nbf` and `iat`
+
 ## 2.17.0
 
 - Parse standard parameters when using `JWT.decode` (https://github.com/jonasroussel/dart_jsonwebtoken/pull/64)
