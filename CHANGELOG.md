@@ -1,3 +1,8 @@
+## 3.1.0
+
+- Fix unconsistant JWK convertion
+- Add `JWTKey.fromJWK` static method for parsing JWK to various key types
+
 ## 3.0.0
 
 - Possible **BREAKING CHANGE**: `exp`, `nbf` and `iat` are now following the JWT RFC for NumericDate by only using UTC DateTime
