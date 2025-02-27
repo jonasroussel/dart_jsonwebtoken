@@ -27,7 +27,7 @@ class SecretKey extends JWTKey {
     Map<String, dynamic> jwk = {
       'kty': 'oct',
       'use': 'sig',
-      'k': base64Url.encode(keyBytes),
+      'k': base64Unpadded(base64Url.encode(keyBytes)),
     };
 
     if (keyID != null) jwk['kid'] = keyID;
@@ -223,8 +223,9 @@ class ECPublicKey extends JWTKey {
 
   @override
   Map<String, dynamic> toJWK({String? keyID, ECDSAAlgorithm? algorithm}) {
-    final curve = key.parameters?.domainName;
-    if (curve == null) throw ArgumentError('curve is null');
+    final params = key.parameters;
+    if (params == null) throw ArgumentError('parameters is null');
+    final curve = curveOpenSSLToNIST(params.domainName);
     final x = key.Q?.x?.toBigInteger();
     if (x == null) throw ArgumentError('x is null');
     final y = key.Q?.y?.toBigInteger();
@@ -233,13 +234,14 @@ class ECPublicKey extends JWTKey {
     Map<String, dynamic> jwk = {
       'kty': 'EC',
       'use': 'sig',
-      'crv': curveOpenSSLToNIST(curve),
+      'crv': curve,
       'x': base64Unpadded(base64Url.encode(bigIntToBytes(x).reversed.toList())),
       'y': base64Unpadded(base64Url.encode(bigIntToBytes(y).reversed.toList())),
     };
 
     if (keyID != null) jwk['kid'] = keyID;
-    if (algorithm != null) jwk['alg'] = algorithm.name;
+    final alg = algorithm?.name ?? ecCurveToAlgorithm(curve)?.name;
+    if (alg != null) jwk['alg'] = alg;
 
     return jwk;
   }
