@@ -1,6 +1,6 @@
 name: dart_jsonwebtoken
 description: An easy to use JSON Web Token (JWT) implementation in Dart with all algorithms supported.
-version: 3.1.0
+version: 3.1.1
 repository: https://github.com/jonasroussel/dart_jsonwebtoken
 homepage: https://github.com/jonasroussel/dart_jsonwebtoken#readme
 

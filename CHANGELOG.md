@@ -1,3 +1,7 @@
+## 3.1.1
+
+- Rollback `collection` to 1.17.1 to be compatible with older flutter versions
+
 ## 3.1.0
 
 - Fix unconsistant JWK convertion
