@@ -1,27 +1,7 @@
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:test/test.dart';
 
-final hsKey = SecretKey('secret passphrase');
-final rsaKey = RSAPublicKey('''-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu1SU1LfVLPHCozMxH2Mo
-4lgOEePzNm0tRgeLezV6ffAt0gunVTLw7onLRnrq0/IzW7yWR7QkrmBL7jTKEn5u
-+qKhbwKfBstIs+bMY2Zkp18gnTxKLxoS2tFczGkPLPgizskuemMghRniWaoLcyeh
-kd3qqGElvW/VDL5AaWTg0nLVkjRo9z+40RQzuVaE8AkAFmxZzow3x+VJYKdjykkJ
-0iT9wCS0DRTXu269V264Vf/3jvredZiKRkgwlL9xNAwxXFg0x/XFw005UWVRIkdg
-cKWTjpBP2dPwVZ4WWC+9aGVd+Gyn1o0CLelf4rEjGoXbAAEgAqeGUxrcIlbjXfbc
-mwIDAQAB
------END PUBLIC KEY-----''');
-final ecKey = ECPublicKey('''-----BEGIN PUBLIC KEY-----
-MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEEVs/o5+uQbTjL3chynL4wXgUg2R9
-q9UU8I5mEovUf86QZ7kOBIjJwqnzD1omageEHWwHdBO6B+dFabmdT9POxg==
------END PUBLIC KEY-----''');
-final secp256kKey = ECPublicKey('''-----BEGIN PUBLIC KEY-----
-MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAE0aELkvG/Xeo5y6o0WXRAjlediLptGz7Q
-8zjDmpGFXkKBYZ6IiL7JJ2TkcHzd83bmeUeGX33RGTYFPXs5t/VBnw==
------END PUBLIC KEY-----''');
-final edKey = EdDSAPublicKey.fromPEM('''-----BEGIN PUBLIC KEY-----
-MCowBQYDK2VwAyEAEi7MNW0Q9T83UA3Rw+8DbspMgqeuxCqa2wXaWS+tHqY=
------END PUBLIC KEY-----''');
+import 'keys_const.dart';
 
 void main() {
   group('Verify a JWT', () {
@@ -130,7 +110,7 @@ void main() {
             '.eyJmb28iOiJiYXIifQ' +
             '.YHSMCF3EegI4GLg46jfD7HBEbqq7qgQ-wOlAnepxxe7Mewtrw3hvfM4bxAi70UqzNdCl3tIqvlATlTyG7VZf9tjb1PG9TGyEaqz87rJktsq0hUbZxKRZgbADHxKjUk_QVuwF39XYv4_ENYVUNDXU5nQJ_d1W2JW-1SzI3cwn_qRqyryyL_x6TOQbtbWdxusJBL-uJmE2XZMqGJah3ZrWICh_ehswwDfZXCifUfHYOnLlzoDuqzeYyoi1y_l83wIBaopF2lbopgjAdZGzrP2kUsDm2RlcGNAlGKGoV3W7rGuosGNsBDHkHYuIFwoPti77bcbticv2nBn1ksGmxvYxiw';
 
-        final jwt = JWT.tryVerify(token, rsaKey);
+        final jwt = JWT.tryVerify(token, rsaPubKey);
 
         expect(jwt, isNotNull);
         expect(jwt?.payload, equals({'foo': 'bar'}));
@@ -140,7 +120,7 @@ void main() {
             '.eyJmb28iOiJiYXIifQ' +
             '.JdaVcZhrmwThENssjjFxL8nTovqCmAmDKl81jU1pBpKRShokN_KPasMhxrwgKQQVubQP3a_GV8JMdz_VRikoMm_iFhj8OUXIt74eZhuZXD6CaZrRrHCBWNX0FfT0OnwjtkNiHsza2dne8WZ4nf1M1g9vOZ4JF2cQ7DfwX6SPuV_nhzkuBcYAifjNYUbFUeKQFRVhoXAnrvvBFT2wCa5pa1QrFpsZbPEsOclCAIwLUx7sbA7V8jZWLDXQm0rlsTUEDAG0g8PQArXf8MiKmOFkoxNPMgmgdt0H6Ju1KqYdmgsTJ87TadLBQ7PVCTm6GfCtSSZBMHfWmvectVWYGRjiHQ';
 
-        final jwt = JWT.tryVerify(token, rsaKey);
+        final jwt = JWT.tryVerify(token, rsaPubKey);
 
         expect(jwt, isNotNull);
         expect(jwt?.payload, equals({'foo': 'bar'}));
@@ -150,7 +130,7 @@ void main() {
             '.eyJmb28iOiJiYXIifQ' +
             '.pIqXt4HVhvjNS-6mPEz9mR7pr8V-w1u-x1jMN7Tie-eqLUEcYA6I-3SeSHfCfEDhM4ssp7wpPZ4CoFJV3m_hQR-sugBbZ6CvSNlGT7U2DXBvmTyHSU-eckM7y4fxWGsa8-PIm1MZHKvIUCD5vYcXKgt0mz_57OOXikcT-sgbUDYB0HU0Gii_klO7QNUV7Wykyu1HK6wg9nQJXJ8rzFhPMGR3Nqo-D9UIhayl714Tm-ZqdAWRD1YMsK6zJz5ajQu1_NZ11j4ACAVF2BuzSSfT2Cuw1zMcE_7xce1nSt1sHho__SBobsUPvO_Izp12ppz--zcAC6dPS1_4W8GxuiodEQ';
 
-        final jwt = JWT.tryVerify(token, rsaKey);
+        final jwt = JWT.tryVerify(token, rsaPubKey);
 
         expect(jwt, isNotNull);
         expect(jwt?.payload, equals({'foo': 'bar'}));
@@ -166,7 +146,7 @@ void main() {
             '.eyJmb28iOiJiYXIifQ' +
             '.mUJVRsRm7VXpxNHfVWdU43BJtuV8MKDcNMSr9agp_-M4FsamUibn04y8PgNzQizdw9BWTwkjQcpm1Go1LHPMyg';
 
-        final jwt = JWT.tryVerify(token, ecKey);
+        final jwt = JWT.tryVerify(token, ecPubKey);
 
         expect(jwt, isNotNull);
         expect(jwt?.payload, equals({'foo': 'bar'}));
@@ -176,7 +156,7 @@ void main() {
             '.eyJmb28iOiJiYXIifQ' +
             '.ZuwDjYNGu7PLS_knFAASC_J4t4tcmv6PHV7Pm_QJImqoCs0K96WFVCDchW4gy6AFE4ANAGTOGgfPcQFulNDAFQ';
 
-        final jwt = JWT.tryVerify(token, secp256kKey);
+        final jwt = JWT.tryVerify(token, secp256kPubKey);
 
         expect(jwt, isNotNull);
         expect(jwt?.payload, equals({'foo': 'bar'}));
@@ -186,7 +166,7 @@ void main() {
             '.eyJmb28iOiJiYXIifQ' +
             '.c0CieEtA25lXmmX3VLeBy0ir8Gv41QGHiwwfHCfzied3v3Ur3DOP0PVjvBkSXQy82iYAWBfjDBj44ZBpwqE4DA';
 
-        final jwt = JWT.tryVerify(token, ecKey);
+        final jwt = JWT.tryVerify(token, ecPubKey);
 
         expect(jwt, isNotNull);
         expect(jwt?.payload, equals({'foo': 'bar'}));
@@ -196,7 +176,7 @@ void main() {
             '.eyJmb28iOiJiYXIifQ' +
             '.WwnWqtru-JEM1fvkYFEgm5946iSk1esdZuBNbQAbfdg6FURD-3J6HEEoLlIQQ8oh8LfdyDR8KSAVt83WLHUFqg';
 
-        final jwt = JWT.tryVerify(token, ecKey);
+        final jwt = JWT.tryVerify(token, ecPubKey);
 
         expect(jwt, isNotNull);
         expect(jwt?.payload, equals({'foo': 'bar'}));
@@ -212,7 +192,7 @@ void main() {
             '.eyJmb28iOiJiYXIifQ' +
             '.JYyEew2G-Bb6p8L7BCfZ79o-42HlMynq7zS_Rc_3q3M2CjvaEY1F_ratOPlveR8wqTAN6swxVfx48ZdRnV282EckX9JOel_MjQH87Iutauj-v6D90xLW2IZt-T2gOkqIo2AQ2i1PeM47jCwbawwuYyy_G433-Rw3tP2j6neNV9tTIAjQicaDVxeqKcvF3l1YjsSLqrLGB4rHLZcCv47CURpO9ZB7WgmOvP_vqKJB_Pcoo6iMI0EIW6REYFIXF1Wxs8Xg9Schyb6p1WjRD4fGPDW9m_uqoaOw9TfAh4GKeWYXE5sw1EZH2l5grStK3_dA0bLeLCOKZkZJZm-TD_cyRw';
 
-        final jwt = JWT.tryVerify(token, rsaKey);
+        final jwt = JWT.tryVerify(token, rsaPubKey);
 
         expect(jwt, isNotNull);
         expect(jwt?.payload, equals({'foo': 'bar'}));
@@ -222,7 +202,7 @@ void main() {
             '.eyJmb28iOiJiYXIifQ' +
             '.dsTJLDMHPG39hBvTWrRAaSFJjRZ8oy5mTPi4EXfgzHj95UznA_LTJwS_T_BCPZ0nU3xjdybyFo7KQU07npShBt4h-1_qsD_VtHZpRFNrzLj9M2mJ40AdQGr_br4itcTotjycy3D6OCCbibHll4zokklRqdz5GL1ofqlMV4a07UzaaDngMXtd88rRclPYR2Z6tW9B_YLqQa_zIRm2kjt2_UuyC2vS70NpbtCWGnB07xLWfTvTLeTwTMfmWcemTEmIq6c-yLSdhenvhJbnKaIDYp7XLqvQPg-cJItAefE-K0aOB1-dji_VLL1GDn1wdkqMaou3ZJ3c8-iSW1uxmW7XSA';
 
-        final jwt = JWT.tryVerify(token, rsaKey);
+        final jwt = JWT.tryVerify(token, rsaPubKey);
 
         expect(jwt, isNotNull);
         expect(jwt?.payload, equals({'foo': 'bar'}));
@@ -232,7 +212,7 @@ void main() {
             '.eyJmb28iOiJiYXIifQ' +
             '.qxSGiQw_OxrmC5AXJB8-06BFjSUyzZv8qK6ClvFHYAh57RrDHBcX-Msly0woDYgxc4ZMTnqJcncbDkA6caXil6e-3q5HPbcjU__tHaCWVglfM9A0ckObE_LL_Q6eJd7aYUFRCvgJ1bmjnT8KUmIMs5dM0PIlAgcVDiBdHkrEa4i8cdl9wd0W3xVOrbSuXc3NVAt5kSHdrC7dK5Zmx6aYmrbD346W_Kg-JmZwJwUzq8BPlbOaRbIg1OkkEtGV2SvI552zbcR0dR_1tB26cIn7G2CIKN77qULVRwZHpzZbM9HzL5edu4U8OzijyRfA1bWLfPNEgy0VYw6zskzReFRCiA';
 
-        final jwt = JWT.tryVerify(token, rsaKey);
+        final jwt = JWT.tryVerify(token, rsaPubKey);
 
         expect(jwt, isNotNull);
         expect(jwt?.payload, equals({'foo': 'bar'}));
@@ -248,7 +228,7 @@ void main() {
             '.eyJmb28iOiJiYXIifQ' +
             '.6Bw5vvdpJ_kgDwidU1l7aagtKCD9-QIJxrz44HXxtc6OJoOmImNko0dgXYpTtXhcEuX7vamSR5JPfGP1Q9d9DA';
 
-        final jwt = JWT.tryVerify(token, edKey);
+        final jwt = JWT.tryVerify(token, edPubKey);
 
         expect(jwt, isNotNull);
         expect(jwt?.payload, equals({'foo': 'bar'}));

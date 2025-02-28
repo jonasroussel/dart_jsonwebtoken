@@ -127,12 +127,21 @@ String curveOpenSSLToNIST(String curveName) {
       return "P-384";
     case "secp521r1":
       return "P-521";
-    case "secp192r1":
-      return "P-192";
-    case "secp224r1":
-      return "P-224";
     default:
       return curveName; // Return the original name if not found
+  }
+}
+
+String curveNISTToOpenSSL(String curveName) {
+  switch (curveName) {
+    case "P-256":
+      return "prime256v1";
+    case "P-384":
+      return "secp384r1";
+    case "P-521":
+      return "secp521r1";
+    default:
+      return curveName;
   }
 }
 

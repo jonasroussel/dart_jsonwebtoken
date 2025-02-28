@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 import 'package:pointycastle/pointycastle.dart' as pc;
+import 'package:pointycastle/ecc/ecc_fp.dart' as ecc_fp;
 
 import 'algorithms.dart';
 import 'exceptions.dart';
@@ -10,7 +11,114 @@ import 'helpers.dart';
 import 'key_parser.dart';
 
 abstract class JWTKey {
+  /// Convert the key to a JWK JSON object representation
   Map<String, dynamic> toJWK({String? keyID});
+
+  /// Parse a JWK JSON object into any valid JWTKey,
+  ///
+  /// Including `SecretKey`, `RSAPrivateKey`, `RSAPublicKey`, `ECPrivateKey`,
+  /// `ECPublicKey`, `EdDSAPrivateKey` and `EdDSAPublicKey`.
+  ///
+  /// Throws a `JWTParseException` if the JWK is invalid or unsupported.
+  static JWTKey fromJWK(Map<String, dynamic> jwk) {
+    if (jwk['kty'] == 'oct') {
+      final key = base64Padded(jwk['k']);
+
+      return SecretKey(key, isBase64Encoded: true);
+    }
+
+    if (jwk['kty'] == 'RSA') {
+      // Private key
+      if (jwk['p'] != null &&
+          jwk['q'] != null &&
+          jwk['d'] != null &&
+          jwk['n'] != null) {
+        final p = bigIntFromBytes(base64Url.decode(base64Padded(jwk['p'])));
+        final q = bigIntFromBytes(base64Url.decode(base64Padded(jwk['q'])));
+        final d = bigIntFromBytes(base64Url.decode(base64Padded(jwk['d'])));
+        final n = bigIntFromBytes(base64Url.decode(base64Padded(jwk['n'])));
+
+        return RSAPrivateKey.raw(pc.RSAPrivateKey(n, d, p, q));
+      }
+
+      // Public key
+      if (jwk['e'] != null && jwk['n'] != null) {
+        final e = bigIntFromBytes(base64Url.decode(base64Padded(jwk['e'])));
+        final n = bigIntFromBytes(base64Url.decode(base64Padded(jwk['n'])));
+
+        return RSAPublicKey.raw(pc.RSAPublicKey(n, e));
+      }
+
+      throw JWTParseException('Invalid JWK');
+    }
+
+    if (jwk['kty'] == 'EC') {
+      final crv = jwk['crv'];
+
+      if (!['P-256', 'P-384', 'P-521', 'secp256k1'].contains(crv)) {
+        throw JWTParseException('Unsupported curve');
+      }
+
+      // Private key
+      if (jwk['d'] != null) {
+        final d = bigIntFromBytes(base64Url.decode(base64Padded(jwk['d'])));
+
+        return ECPrivateKey.raw(pc.ECPrivateKey(
+          d,
+          pc.ECDomainParameters(curveNISTToOpenSSL(crv)),
+        ));
+      }
+
+      // Public key
+      if (jwk['x'] != null && jwk['y'] != null) {
+        final x = bigIntFromBytes(base64Url.decode(base64Padded(jwk['x'])));
+        final y = bigIntFromBytes(base64Url.decode(base64Padded(jwk['y'])));
+
+        final params = pc.ECDomainParameters(curveNISTToOpenSSL(crv));
+
+        return ECPublicKey.raw(pc.ECPublicKey(
+          ecc_fp.ECPoint(
+            params.curve as ecc_fp.ECCurve,
+            params.curve.fromBigInteger(x) as ecc_fp.ECFieldElement?,
+            params.curve.fromBigInteger(y) as ecc_fp.ECFieldElement?,
+            false,
+          ),
+          params,
+        ));
+      }
+
+      throw JWTParseException('Invalid JWK');
+    }
+
+    if (jwk['kty'] == 'OKP') {
+      final crv = jwk['crv'];
+
+      if (crv != 'Ed25519') throw JWTParseException('Unsupported curve');
+
+      // Private key
+      if (jwk['d'] != null && jwk['x'] != null) {
+        final d = base64Url.decode(base64Padded(jwk['d']));
+        final x = base64Url.decode(base64Padded(jwk['x']));
+
+        return EdDSAPrivateKey(
+          Uint8List(d.length + x.length)
+            ..setAll(0, d)
+            ..setAll(d.length, x),
+        );
+      }
+
+      // Public key
+      if (jwk['x'] != null) {
+        final x = base64Url.decode(base64Padded(jwk['x']));
+
+        return EdDSAPublicKey(x);
+      }
+
+      throw JWTParseException('Invalid JWK');
+    }
+
+    throw JWTParseException('Unsupported key type');
+  }
 }
 
 /// For HMAC algorithms
@@ -27,7 +135,7 @@ class SecretKey extends JWTKey {
     Map<String, dynamic> jwk = {
       'kty': 'oct',
       'use': 'sig',
-      'k': base64Url.encode(keyBytes),
+      'k': base64Unpadded(base64Url.encode(keyBytes)),
     };
 
     if (keyID != null) jwk['kid'] = keyID;
@@ -223,8 +331,9 @@ class ECPublicKey extends JWTKey {
 
   @override
   Map<String, dynamic> toJWK({String? keyID, ECDSAAlgorithm? algorithm}) {
-    final curve = key.parameters?.domainName;
-    if (curve == null) throw ArgumentError('curve is null');
+    final params = key.parameters;
+    if (params == null) throw ArgumentError('parameters is null');
+    final curve = curveOpenSSLToNIST(params.domainName);
     final x = key.Q?.x?.toBigInteger();
     if (x == null) throw ArgumentError('x is null');
     final y = key.Q?.y?.toBigInteger();
@@ -233,13 +342,14 @@ class ECPublicKey extends JWTKey {
     Map<String, dynamic> jwk = {
       'kty': 'EC',
       'use': 'sig',
-      'crv': curveOpenSSLToNIST(curve),
+      'crv': curve,
       'x': base64Unpadded(base64Url.encode(bigIntToBytes(x).reversed.toList())),
       'y': base64Unpadded(base64Url.encode(bigIntToBytes(y).reversed.toList())),
     };
 
     if (keyID != null) jwk['kid'] = keyID;
-    if (algorithm != null) jwk['alg'] = algorithm.name;
+    final alg = algorithm?.name ?? ecCurveToAlgorithm(curve)?.name;
+    if (alg != null) jwk['alg'] = alg;
 
     return jwk;
   }

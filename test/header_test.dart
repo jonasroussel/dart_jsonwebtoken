@@ -3,7 +3,7 @@ import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:fake_async/fake_async.dart';
 import 'package:test/test.dart';
 
-final hsKey = SecretKey('secret passphrase');
+import 'keys_const.dart';
 
 void main() {
   group("JWT Header", () {
