@@ -1,7 +1,6 @@
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:crypto/crypto.dart';
 import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 import 'package:pointycastle/pointycastle.dart' as pc;
 
@@ -148,12 +147,10 @@ class HMACAlgorithm extends JWTAlgorithm {
 
     final keyBytes = decodeHMACSecret(secretKey.key, secretKey.isBase64Encoded);
 
-    final hmac = Hmac(
-      _getHash(name),
-      keyBytes,
-    );
+    final hmac = pc.Mac('${_getHash(name)}/HMAC');
+    hmac.init(pc.KeyParameter(keyBytes));
 
-    return Uint8List.fromList(hmac.convert(body).bytes);
+    return Uint8List.fromList(hmac.process(body));
   }
 
   @override
@@ -171,14 +168,14 @@ class HMACAlgorithm extends JWTAlgorithm {
     return true;
   }
 
-  Hash _getHash(String name) {
+  String _getHash(String name) {
     switch (name) {
       case 'HS256':
-        return sha256;
+        return 'SHA-256';
       case 'HS384':
-        return sha384;
+        return 'SHA-384';
       case 'HS512':
-        return sha512;
+        return 'SHA-512';
       default:
         throw ArgumentError.value(name, 'name', 'unknown hash name');
     }

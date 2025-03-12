@@ -2,8 +2,6 @@ import 'dart:collection';
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:collection/collection.dart';
-
 import 'algorithms.dart';
 import 'exceptions.dart';
 import 'helpers.dart';
@@ -112,7 +110,7 @@ class JWT {
             if (payload['aud'] is String && payload['aud'] != audience.first) {
               throw JWTInvalidException('invalid audience');
             } else if (payload['aud'] is List &&
-                !ListEquality().equals(payload['aud'], audience)) {
+                !isListEquals(payload['aud'], audience)) {
               throw JWTInvalidException('invalid audience');
             }
           } else {
