@@ -1,3 +1,10 @@
+## 3.2.0
+
+- Update upper bound of pointycastle (https://github.com/jonasroussel/dart_jsonwebtoken/pull/65)
+- Dart SDK minimum version set to 3.0.0
+- Use `pointycastle` for HMAC calculation instead of `crypto`
+- Implement custom deep list equality instead of using the `collection` package
+
 ## 3.1.1
 
 - Rollback `collection` to 1.17.1 to be compatible with older flutter versions
