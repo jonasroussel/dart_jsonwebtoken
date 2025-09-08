@@ -197,7 +197,8 @@ class JWT {
   static JWT decode(String token) {
     try {
       final parts = token.split('.');
-      var header = jsonBase64.decode(base64Padded(parts[0]));
+      var header =
+          jsonBase64.decode(base64Padded(parts[0])) as Map<String, dynamic>;
 
       dynamic payload;
 
@@ -214,7 +215,7 @@ class JWT {
 
       return JWT(
         payload,
-        header: header is! Map<String, dynamic> ? null : header,
+        header: header,
         audience: audiance,
         issuer: issuer,
         subject: subject,
