@@ -54,10 +54,10 @@ class JWT {
         throw JWTInvalidException('invalid signature');
       }
 
-      dynamic payload;
+      Object payload;
 
       try {
-        payload = jsonBase64.decode(base64Padded(parts[1]));
+        payload = jsonBase64.decode(base64Padded(parts[1])) as Map;
       } catch (ex) {
         payload = utf8.decode(base64Url.decode(base64Padded(parts[1])));
       }
@@ -240,31 +240,34 @@ class JWT {
 
   /// JSON Web Token
   JWT(
-    this.payload, {
+    Object payload, {
     this.audience,
     this.subject,
     this.issuer,
     this.jwtId,
-    this.header,
-  });
+    Map<String, dynamic>? header,
+  })  : payload = payload is String
+            ? payload
+            : Map<String, dynamic>.unmodifiable(payload as Map),
+        header = header != null ? Map.unmodifiable(header) : null;
 
-  /// Custom claims
-  dynamic payload;
+  /// Custom claims, contains either a `Map<String, dynamic>` or plain `String`.
+  final Object payload;
 
   /// Audience claim
-  Audience? audience;
+  final Audience? audience;
 
   /// Subject claim
-  String? subject;
+  final String? subject;
 
   /// Issuer claim
-  String? issuer;
+  final String? issuer;
 
   /// JWT Id claim
-  String? jwtId;
+  final String? jwtId;
 
   /// JWT header
-  Map<String, dynamic>? header;
+  final Map<String, dynamic>? header;
 
   /// Sign and generate a new token.
   ///
@@ -280,8 +283,9 @@ class JWT {
     Duration? notBefore,
     bool noIssueAt = false,
   }) {
+    var payload = this.payload;
     try {
-      if (payload is Map<String, dynamic> || payload is Map<dynamic, dynamic>) {
+      if (payload is Map) {
         try {
           payload = Map<String, dynamic>.from(payload);
 
