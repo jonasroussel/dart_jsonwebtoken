@@ -215,7 +215,7 @@ class JWT {
       final payload =
           (jsonBase64.decode(base64Padded(parts[1])) as Map<String, dynamic>);
 
-      final audiance = _parseAud(payload['aud']);
+      final audience = _parseAud(payload['aud']);
       final issuer = payload['iss']?.toString();
       final subject = payload['sub']?.toString();
       final jwtId = payload['jti']?.toString();
@@ -223,7 +223,7 @@ class JWT {
       return JWT(
         payload,
         header: header is! Map<String, dynamic> ? null : header,
-        audience: audiance,
+        audience: audience,
         issuer: issuer,
         subject: subject,
         jwtId: jwtId,
