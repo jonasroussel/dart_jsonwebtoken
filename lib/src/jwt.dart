@@ -224,7 +224,7 @@ class JWT {
       return JWT(
         payload,
         header: header,
-        audience: audiance,
+        audience: audience,
         issuer: issuer,
         subject: subject,
         jwtId: jwtId,
