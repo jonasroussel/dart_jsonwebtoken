@@ -1,3 +1,7 @@
+## 3.3.0
+
+- Increase `JWT.payload` strictness (https://github.com/jonasroussel/dart_jsonwebtoken/issues/67)
+
 ## 3.2.0
 
 - Update upper bound of pointycastle (https://github.com/jonasroussel/dart_jsonwebtoken/pull/65)
