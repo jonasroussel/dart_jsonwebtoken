@@ -2,6 +2,7 @@ name: Tests CI
 on:
   pull_request:
     types: [opened, synchronize]
+  workflow_dispatch:
 
 jobs:
   analyze:
