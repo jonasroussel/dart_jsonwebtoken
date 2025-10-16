@@ -1,5 +1,10 @@
+## 3.3.1
+
+- Rollback to a `dynamic` `JWT.payload`
+
 ## 3.3.0
 
+- **RETRACTED**
 - Increase `JWT.payload` strictness (https://github.com/jonasroussel/dart_jsonwebtoken/issues/67)
 
 ## 3.2.0

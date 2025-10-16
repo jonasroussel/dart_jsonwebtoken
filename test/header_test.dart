@@ -147,18 +147,5 @@ void main() {
         });
       });
     });
-
-    group('invalid header', () {
-      test('invalid (non map) header should fail to decode', () {
-        final token =
-            'W10' + // base64 for `[]`, which can JSON decode but is not valid
-                '.eyJmb28iOiJiYXIifQ' +
-                '.'; // signature is not checked here
-
-        final jwt = JWT.tryDecode(token);
-
-        expect(jwt, isNull);
-      });
-    });
   });
 }

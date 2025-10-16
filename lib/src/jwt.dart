@@ -20,9 +20,6 @@ class JWT {
   /// value is a timestamp (number of seconds since epoch) in UTC if
   /// [issueAtUtc] is true, it is compared to the value of the 'iat' claim.
   /// Verification fails if the 'iat' claim is before [issueAt].
-  ///
-  /// If the embedded `payload` is not a JSON map (but rather just a plain string),
-  /// none of the verifications are executed. In that case only the signature is verified.
   static JWT verify(
     String token,
     JWTKey key, {
@@ -64,11 +61,10 @@ class JWT {
         throw JWTInvalidException('invalid signature');
       }
 
-      Object payload;
+      dynamic payload;
 
       try {
-        payload =
-            jsonBase64.decode(base64Padded(parts[1])) as Map<String, dynamic>;
+        payload = jsonBase64.decode(base64Padded(parts[1]));
       } catch (ex) {
         payload = utf8.decode(base64Url.decode(base64Padded(parts[1])));
       }
@@ -205,16 +201,18 @@ class JWT {
   ///
   /// This also sets [JWT.audience], [JWT.subject], [JWT.issuer], and
   /// [JWT.jwtId] even though they are not verified. Use with caution.
-  ///
-  /// This methods only supports map payloads. For `String` payloads use `verify`.
   static JWT decode(String token) {
     try {
       final parts = token.split('.');
-      var header =
-          jsonBase64.decode(base64Padded(parts[0])) as Map<String, dynamic>;
+      var header = jsonBase64.decode(base64Padded(parts[0]));
 
-      final payload =
-          (jsonBase64.decode(base64Padded(parts[1])) as Map<String, dynamic>);
+      dynamic payload;
+
+      try {
+        payload = jsonBase64.decode(base64Padded(parts[1]));
+      } catch (ex) {
+        payload = utf8.decode(base64Url.decode(base64Padded(parts[1])));
+      }
 
       final audience = _parseAud(payload['aud']);
       final issuer = payload['iss']?.toString();
@@ -223,7 +221,7 @@ class JWT {
 
       return JWT(
         payload,
-        header: header,
+        header: header is! Map<String, dynamic> ? null : header,
         audience: audience,
         issuer: issuer,
         subject: subject,
@@ -249,36 +247,16 @@ class JWT {
 
   /// JSON Web Token
   JWT(
-    Object payload, {
+    this.payload, {
     this.audience,
     this.subject,
     this.issuer,
     this.jwtId,
     this.header,
-  }) {
-    this.payload = payload;
-  }
+  });
 
-  late Object _payload;
-
-  /// The token's payload, either as a `Map<String, dynamic>` or plain `String`
-  /// (in case it was not a JSON-encoded map).
-  ///
-  /// If it's a map, it has all claims, containing the utilized registered claims
-  /// as well custom ones added.
-  Object get payload => _payload;
-
-  void set payload(Object value) {
-    if (value is String) {
-      _payload = value;
-    } else if (value is Map) {
-      _payload = Map<String, dynamic>.from(value);
-    } else {
-      throw Exception(
-        'Unexpected `payload` type `${value.runtimeType}`, must be either `String` or `Map<String, *>`',
-      );
-    }
-  }
+  /// Custom claims
+  dynamic payload;
 
   /// Audience claim
   Audience? audience;
@@ -310,8 +288,7 @@ class JWT {
     bool noIssueAt = false,
   }) {
     try {
-      var payload = this.payload;
-      if (payload is Map<String, dynamic>) {
+      if (payload is Map<String, dynamic> || payload is Map<dynamic, dynamic>) {
         try {
           payload = Map<String, dynamic>.from(payload);
 
