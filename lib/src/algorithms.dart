@@ -42,7 +42,7 @@ abstract class JWTAlgorithm {
   /// ECDSA using P-384 curve and SHA-384 hash algorithm
   static const ES384 = ECDSAAlgorithm('ES384');
 
-  /// ECDSA using P-512 curve and SHA-512 hash algorithm
+  /// ECDSA using P-521 curve and SHA-512 hash algorithm
   static const ES512 = ECDSAAlgorithm('ES512');
 
   /// ECDSA using secp256k1 curve and SHA-256 hash algorithm
@@ -159,13 +159,7 @@ class HMACAlgorithm extends JWTAlgorithm {
 
     final actual = sign(key, body);
 
-    if (actual.length != signature.length) return false;
-
-    for (var i = 0; i < actual.length; i++) {
-      if (actual[i] != signature[i]) return false;
-    }
-
-    return true;
+    return fixedTimeBytesEquals(actual, signature);
   }
 
   String _getHash(String name) {

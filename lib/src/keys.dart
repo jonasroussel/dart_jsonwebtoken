@@ -279,7 +279,16 @@ class ECPrivateKey extends JWTKey {
   ECPrivateKey.clone(ECPrivateKey _key)
       : key = _key.key,
         size = _key.size;
-  ECPrivateKey.bytes(Uint8List bytes) : key = KeyParser.ecPrivateKey(bytes);
+  ECPrivateKey.bytes(Uint8List bytes) {
+    key = KeyParser.ecPrivateKey(bytes);
+
+    final _params = key.parameters;
+    if (_params == null) {
+      throw JWTParseException('ECPrivateKey parameters are invalid');
+    }
+
+    size = (_params.curve.fieldSize / 8).ceil();
+  }
 
   @override
   Map<String, dynamic> toJWK({String? keyID, ECDSAAlgorithm? algorithm}) {

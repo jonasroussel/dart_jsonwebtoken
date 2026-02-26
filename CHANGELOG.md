@@ -1,3 +1,10 @@
+## 3.3.2
+
+- Use constant-time comparison for HMAC signature verification (timing-attack resistant)
+- Handle non-Map payload in `JWT.decode` (audience, issuer, subject, jwtId)
+- Allow `aud` claim as generic `List` in `_parseAud`
+- Fix `ECPrivateKey.bytes`, derive EC private key size from parameters
+
 ## 3.3.1
 
 - Rollback to a `dynamic` `JWT.payload`

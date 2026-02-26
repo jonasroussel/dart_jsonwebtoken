@@ -204,6 +204,11 @@ class JWT {
   static JWT decode(String token) {
     try {
       final parts = token.split('.');
+
+      if (parts.length < 2 || parts[0].isEmpty || parts[1].isEmpty) {
+        throw JWTInvalidException('invalid token structure');
+      }
+
       var header = jsonBase64.decode(base64Padded(parts[0]));
 
       dynamic payload;
@@ -214,10 +219,21 @@ class JWT {
         payload = utf8.decode(base64Url.decode(base64Padded(parts[1])));
       }
 
-      final audience = _parseAud(payload['aud']);
-      final issuer = payload['iss']?.toString();
-      final subject = payload['sub']?.toString();
-      final jwtId = payload['jti']?.toString();
+      final Audience? audience;
+      final String? issuer;
+      final String? subject;
+      final String? jwtId;
+      if (payload is Map) {
+        audience = _parseAud(payload['aud']);
+        issuer = payload['iss']?.toString();
+        subject = payload['sub']?.toString();
+        jwtId = payload['jti']?.toString();
+      } else {
+        audience = null;
+        issuer = null;
+        subject = null;
+        jwtId = null;
+      }
 
       return JWT(
         payload,
@@ -376,8 +392,8 @@ class JWT {
   static Audience? _parseAud(dynamic val) {
     if (val is String) {
       return Audience.one(val);
-    } else if (val is List<String>) {
-      return Audience(val);
+    } else if (val is List) {
+      return Audience(List.from(val.map((e) => e.toString())));
     } else {
       return null;
     }

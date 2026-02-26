@@ -10,7 +10,7 @@ JSON Web Tokens are an open, industry standard RFC 7519 method for representing 
 
 ## Examples
 
-Check out the [Example File](https://github.com/jonasroussel/dart_jsonwebtoken/blob/main/example/example.dart) for a full example code of all the differents algorithms.
+Check out the [Example File](https://github.com/jonasroussel/dart_jsonwebtoken/blob/main/example/example.dart) for a full example code of all the different algorithms.
 
 You can also check out the [jwt.io](https://jwt.io) website for more information.
 
@@ -45,7 +45,7 @@ final token = jwt.sign(SecretKey('secret passphrase'));
 print('Signed token: $token\n');
 ```
 
-### Check if the JWT made is correct.
+### Verifying a JWT
 
 ```dart
 try {
@@ -60,7 +60,9 @@ try {
 }
 ```
 
-### You can also, decode the token without checking its signature
+### Decoding without verification
+
+You can decode a token without checking its signature (e.g. for inspection). **Do not use this for authorization**—always verify with `JWT.verify` when trusting the token.
 
 ```dart
 final jwt = JWT.decode(token);
@@ -68,12 +70,12 @@ final jwt = JWT.decode(token);
 print('Payload: ${jwt.payload}');
 ```
 
-### Keys creation for all the algorithms
+### Key creation for all algorithms
 
-The raw PEM content provided here is intended for learning purposes. In a production environment, it's recommended to read the private and public keys from separate files. Then, you can pass the content of these files (as strings) in the parameters
+The raw PEM content below is for learning only. In production, read private and public keys from files and pass their contents (as strings) to the constructors.
 
 ```dart
-// H256, H384, H512
+// HS256, HS384, HS512
 final hmacKey = SecretKey('secret passphrase');
 
 
@@ -104,7 +106,7 @@ MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgevZzL1gdAFr88hb2
 ''');
 
 // You can also extract the public key from a certificate with ECPublicKey.cert(...)
-final ecPubKey = ECPublicKEy('''
+final ecPubKey = ECPublicKey('''
 -----BEGIN PUBLIC KEY-----
 MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEEVs/o5+uQbTjL3chynL4wXgUg2R9
 ...
