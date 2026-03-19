@@ -8,9 +8,6 @@ on:
   schedule:
     - cron: "0 0 * * 0"
 
-env:
-  PUB_ENVIRONMENT: bot.github
-
 jobs:
   analyze:
     runs-on: ubuntu-latest
