@@ -69,9 +69,7 @@ void main() {
           isA<AssertionError>().having(
             (e) => e.message,
             'message',
-            contains(
-              'If payload is a Map its must be a Map<String, dynamic>',
-            ),
+            contains('If payload is a Map its must be a Map<String, dynamic>'),
           ),
         ),
       );

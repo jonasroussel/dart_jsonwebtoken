@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
-import 'package:pointycastle/pointycastle.dart' as pc;
 import 'package:pointycastle/ecc/ecc_fp.dart' as ecc_fp;
+import 'package:pointycastle/pointycastle.dart' as pc;
 
 import 'algorithms.dart';
 import 'exceptions.dart';
@@ -20,105 +20,86 @@ abstract class JWTKey {
   /// `ECPublicKey`, `EdDSAPrivateKey` and `EdDSAPublicKey`.
   ///
   /// Throws a `JWTParseException` if the JWK is invalid or unsupported.
-  static JWTKey fromJWK(Map<String, dynamic> jwk) {
-    if (jwk['kty'] == 'oct') {
-      final key = base64Padded(jwk['k']);
-
-      return SecretKey(key, isBase64Encoded: true);
-    }
-
-    if (jwk['kty'] == 'RSA') {
-      // Private key
-      if (jwk['p'] != null &&
-          jwk['q'] != null &&
-          jwk['d'] != null &&
-          jwk['n'] != null) {
-        final p = bigIntFromBytes(base64Url.decode(base64Padded(jwk['p'])));
-        final q = bigIntFromBytes(base64Url.decode(base64Padded(jwk['q'])));
-        final d = bigIntFromBytes(base64Url.decode(base64Padded(jwk['d'])));
-        final n = bigIntFromBytes(base64Url.decode(base64Padded(jwk['n'])));
-
-        return RSAPrivateKey.raw(pc.RSAPrivateKey(n, d, p, q));
-      }
-
-      // Public key
-      if (jwk['e'] != null && jwk['n'] != null) {
-        final e = bigIntFromBytes(base64Url.decode(base64Padded(jwk['e'])));
-        final n = bigIntFromBytes(base64Url.decode(base64Padded(jwk['n'])));
-
-        return RSAPublicKey.raw(pc.RSAPublicKey(n, e));
-      }
-
-      throw JWTParseException('Invalid JWK');
-    }
-
-    if (jwk['kty'] == 'EC') {
-      final crv = jwk['crv'];
-
-      if (!['P-256', 'P-384', 'P-521', 'secp256k1'].contains(crv)) {
-        throw JWTParseException('Unsupported curve');
-      }
-
-      // Private key
-      if (jwk['d'] != null) {
-        final d = bigIntFromBytes(base64Url.decode(base64Padded(jwk['d'])));
-
-        return ECPrivateKey.raw(pc.ECPrivateKey(
-          d,
+  static JWTKey fromJWK(Map<String, dynamic> jwk) => switch (jwk) {
+    {'kty': 'oct', 'k': final String k} => SecretKey(
+      base64Padded(k),
+      isBase64Encoded: true,
+    ),
+    {
+      'kty': 'RSA',
+      'p': final String p,
+      'q': final String q,
+      'd': final String d,
+      'n': final String n,
+    } =>
+      RSAPrivateKey.raw(
+        pc.RSAPrivateKey(
+          bigIntFromBytes(base64Url.decode(base64Padded(n))),
+          bigIntFromBytes(base64Url.decode(base64Padded(d))),
+          bigIntFromBytes(base64Url.decode(base64Padded(p))),
+          bigIntFromBytes(base64Url.decode(base64Padded(q))),
+        ),
+      ),
+    {'kty': 'RSA', 'e': final String e, 'n': final String n} =>
+      RSAPublicKey.raw(
+        pc.RSAPublicKey(
+          bigIntFromBytes(base64Url.decode(base64Padded(n))),
+          bigIntFromBytes(base64Url.decode(base64Padded(e))),
+        ),
+      ),
+    {'kty': 'EC', 'crv': final String crv, 'd': final String d}
+        when ['P-256', 'P-384', 'P-521', 'secp256k1'].contains(crv) =>
+      ECPrivateKey.raw(
+        pc.ECPrivateKey(
+          bigIntFromBytes(base64Url.decode(base64Padded(d))),
           pc.ECDomainParameters(curveNISTToOpenSSL(crv)),
-        ));
-      }
-
-      // Public key
-      if (jwk['x'] != null && jwk['y'] != null) {
-        final x = bigIntFromBytes(base64Url.decode(base64Padded(jwk['x'])));
-        final y = bigIntFromBytes(base64Url.decode(base64Padded(jwk['y'])));
-
+        ),
+      ),
+    {
+      'kty': 'EC',
+      'crv': final String crv,
+      'x': final String x,
+      'y': final String y,
+    }
+        when ['P-256', 'P-384', 'P-521', 'secp256k1'].contains(crv) =>
+      ECPublicKey.raw(() {
         final params = pc.ECDomainParameters(curveNISTToOpenSSL(crv));
-
-        return ECPublicKey.raw(pc.ECPublicKey(
+        return pc.ECPublicKey(
           ecc_fp.ECPoint(
             params.curve as ecc_fp.ECCurve,
-            params.curve.fromBigInteger(x) as ecc_fp.ECFieldElement?,
-            params.curve.fromBigInteger(y) as ecc_fp.ECFieldElement?,
-            false,
+            params.curve.fromBigInteger(
+                  bigIntFromBytes(base64Url.decode(base64Padded(x))),
+                )
+                as ecc_fp.ECFieldElement?,
+            params.curve.fromBigInteger(
+                  bigIntFromBytes(base64Url.decode(base64Padded(y))),
+                )
+                as ecc_fp.ECFieldElement?,
           ),
           params,
-        ));
-      }
-
-      throw JWTParseException('Invalid JWK');
-    }
-
-    if (jwk['kty'] == 'OKP') {
-      final crv = jwk['crv'];
-
-      if (crv != 'Ed25519') throw JWTParseException('Unsupported curve');
-
-      // Private key
-      if (jwk['d'] != null && jwk['x'] != null) {
-        final d = base64Url.decode(base64Padded(jwk['d']));
-        final x = base64Url.decode(base64Padded(jwk['x']));
-
-        return EdDSAPrivateKey(
-          Uint8List(d.length + x.length)
-            ..setAll(0, d)
-            ..setAll(d.length, x),
         );
-      }
-
-      // Public key
-      if (jwk['x'] != null) {
-        final x = base64Url.decode(base64Padded(jwk['x']));
-
-        return EdDSAPublicKey(x);
-      }
-
-      throw JWTParseException('Invalid JWK');
-    }
-
-    throw JWTParseException('Unsupported key type');
-  }
+      }()),
+    {
+      'kty': 'OKP',
+      'crv': 'Ed25519',
+      'd': final String d,
+      'x': final String x,
+    } =>
+      EdDSAPrivateKey(() {
+        final dBytes = base64Url.decode(base64Padded(d));
+        final xBytes = base64Url.decode(base64Padded(x));
+        return Uint8List(dBytes.length + xBytes.length)
+          ..setAll(0, dBytes)
+          ..setAll(dBytes.length, xBytes);
+      }()),
+    {'kty': 'OKP', 'crv': 'Ed25519', 'x': final String x} => EdDSAPublicKey(
+      base64Url.decode(base64Padded(x)),
+    ),
+    {'kty': 'EC', 'crv': final String _} => throw JWTParseException(
+      'Unsupported curve',
+    ),
+    _ => throw JWTParseException('Invalid or unsupported JWK'),
+  };
 }
 
 /// For HMAC algorithms
@@ -132,7 +113,7 @@ class SecretKey extends JWTKey {
   Map<String, dynamic> toJWK({String? keyID, HMACAlgorithm? algorithm}) {
     final keyBytes = decodeHMACSecret(key, isBase64Encoded);
 
-    Map<String, dynamic> jwk = {
+    final jwk = <String, dynamic>{
       'kty': 'oct',
       'use': 'sig',
       'k': base64Unpadded(base64Url.encode(keyBytes)),
@@ -156,8 +137,8 @@ class RSAPrivateKey extends JWTKey {
     );
   }
 
-  RSAPrivateKey.raw(pc.RSAPrivateKey _key) : key = _key;
-  RSAPrivateKey.clone(RSAPrivateKey _key) : key = _key.key;
+  RSAPrivateKey.raw(this.key);
+  RSAPrivateKey.clone(RSAPrivateKey other) : key = other.key;
   RSAPrivateKey.bytes(Uint8List bytes) : key = KeyParser.rsaPrivateKey(bytes);
 
   @override
@@ -176,19 +157,22 @@ class RSAPrivateKey extends JWTKey {
     final dq = d % (q - BigInt.one);
     final qi = q.modInverse(p);
 
-    Map<String, dynamic> jwk = {
+    final jwk = <String, dynamic>{
       'kty': 'RSA',
       'use': 'sig',
       'p': base64Unpadded(base64Url.encode(bigIntToBytes(p).reversed.toList())),
       'q': base64Unpadded(base64Url.encode(bigIntToBytes(q).reversed.toList())),
       'd': base64Unpadded(base64Url.encode(bigIntToBytes(d).reversed.toList())),
       'e': base64Unpadded(base64Url.encode(bigIntToBytes(e).reversed.toList())),
-      'dp':
-          base64Unpadded(base64Url.encode(bigIntToBytes(dp).reversed.toList())),
-      'dq':
-          base64Unpadded(base64Url.encode(bigIntToBytes(dq).reversed.toList())),
-      'qi':
-          base64Unpadded(base64Url.encode(bigIntToBytes(qi).reversed.toList())),
+      'dp': base64Unpadded(
+        base64Url.encode(bigIntToBytes(dp).reversed.toList()),
+      ),
+      'dq': base64Unpadded(
+        base64Url.encode(bigIntToBytes(dq).reversed.toList()),
+      ),
+      'qi': base64Unpadded(
+        base64Url.encode(bigIntToBytes(qi).reversed.toList()),
+      ),
       'n': base64Unpadded(base64Url.encode(bigIntToBytes(n).reversed.toList())),
     };
 
@@ -210,8 +194,8 @@ class RSAPublicKey extends JWTKey {
     );
   }
 
-  RSAPublicKey.raw(pc.RSAPublicKey _key) : key = _key;
-  RSAPublicKey.clone(RSAPublicKey _key) : key = _key.key;
+  RSAPublicKey.raw(this.key);
+  RSAPublicKey.clone(RSAPublicKey other) : key = other.key;
   RSAPublicKey.bytes(Uint8List bytes) {
     try {
       key = KeyParser.rsaPublicKey(bytes);
@@ -232,7 +216,7 @@ class RSAPublicKey extends JWTKey {
     final n = key.modulus;
     if (n == null) throw ArgumentError('n is null');
 
-    Map<String, dynamic> jwk = {
+    final jwk = <String, dynamic>{
       'kty': 'RSA',
       'use': 'sig',
       'e': base64Unpadded(base64Url.encode(bigIntToBytes(e).reversed.toList())),
@@ -252,42 +236,40 @@ class ECPrivateKey extends JWTKey {
   late int size;
 
   ECPrivateKey(String pem) {
-    final _key = KeyParser.ecPrivateKeyFromPEM(
+    final parsedKey = KeyParser.ecPrivateKeyFromPEM(
       pem,
       pkcs1: pem.startsWith(KeyParser.BEGIN_EC_PRIVATE_KEY),
     );
-    final _params = _key.parameters;
+    final params = parsedKey.parameters;
 
-    if (_params == null) {
+    if (params == null) {
       throw JWTParseException('ECPrivateKey parameters are invalid');
     }
 
-    key = _key;
-    size = (_params.curve.fieldSize / 8).ceil();
+    key = parsedKey;
+    size = (params.curve.fieldSize / 8).ceil();
   }
 
-  ECPrivateKey.raw(pc.ECPrivateKey _key) {
-    final _params = _key.parameters;
+  ECPrivateKey.raw(pc.ECPrivateKey other) {
+    final params = other.parameters;
 
-    if (_params == null) {
+    if (params == null) {
       throw JWTParseException('ECPrivateKey parameters are invalid');
     }
 
-    key = _key;
-    size = (_params.curve.fieldSize / 8).ceil();
+    key = other;
+    size = (params.curve.fieldSize / 8).ceil();
   }
-  ECPrivateKey.clone(ECPrivateKey _key)
-      : key = _key.key,
-        size = _key.size;
+  ECPrivateKey.clone(ECPrivateKey other) : key = other.key, size = other.size;
   ECPrivateKey.bytes(Uint8List bytes) {
     key = KeyParser.ecPrivateKey(bytes);
 
-    final _params = key.parameters;
-    if (_params == null) {
+    final params = key.parameters;
+    if (params == null) {
       throw JWTParseException('ECPrivateKey parameters are invalid');
     }
 
-    size = (_params.curve.fieldSize / 8).ceil();
+    size = (params.curve.fieldSize / 8).ceil();
   }
 
   @override
@@ -297,14 +279,14 @@ class ECPrivateKey extends JWTKey {
     final curve = curveOpenSSLToNIST(params.domainName);
     final d = key.d;
     if (d == null) throw ArgumentError('d is null');
-    final Q = params.G * d;
-    if (Q == null) throw ArgumentError('Q is null');
-    final x = Q.x?.toBigInteger();
+    final qPoint = params.G * d;
+    if (qPoint == null) throw ArgumentError('Q is null');
+    final x = qPoint.x?.toBigInteger();
     if (x == null) throw ArgumentError('x is null');
-    final y = Q.y?.toBigInteger();
+    final y = qPoint.y?.toBigInteger();
     if (y == null) throw ArgumentError('y is null');
 
-    Map<String, dynamic> jwk = {
+    final jwk = <String, dynamic>{
       'kty': 'EC',
       'use': 'sig',
       'crv': curve,
@@ -329,8 +311,8 @@ class ECPublicKey extends JWTKey {
     key = KeyParser.ecPublicKeyFromPEM(pem);
   }
 
-  ECPublicKey.raw(pc.ECPublicKey _key) : key = _key;
-  ECPublicKey.clone(ECPublicKey _key) : key = _key.key;
+  ECPublicKey.raw(this.key);
+  ECPublicKey.clone(ECPublicKey other) : key = other.key;
   ECPublicKey.bytes(Uint8List bytes) : key = KeyParser.ecPublicKey(bytes);
   ECPublicKey.cert(String pem) {
     final bytes = KeyParser.publicKeyBytesFromCertificate(pem);
@@ -348,7 +330,7 @@ class ECPublicKey extends JWTKey {
     final y = key.Q?.y?.toBigInteger();
     if (y == null) throw ArgumentError('y is null');
 
-    Map<String, dynamic> jwk = {
+    final jwk = <String, dynamic>{
       'kty': 'EC',
       'use': 'sig',
       'crv': curve,
@@ -371,11 +353,11 @@ class EdDSAPrivateKey extends JWTKey {
   EdDSAPrivateKey(List<int> bytes) : key = ed.PrivateKey(bytes);
 
   EdDSAPrivateKey.fromPEM(String pem)
-      : key = KeyParser.edPrivateKeyFromPEM(pem);
+    : key = KeyParser.edPrivateKeyFromPEM(pem);
 
   @override
   Map<String, dynamic> toJWK({String? keyID}) {
-    Map<String, dynamic> jwk = {
+    final jwk = <String, dynamic>{
       'kty': 'OKP',
       'use': 'sig',
       'crv': 'Ed25519',
@@ -400,7 +382,7 @@ class EdDSAPublicKey extends JWTKey {
 
   @override
   Map<String, dynamic> toJWK({String? keyID}) {
-    Map<String, dynamic> jwk = {
+    final jwk = <String, dynamic>{
       'kty': 'OKP',
       'use': 'sig',
       'crv': 'Ed25519',
