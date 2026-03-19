@@ -1,3 +1,4 @@
+// ignore_for_file: lines_longer_than_80_chars
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:test/test.dart';
 
@@ -11,11 +12,7 @@ void main() {
 
         expect(
           jwk,
-          equals({
-            'kty': 'oct',
-            'use': 'sig',
-            'k': 'c2VjcmV0IHBhc3NwaHJhc2U',
-          }),
+          equals({'kty': 'oct', 'use': 'sig', 'k': 'c2VjcmV0IHBhc3NwaHJhc2U'}),
         );
 
         final jwkWithAlgorithm = hsKey.toJWK(algorithm: JWTAlgorithm.HS256);
@@ -44,7 +41,7 @@ void main() {
             'qi':
                 'JzNw0H9xSaEp12jIa1QSKL4nOZdMRZBB7JAIxU3rzvOhbM9QtmknkSkqhhaDkNLZicwRLNUeiqpxyJ4nA00KyoQK4C11-L9wnXY300SZBVg2xPwpLymTTq3H9Z4Whgj7KUSY9ilJI9RYZfQp3HZ_0bGBDjW8EEoyHzD5L8RfvB0',
             'n':
-                'u1SU1LfVLPHCozMxH2Mo4lgOEePzNm0tRgeLezV6ffAt0gunVTLw7onLRnrq0_IzW7yWR7QkrmBL7jTKEn5u-qKhbwKfBstIs-bMY2Zkp18gnTxKLxoS2tFczGkPLPgizskuemMghRniWaoLcyehkd3qqGElvW_VDL5AaWTg0nLVkjRo9z-40RQzuVaE8AkAFmxZzow3x-VJYKdjykkJ0iT9wCS0DRTXu269V264Vf_3jvredZiKRkgwlL9xNAwxXFg0x_XFw005UWVRIkdgcKWTjpBP2dPwVZ4WWC-9aGVd-Gyn1o0CLelf4rEjGoXbAAEgAqeGUxrcIlbjXfbcmw'
+                'u1SU1LfVLPHCozMxH2Mo4lgOEePzNm0tRgeLezV6ffAt0gunVTLw7onLRnrq0_IzW7yWR7QkrmBL7jTKEn5u-qKhbwKfBstIs-bMY2Zkp18gnTxKLxoS2tFczGkPLPgizskuemMghRniWaoLcyehkd3qqGElvW_VDL5AaWTg0nLVkjRo9z-40RQzuVaE8AkAFmxZzow3x-VJYKdjykkJ0iT9wCS0DRTXu269V264Vf_3jvredZiKRkgwlL9xNAwxXFg0x_XFw005UWVRIkdgcKWTjpBP2dPwVZ4WWC-9aGVd-Gyn1o0CLelf4rEjGoXbAAEgAqeGUxrcIlbjXfbcmw',
           }),
         );
 
@@ -54,7 +51,7 @@ void main() {
         expect(jwkWithAlgorithm['alg'], equals('RS256'));
       });
 
-      test("should convert RSAPublicKey to JWK", () {
+      test('should convert RSAPublicKey to JWK', () {
         final jwk = rsaPubKey.toJWK();
 
         expect(
@@ -64,7 +61,7 @@ void main() {
             'use': 'sig',
             'e': 'AQAB',
             'n':
-                'u1SU1LfVLPHCozMxH2Mo4lgOEePzNm0tRgeLezV6ffAt0gunVTLw7onLRnrq0_IzW7yWR7QkrmBL7jTKEn5u-qKhbwKfBstIs-bMY2Zkp18gnTxKLxoS2tFczGkPLPgizskuemMghRniWaoLcyehkd3qqGElvW_VDL5AaWTg0nLVkjRo9z-40RQzuVaE8AkAFmxZzow3x-VJYKdjykkJ0iT9wCS0DRTXu269V264Vf_3jvredZiKRkgwlL9xNAwxXFg0x_XFw005UWVRIkdgcKWTjpBP2dPwVZ4WWC-9aGVd-Gyn1o0CLelf4rEjGoXbAAEgAqeGUxrcIlbjXfbcmw'
+                'u1SU1LfVLPHCozMxH2Mo4lgOEePzNm0tRgeLezV6ffAt0gunVTLw7onLRnrq0_IzW7yWR7QkrmBL7jTKEn5u-qKhbwKfBstIs-bMY2Zkp18gnTxKLxoS2tFczGkPLPgizskuemMghRniWaoLcyehkd3qqGElvW_VDL5AaWTg0nLVkjRo9z-40RQzuVaE8AkAFmxZzow3x-VJYKdjykkJ0iT9wCS0DRTXu269V264Vf_3jvredZiKRkgwlL9xNAwxXFg0x_XFw005UWVRIkdgcKWTjpBP2dPwVZ4WWC-9aGVd-Gyn1o0CLelf4rEjGoXbAAEgAqeGUxrcIlbjXfbcmw',
           }),
         );
 
@@ -72,7 +69,7 @@ void main() {
         expect(jwkWithAlgorithm['alg'], equals('RS256'));
       });
 
-      test("should convert ECPrivateKey to JWK", () {
+      test('should convert ECPrivateKey to JWK', () {
         final jwk = ecPrivKey.toJWK();
 
         expect(
@@ -84,12 +81,12 @@ void main() {
             'd': 'evZzL1gdAFr88hb2OF_2NxApJCzGCEDdfSp6VQO30hw',
             'x': 'EVs_o5-uQbTjL3chynL4wXgUg2R9q9UU8I5mEovUf84',
             'y': 'kGe5DgSIycKp8w9aJmoHhB1sB3QTugfnRWm5nU_TzsY',
-            'alg': 'ES256'
+            'alg': 'ES256',
           }),
         );
       });
 
-      test("should convert ECPublicKey to JWK", () {
+      test('should convert ECPublicKey to JWK', () {
         final jwk = ecPubKey.toJWK();
 
         expect(
@@ -100,12 +97,12 @@ void main() {
             'crv': 'P-256',
             'x': 'EVs_o5-uQbTjL3chynL4wXgUg2R9q9UU8I5mEovUf84',
             'y': 'kGe5DgSIycKp8w9aJmoHhB1sB3QTugfnRWm5nU_TzsY',
-            'alg': 'ES256'
+            'alg': 'ES256',
           }),
         );
       });
 
-      test("should convert EdDSAPrivateKey to JWK", () {
+      test('should convert EdDSAPrivateKey to JWK', () {
         final jwk = edPrivKey.toJWK();
 
         expect(
@@ -116,12 +113,12 @@ void main() {
             'crv': 'Ed25519',
             'd': 'JcKMEe-MCuNeq5QjmOjfHlIcjih9kDZrPAnf0gL9By0',
             'x': 'Ei7MNW0Q9T83UA3Rw-8DbspMgqeuxCqa2wXaWS-tHqY',
-            'alg': 'EdDSA'
+            'alg': 'EdDSA',
           }),
         );
       });
 
-      test("should convert EdDSAPublicKey to JWK", () {
+      test('should convert EdDSAPublicKey to JWK', () {
         final jwk = edPubKey.toJWK();
 
         expect(
@@ -131,7 +128,7 @@ void main() {
             'use': 'sig',
             'crv': 'Ed25519',
             'x': 'Ei7MNW0Q9T83UA3Rw-8DbspMgqeuxCqa2wXaWS-tHqY',
-            'alg': 'EdDSA'
+            'alg': 'EdDSA',
           }),
         );
       });

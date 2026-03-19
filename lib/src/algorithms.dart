@@ -1,3 +1,4 @@
+// ignore_for_file: constant_identifier_names
 import 'dart:math';
 import 'dart:typed_data';
 
@@ -52,40 +53,23 @@ abstract class JWTAlgorithm {
   static const EdDSA = EdDSAAlgorithm('EdDSA');
 
   /// Return the `JWTAlgorithm` from his string name
-  static JWTAlgorithm fromName(String name) {
-    switch (name) {
-      case 'HS256':
-        return JWTAlgorithm.HS256;
-      case 'HS384':
-        return JWTAlgorithm.HS384;
-      case 'HS512':
-        return JWTAlgorithm.HS512;
-      case 'RS256':
-        return JWTAlgorithm.RS256;
-      case 'RS384':
-        return JWTAlgorithm.RS384;
-      case 'RS512':
-        return JWTAlgorithm.RS512;
-      case 'ES256':
-        return JWTAlgorithm.ES256;
-      case 'ES384':
-        return JWTAlgorithm.ES384;
-      case 'ES512':
-        return JWTAlgorithm.ES512;
-      case 'ES256K':
-        return JWTAlgorithm.ES256K;
-      case 'EdDSA':
-        return JWTAlgorithm.EdDSA;
-      case 'PS256':
-        return JWTAlgorithm.PS256;
-      case 'PS384':
-        return JWTAlgorithm.PS384;
-      case 'PS512':
-        return JWTAlgorithm.PS512;
-      default:
-        throw JWTInvalidException('unknown algorithm');
-    }
-  }
+  static JWTAlgorithm fromName(String name) => switch (name) {
+    'HS256' => JWTAlgorithm.HS256,
+    'HS384' => JWTAlgorithm.HS384,
+    'HS512' => JWTAlgorithm.HS512,
+    'RS256' => JWTAlgorithm.RS256,
+    'RS384' => JWTAlgorithm.RS384,
+    'RS512' => JWTAlgorithm.RS512,
+    'ES256' => JWTAlgorithm.ES256,
+    'ES384' => JWTAlgorithm.ES384,
+    'ES512' => JWTAlgorithm.ES512,
+    'ES256K' => JWTAlgorithm.ES256K,
+    'EdDSA' => JWTAlgorithm.EdDSA,
+    'PS256' => JWTAlgorithm.PS256,
+    'PS384' => JWTAlgorithm.PS384,
+    'PS512' => JWTAlgorithm.PS512,
+    _ => throw JWTInvalidException('unknown algorithm'),
+  };
 
   const JWTAlgorithm();
 
@@ -147,8 +131,8 @@ class HMACAlgorithm extends JWTAlgorithm {
 
     final keyBytes = decodeHMACSecret(secretKey.key, secretKey.isBase64Encoded);
 
-    final hmac = pc.Mac('${_getHash(name)}/HMAC');
-    hmac.init(pc.KeyParameter(keyBytes));
+    final hmac = pc.Mac('${_getHash(name)}/HMAC')
+      ..init(pc.KeyParameter(keyBytes));
 
     return Uint8List.fromList(hmac.process(body));
   }
@@ -162,18 +146,12 @@ class HMACAlgorithm extends JWTAlgorithm {
     return fixedTimeBytesEquals(actual, signature);
   }
 
-  String _getHash(String name) {
-    switch (name) {
-      case 'HS256':
-        return 'SHA-256';
-      case 'HS384':
-        return 'SHA-384';
-      case 'HS512':
-        return 'SHA-512';
-      default:
-        throw ArgumentError.value(name, 'name', 'unknown hash name');
-    }
-  }
+  String _getHash(String name) => switch (name) {
+    'HS256' => 'SHA-256',
+    'HS384' => 'SHA-384',
+    'HS512' => 'SHA-512',
+    _ => throw ArgumentError.value(name, 'name', 'unknown hash name'),
+  };
 }
 
 class RSAAlgorithm extends JWTAlgorithm {
@@ -191,11 +169,8 @@ class RSAAlgorithm extends JWTAlgorithm {
     final privateKey = key as RSAPrivateKey;
 
     final algorithm = _getAlgorithm(name);
-
-    final signer = pc.Signer('${_getHash(name)}/${algorithm}');
-    pc.CipherParameters params = pc.PrivateKeyParameter<pc.RSAPrivateKey>(
-      privateKey.key,
-    );
+    final signer = pc.Signer('${_getHash(name)}/$algorithm');
+    final params = pc.PrivateKeyParameter<pc.RSAPrivateKey>(privateKey.key);
 
     if (algorithm == 'PSS') {
       final random = _random ?? Random.secure();
@@ -203,13 +178,10 @@ class RSAAlgorithm extends JWTAlgorithm {
         List.generate(_getSaltLength(name), (_) => random.nextInt(256)),
       );
 
-      params = pc.ParametersWithSalt(
-        params,
-        salt,
-      );
+      signer.init(true, pc.ParametersWithSalt(params, salt));
+    } else {
+      signer.init(true, params);
     }
-
-    signer.init(true, params);
 
     final signature = signer.generateSignature(Uint8List.fromList(body));
 
@@ -227,21 +199,21 @@ class RSAAlgorithm extends JWTAlgorithm {
 
     try {
       final algorithm = _getAlgorithm(name);
-
-      final signer = pc.Signer('${_getHash(name)}/${algorithm}');
-      pc.CipherParameters params = pc.PublicKeyParameter<pc.RSAPublicKey>(
-        publicKey.key,
-      );
+      final signer = pc.Signer('${_getHash(name)}/$algorithm');
+      final params = pc.PublicKeyParameter<pc.RSAPublicKey>(publicKey.key);
 
       if (algorithm == 'PSS') {
-        params = pc.ParametersWithSaltConfiguration(
-          params,
-          pc.SecureRandom('Fortuna'),
-          _getSaltLength(name),
+        signer.init(
+          false,
+          pc.ParametersWithSaltConfiguration(
+            params,
+            pc.SecureRandom('Fortuna'),
+            _getSaltLength(name),
+          ),
         );
+      } else {
+        signer.init(false, params);
       }
-
-      signer.init(false, params);
 
       final msg = Uint8List.fromList(body);
       final sign = algorithm == 'PSS'
@@ -254,49 +226,25 @@ class RSAAlgorithm extends JWTAlgorithm {
     }
   }
 
-  String _getHash(String name) {
-    switch (name) {
-      case 'RS256':
-      case 'PS256':
-        return 'SHA-256';
-      case 'RS384':
-      case 'PS384':
-        return 'SHA-384';
-      case 'RS512':
-      case 'PS512':
-        return 'SHA-512';
-      default:
-        throw ArgumentError.value(name, 'name', 'unknown hash name');
-    }
-  }
+  String _getHash(String name) => switch (name) {
+    'RS256' || 'PS256' => 'SHA-256',
+    'RS384' || 'PS384' => 'SHA-384',
+    'RS512' || 'PS512' => 'SHA-512',
+    _ => throw ArgumentError.value(name, 'name', 'unknown hash name'),
+  };
 
-  String _getAlgorithm(String name) {
-    switch (name) {
-      case 'RS256':
-      case 'RS384':
-      case 'RS512':
-        return 'RSA';
-      case 'PS256':
-      case 'PS384':
-      case 'PS512':
-        return 'PSS';
-      default:
-        throw ArgumentError.value(name, 'name', 'unknown algorithm name');
-    }
-  }
+  String _getAlgorithm(String name) => switch (name) {
+    'RS256' || 'RS384' || 'RS512' => 'RSA',
+    'PS256' || 'PS384' || 'PS512' => 'PSS',
+    _ => throw ArgumentError.value(name, 'name', 'unknown algorithm name'),
+  };
 
-  int _getSaltLength(String name) {
-    switch (name) {
-      case 'PS256':
-        return 32;
-      case 'PS384':
-        return 48;
-      case 'PS512':
-        return 64;
-      default:
-        return 32;
-    }
-  }
+  int _getSaltLength(String name) => switch (name) {
+    'PS256' => 32,
+    'PS384' => 48,
+    'PS512' => 64,
+    _ => 32,
+  };
 }
 
 class ECDSAAlgorithm extends JWTAlgorithm {
@@ -312,14 +260,11 @@ class ECDSAAlgorithm extends JWTAlgorithm {
     assert(key is ECPrivateKey, 'key must be a ECPrivateKey');
     final privateKey = key as ECPrivateKey;
 
-    final signer = pc.Signer('${_getHash(name)}/DET-ECDSA');
-    final params = pc.PrivateKeyParameter<pc.ECPrivateKey>(privateKey.key);
+    final signer = pc.Signer('${_getHash(name)}/DET-ECDSA')
+      ..init(true, pc.PrivateKeyParameter<pc.ECPrivateKey>(privateKey.key));
 
-    signer.init(true, params);
-
-    final signature = signer.generateSignature(
-      Uint8List.fromList(body),
-    ) as pc.ECSignature;
+    final signature =
+        signer.generateSignature(Uint8List.fromList(body)) as pc.ECSignature;
 
     final rBytes = bigIntToBytes(signature.r).toList();
     while (rBytes.length < 32) {
@@ -332,10 +277,9 @@ class ECDSAAlgorithm extends JWTAlgorithm {
     }
 
     final len = privateKey.size;
-    final bytes = Uint8List(len * 2);
-
-    bytes.setRange(len - rBytes.length, len, rBytes.reversed);
-    bytes.setRange((len * 2) - sBytes.length, len * 2, sBytes.reversed);
+    final bytes = Uint8List(len * 2)
+      ..setRange(len - rBytes.length, len, rBytes.reversed)
+      ..setRange((len * 2) - sBytes.length, len * 2, sBytes.reversed);
 
     return bytes;
   }
@@ -345,10 +289,8 @@ class ECDSAAlgorithm extends JWTAlgorithm {
     assert(key is ECPublicKey, 'key must be a ECPublicKey');
     final publicKey = key as ECPublicKey;
 
-    final signer = pc.Signer('${_getHash(name)}/DET-ECDSA');
-    final params = pc.PublicKeyParameter<pc.ECPublicKey>(publicKey.key);
-
-    signer.init(false, params);
+    final signer = pc.Signer('${_getHash(name)}/DET-ECDSA')
+      ..init(false, pc.PublicKeyParameter<pc.ECPublicKey>(publicKey.key));
 
     final len = signature.length ~/ 2;
     final sign = pc.ECSignature(
@@ -359,17 +301,10 @@ class ECDSAAlgorithm extends JWTAlgorithm {
     return signer.verifySignature(body, sign);
   }
 
-  String _getHash(String name) {
-    switch (name) {
-      case 'ES256':
-      case 'ES256K':
-        return 'SHA-256';
-      case 'ES384':
-        return 'SHA-384';
-      case 'ES512':
-        return 'SHA-512';
-      default:
-        throw ArgumentError.value(name, 'name', 'unknown hash name');
-    }
-  }
+  String _getHash(String name) => switch (name) {
+    'ES256' || 'ES256K' => 'SHA-256',
+    'ES384' => 'SHA-384',
+    'ES512' => 'SHA-512',
+    _ => throw ArgumentError.value(name, 'name', 'unknown hash name'),
+  };
 }

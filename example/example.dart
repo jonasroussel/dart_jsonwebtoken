@@ -36,18 +36,13 @@ void main() {
 void hs256() {
   String token;
 
-  /* Sign */ {
+  /* Sign */
+  {
     // Create a json web token
-    final jwt = JWT(
-      {
-        'id': 123,
-        'server': {
-          'id': '3e4fc296',
-          'loc': 'euw-2',
-        }
-      },
-      issuer: 'https://github.com/jonasroussel/dart_jsonwebtoken',
-    );
+    final jwt = JWT({
+      'id': 123,
+      'server': {'id': '3e4fc296', 'loc': 'euw-2'},
+    }, issuer: 'https://github.com/jonasroussel/dart_jsonwebtoken');
 
     // Sign it
     token = jwt.sign(SecretKey('secret passphrase'));
@@ -55,7 +50,8 @@ void hs256() {
     print('Signed token: $token\n');
   }
 
-  /* Verify */ {
+  /* Verify */
+  {
     try {
       // Verify a token
       final jwt = JWT.verify(token, SecretKey('secret passphrase'));
@@ -73,18 +69,13 @@ void hs256() {
 void rs256() {
   String token;
 
-  /* Sign */ {
+  /* Sign */
+  {
     // Create a json web token
-    final jwt = JWT(
-      {
-        'id': 123,
-        'server': {
-          'id': '3e4fc296',
-          'loc': 'euw-2',
-        }
-      },
-      issuer: 'https://github.com/jonasroussel/dart_jsonwebtoken',
-    );
+    final jwt = JWT({
+      'id': 123,
+      'server': {'id': '3e4fc296', 'loc': 'euw-2'},
+    }, issuer: 'https://github.com/jonasroussel/dart_jsonwebtoken');
 
     // Sign it
     final pem = File('./example/rsa_private.pem').readAsStringSync();
@@ -95,7 +86,8 @@ void rs256() {
     print('Signed token: $token\n');
   }
 
-  /* Verify */ {
+  /* Verify */
+  {
     try {
       // Verify a token
       final pem = File('./example/rsa_public.pem').readAsStringSync();
@@ -116,18 +108,13 @@ void rs256() {
 void es256() {
   String token;
 
-  /* Sign */ {
+  /* Sign */
+  {
     // Create a json web token
-    final jwt = JWT(
-      {
-        'id': 123,
-        'server': {
-          'id': '3e4fc296',
-          'loc': 'euw-2',
-        }
-      },
-      issuer: 'https://github.com/jonasroussel/dart_jsonwebtoken',
-    );
+    final jwt = JWT({
+      'id': 123,
+      'server': {'id': '3e4fc296', 'loc': 'euw-2'},
+    }, issuer: 'https://github.com/jonasroussel/dart_jsonwebtoken');
 
     // Sign it
     final pem = File('./example/ec_private.pem').readAsStringSync();
@@ -138,7 +125,8 @@ void es256() {
     print('Signed token: $token\n');
   }
 
-  /* Verify */ {
+  /* Verify */
+  {
     try {
       // Verify a token
       final pem = File('./example/ec_public.pem').readAsStringSync();
@@ -159,18 +147,13 @@ void es256() {
 void es256k() {
   String token;
 
-  /* Sign */ {
+  /* Sign */
+  {
     // Create a json web token
-    final jwt = JWT(
-      {
-        'id': 123,
-        'server': {
-          'id': '3e4fc296',
-          'loc': 'euw-2',
-        }
-      },
-      issuer: 'https://github.com/jonasroussel/dart_jsonwebtoken',
-    );
+    final jwt = JWT({
+      'id': 123,
+      'server': {'id': '3e4fc296', 'loc': 'euw-2'},
+    }, issuer: 'https://github.com/jonasroussel/dart_jsonwebtoken');
 
     // Sign it
     final pem = File('./example/ec_256k_private.pem').readAsStringSync();
@@ -181,7 +164,8 @@ void es256k() {
     print('Signed token: $token\n');
   }
 
-  /* Verify */ {
+  /* Verify */
+  {
     try {
       // Verify a token
       final pem = File('./example/ec_256k_public.pem').readAsStringSync();
@@ -202,18 +186,13 @@ void es256k() {
 void ps256() {
   String token;
 
-  /* Sign */ {
+  /* Sign */
+  {
     // Create a json web token
-    final jwt = JWT(
-      {
-        'id': 123,
-        'server': {
-          'id': '3e4fc296',
-          'loc': 'euw-2',
-        }
-      },
-      issuer: 'https://github.com/jonasroussel/dart_jsonwebtoken',
-    );
+    final jwt = JWT({
+      'id': 123,
+      'server': {'id': '3e4fc296', 'loc': 'euw-2'},
+    }, issuer: 'https://github.com/jonasroussel/dart_jsonwebtoken');
 
     // Sign it
     final pem = File('./example/rsa_pss_private.pem').readAsStringSync();
@@ -224,7 +203,8 @@ void ps256() {
     print('Signed token: $token\n');
   }
 
-  /* Verify */ {
+  /* Verify */
+  {
     try {
       // Verify a token
       final pem = File('./example/rsa_pss_public.pem').readAsStringSync();
@@ -245,18 +225,13 @@ void ps256() {
 void rsaCert() {
   String token;
 
-  /* Sign */ {
+  /* Sign */
+  {
     // Create a json web token
-    final jwt = JWT(
-      {
-        'id': 123,
-        'server': {
-          'id': '3e4fc296',
-          'loc': 'euw-2',
-        }
-      },
-      issuer: 'https://github.com/jonasroussel/dart_jsonwebtoken',
-    );
+    final jwt = JWT({
+      'id': 123,
+      'server': {'id': '3e4fc296', 'loc': 'euw-2'},
+    }, issuer: 'https://github.com/jonasroussel/dart_jsonwebtoken');
 
     // Sign it
     final pem = File('./example/rsa_cert_private.pem').readAsStringSync();
@@ -267,7 +242,8 @@ void rsaCert() {
     print('Signed token: $token\n');
   }
 
-  /* Verify */ {
+  /* Verify */
+  {
     try {
       // Verify a token
       final pem = File('./example/rsa_certificate.pem').readAsStringSync();
@@ -287,18 +263,13 @@ void rsaCert() {
 void eddsa() {
   String token;
 
-  /* Sign */ {
+  /* Sign */
+  {
     // Create a json web token
-    final jwt = JWT(
-      {
-        'id': 123,
-        'server': {
-          'id': '3e4fc296',
-          'loc': 'euw-2',
-        }
-      },
-      issuer: 'https://github.com/jonasroussel/dart_jsonwebtoken',
-    );
+    final jwt = JWT({
+      'id': 123,
+      'server': {'id': '3e4fc296', 'loc': 'euw-2'},
+    }, issuer: 'https://github.com/jonasroussel/dart_jsonwebtoken');
 
     // Sign it
     final privPem = File('./example/eddsa_private.pem').readAsStringSync();
@@ -309,7 +280,8 @@ void eddsa() {
     print('Signed token: $token\n');
   }
 
-  /* Verify */ {
+  /* Verify */
+  {
     try {
       // Verify a token
       final pem = File('./example/eddsa_public.pem').readAsStringSync();

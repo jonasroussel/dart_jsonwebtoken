@@ -1,3 +1,7 @@
+## 3.3.3-wip
+
+- Require `sdk: ^3.9.0`
+
 ## 3.3.2
 
 - Use constant-time comparison for HMAC signature verification (timing-attack resistant)

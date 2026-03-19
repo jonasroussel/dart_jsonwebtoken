@@ -36,126 +36,131 @@ class JWT {
     try {
       final parts = token.split('.');
 
-      if (parts.length != 3) {
+      if (parts case [
+        final headerPart,
+        final payloadPart,
+        final signaturePart,
+      ]) {
+        final header = jsonBase64.decode(base64Padded(headerPart));
+
+        if (header == null || header is! Map<String, dynamic>) {
+          throw JWTInvalidException('invalid header');
+        }
+
+        if (checkHeaderType && header['typ'] != 'JWT') {
+          throw JWTInvalidException('not a jwt');
+        }
+
+        final algorithm = JWTAlgorithm.fromName(header['alg'] as String);
+
+        final body = utf8.encode('$headerPart.$payloadPart');
+        final signature = base64Url.decode(base64Padded(signaturePart));
+
+        if (!algorithm.verify(key, Uint8List.fromList(body), signature)) {
+          throw JWTInvalidException('invalid signature');
+        }
+
+        dynamic payload;
+
+        try {
+          payload = jsonBase64.decode(base64Padded(payloadPart));
+        } catch (ex) {
+          payload = utf8.decode(base64Url.decode(base64Padded(payloadPart)));
+        }
+
+        if (payload is Map) {
+          // exp
+          if (checkExpiresIn && payload.containsKey('exp')) {
+            final exp = DateTime.fromMillisecondsSinceEpoch(
+              ((payload['exp'] as num) * 1000).toInt(),
+              isUtc: true,
+            );
+            if (exp.isBefore(timeNowUTC())) {
+              throw JWTExpiredException();
+            }
+          }
+
+          // nbf
+          if (checkNotBefore && payload.containsKey('nbf')) {
+            final nbf = DateTime.fromMillisecondsSinceEpoch(
+              ((payload['nbf'] as num) * 1000).toInt(),
+              isUtc: true,
+            );
+            if (nbf.isAfter(timeNowUTC())) {
+              throw JWTNotActiveException();
+            }
+          }
+
+          // iat
+          if (issueAt != null) {
+            if (!payload.containsKey('iat')) {
+              throw JWTInvalidException('invalid issue at');
+            }
+            final iat = DateTime.fromMillisecondsSinceEpoch(
+              ((payload['iat'] as num) * 1000).toInt(),
+              isUtc: true,
+            );
+            final issueAtTime = DateTime.fromMillisecondsSinceEpoch(
+              issueAt.inMilliseconds,
+              isUtc: issueAtUtc,
+            );
+            // Verify that the token isn't expired
+            if (iat.isBefore(issueAtTime)) {
+              throw JWTInvalidException('expired issue at');
+            }
+          }
+
+          // aud
+          if (audience != null) {
+            if (payload.containsKey('aud')) {
+              if (payload['aud'] is String &&
+                  payload['aud'] != audience.first) {
+                throw JWTInvalidException('invalid audience');
+              } else if (payload['aud'] is List &&
+                  !isListEquals(payload['aud'] as List, audience)) {
+                throw JWTInvalidException('invalid audience');
+              }
+            } else {
+              throw JWTInvalidException('invalid audience');
+            }
+          }
+
+          // sub
+          if (subject != null) {
+            if (!payload.containsKey('sub') || payload['sub'] != subject) {
+              throw JWTInvalidException('invalid subject');
+            }
+          }
+
+          // iss
+          if (issuer != null) {
+            if (!payload.containsKey('iss') || payload['iss'] != issuer) {
+              throw JWTInvalidException('invalid issuer');
+            }
+          }
+
+          // jti
+          if (jwtId != null) {
+            if (!payload.containsKey('jti') || payload['jti'] != jwtId) {
+              throw JWTInvalidException('invalid jwt id');
+            }
+          }
+
+          return JWT(
+            payload,
+            header: header,
+            audience: _parseAud(payload['aud']),
+            issuer: payload['iss']?.toString(),
+            subject: payload['sub']?.toString(),
+            jwtId: payload['jti']?.toString(),
+          );
+        } else {
+          return JWT(payload);
+        }
+      } else {
         throw JWTInvalidException(
           'token does not use JWS Compact Serialization',
         );
-      }
-
-      final header = jsonBase64.decode(base64Padded(parts[0]));
-
-      if (header == null || header is! Map<String, dynamic>) {
-        throw JWTInvalidException('invalid header');
-      }
-
-      if (checkHeaderType && header['typ'] != 'JWT') {
-        throw JWTInvalidException('not a jwt');
-      }
-
-      final algorithm = JWTAlgorithm.fromName(header['alg']);
-
-      final body = utf8.encode(parts[0] + '.' + parts[1]);
-      final signature = base64Url.decode(base64Padded(parts[2]));
-
-      if (!algorithm.verify(key, Uint8List.fromList(body), signature)) {
-        throw JWTInvalidException('invalid signature');
-      }
-
-      dynamic payload;
-
-      try {
-        payload = jsonBase64.decode(base64Padded(parts[1]));
-      } catch (ex) {
-        payload = utf8.decode(base64Url.decode(base64Padded(parts[1])));
-      }
-
-      if (payload is Map) {
-        // exp
-        if (checkExpiresIn && payload.containsKey('exp')) {
-          final exp = DateTime.fromMillisecondsSinceEpoch(
-            (payload['exp'] * 1000).toInt(),
-            isUtc: true,
-          );
-          if (exp.isBefore(timeNowUTC())) {
-            throw JWTExpiredException();
-          }
-        }
-
-        // nbf
-        if (checkNotBefore && payload.containsKey('nbf')) {
-          final nbf = DateTime.fromMillisecondsSinceEpoch(
-            (payload['nbf'] * 1000).toInt(),
-            isUtc: true,
-          );
-          if (nbf.isAfter(timeNowUTC())) {
-            throw JWTNotActiveException();
-          }
-        }
-
-        // iat
-        if (issueAt != null) {
-          if (!payload.containsKey('iat')) {
-            throw JWTInvalidException('invalid issue at');
-          }
-          final iat = DateTime.fromMillisecondsSinceEpoch(
-            (payload['iat'] * 1000).toInt(),
-            isUtc: true,
-          );
-          final issueAtTime = DateTime.fromMillisecondsSinceEpoch(
-            issueAt.inMilliseconds,
-            isUtc: issueAtUtc,
-          );
-          // Verify that the token isn't expired
-          if (iat.isBefore(issueAtTime)) {
-            throw JWTInvalidException('expired issue at');
-          }
-        }
-
-        // aud
-        if (audience != null) {
-          if (payload.containsKey('aud')) {
-            if (payload['aud'] is String && payload['aud'] != audience.first) {
-              throw JWTInvalidException('invalid audience');
-            } else if (payload['aud'] is List &&
-                !isListEquals(payload['aud'], audience)) {
-              throw JWTInvalidException('invalid audience');
-            }
-          } else {
-            throw JWTInvalidException('invalid audience');
-          }
-        }
-
-        // sub
-        if (subject != null) {
-          if (!payload.containsKey('sub') || payload['sub'] != subject) {
-            throw JWTInvalidException('invalid subject');
-          }
-        }
-
-        // iss
-        if (issuer != null) {
-          if (!payload.containsKey('iss') || payload['iss'] != issuer) {
-            throw JWTInvalidException('invalid issuer');
-          }
-        }
-
-        // jti
-        if (jwtId != null) {
-          if (!payload.containsKey('jti') || payload['jti'] != jwtId) {
-            throw JWTInvalidException('invalid jwt id');
-          }
-        }
-
-        return JWT(
-          payload,
-          header: header,
-          audience: _parseAud(payload['aud']),
-          issuer: payload['iss']?.toString(),
-          subject: payload['sub']?.toString(),
-          jwtId: payload['jti']?.toString(),
-        );
-      } else {
-        return JWT(payload);
       }
     } catch (ex, stackTrace) {
       if (ex is Exception && ex is! JWTException) {
@@ -204,45 +209,48 @@ class JWT {
   static JWT decode(String token) {
     try {
       final parts = token.split('.');
+      if (parts case [final headerPart, final payloadPart, ...]) {
+        if (headerPart.isEmpty || payloadPart.isEmpty) {
+          throw JWTInvalidException('invalid token structure');
+        }
 
-      if (parts.length < 2 || parts[0].isEmpty || parts[1].isEmpty) {
+        final header = jsonBase64.decode(base64Padded(headerPart));
+
+        dynamic payload;
+
+        try {
+          payload = jsonBase64.decode(base64Padded(payloadPart));
+        } catch (ex) {
+          payload = utf8.decode(base64Url.decode(base64Padded(payloadPart)));
+        }
+
+        final Audience? audience;
+        final String? issuer;
+        final String? subject;
+        final String? jwtId;
+        if (payload is Map) {
+          audience = _parseAud(payload['aud']);
+          issuer = payload['iss']?.toString();
+          subject = payload['sub']?.toString();
+          jwtId = payload['jti']?.toString();
+        } else {
+          audience = null;
+          issuer = null;
+          subject = null;
+          jwtId = null;
+        }
+
+        return JWT(
+          payload,
+          header: header is! Map<String, dynamic> ? null : header,
+          audience: audience,
+          issuer: issuer,
+          subject: subject,
+          jwtId: jwtId,
+        );
+      } else {
         throw JWTInvalidException('invalid token structure');
       }
-
-      var header = jsonBase64.decode(base64Padded(parts[0]));
-
-      dynamic payload;
-
-      try {
-        payload = jsonBase64.decode(base64Padded(parts[1]));
-      } catch (ex) {
-        payload = utf8.decode(base64Url.decode(base64Padded(parts[1])));
-      }
-
-      final Audience? audience;
-      final String? issuer;
-      final String? subject;
-      final String? jwtId;
-      if (payload is Map) {
-        audience = _parseAud(payload['aud']);
-        issuer = payload['iss']?.toString();
-        subject = payload['sub']?.toString();
-        jwtId = payload['jti']?.toString();
-      } else {
-        audience = null;
-        issuer = null;
-        subject = null;
-        jwtId = null;
-      }
-
-      return JWT(
-        payload,
-        header: header is! Map<String, dynamic> ? null : header,
-        audience: audience,
-        issuer: issuer,
-        subject: subject,
-        jwtId: jwtId,
-      );
     } catch (ex, stackTrace) {
       if (ex is Exception && ex is! JWTException) {
         throw JWTUndefinedException(ex, stackTrace);
@@ -306,21 +314,19 @@ class JWT {
     try {
       if (payload is Map<String, dynamic> || payload is Map<dynamic, dynamic>) {
         try {
-          payload = Map<String, dynamic>.from(payload);
+          payload = Map<String, dynamic>.from(payload as Map);
 
-          if (!noIssueAt) {
-            payload['iat'] = secondsSinceEpoch(timeNowUTC());
-          }
-          if (expiresIn != null) {
-            payload['exp'] = secondsSinceEpoch(timeNowUTC().add(expiresIn));
-          }
-          if (notBefore != null) {
-            payload['nbf'] = secondsSinceEpoch(timeNowUTC().add(notBefore));
-          }
-          if (audience != null) payload['aud'] = audience!.toJson();
-          if (subject != null) payload['sub'] = subject;
-          if (issuer != null) payload['iss'] = issuer;
-          if (jwtId != null) payload['jti'] = jwtId;
+          (payload as Map<String, dynamic>).addAll({
+            if (!noIssueAt) 'iat': secondsSinceEpoch(timeNowUTC()),
+            if (expiresIn != null)
+              'exp': secondsSinceEpoch(timeNowUTC().add(expiresIn)),
+            if (notBefore != null)
+              'nbf': secondsSinceEpoch(timeNowUTC().add(notBefore)),
+            if (audience != null) 'aud': audience!.toJson(),
+            if (subject != null) 'sub': subject,
+            if (issuer != null) 'iss': issuer,
+            if (jwtId != null) 'jti': jwtId,
+          });
         } catch (ex) {
           assert(
             payload is Map<String, dynamic>,
@@ -329,9 +335,11 @@ class JWT {
         }
       }
 
-      final tokenHeader = Map.from(header ?? {});
-      tokenHeader.putIfAbsent('alg', () => algorithm.name);
-      tokenHeader.putIfAbsent('typ', () => 'JWT');
+      final tokenHeader = <String, dynamic>{
+        ...?header,
+        'alg': algorithm.name,
+        'typ': 'JWT',
+      };
 
       final b64Header = base64Unpadded(jsonBase64.encode(tokenHeader));
 
@@ -339,7 +347,7 @@ class JWT {
       try {
         b64Payload = base64Unpadded(
           payload is String
-              ? base64Url.encode(utf8.encode(payload))
+              ? base64Url.encode(utf8.encode(payload as String))
               : jsonBase64.encode(payload),
         );
       } catch (ex) {
@@ -351,14 +359,11 @@ class JWT {
       final body = '$b64Header.$b64Payload';
       final signature = base64Unpadded(
         base64Url.encode(
-          algorithm.sign(
-            key,
-            Uint8List.fromList(utf8.encode(body)),
-          ),
+          algorithm.sign(key, Uint8List.fromList(utf8.encode(body))),
         ),
       );
 
-      return body + '.' + signature;
+      return '$body.$signature';
     } catch (ex, stackTrace) {
       if (ex is Exception && ex is! JWTException) {
         throw JWTUndefinedException(ex, stackTrace);
@@ -423,9 +428,9 @@ class Audience extends ListBase<String> {
   void operator []=(int index, String value) => _audiences[index] = value;
 
   @override
-  void add(String value) => _audiences.add(value);
+  void add(String element) => _audiences.add(element);
   @override
-  void addAll(Iterable<String> all) => _audiences.addAll(all);
+  void addAll(Iterable<String> iterable) => _audiences.addAll(iterable);
 
   dynamic toJson() {
     if (_audiences.length == 1) {

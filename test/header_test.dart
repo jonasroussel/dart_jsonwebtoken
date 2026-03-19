@@ -6,13 +6,13 @@ import 'package:test/test.dart';
 import 'keys_const.dart';
 
 void main() {
-  group("JWT Header", () {
+  group('JWT Header', () {
     //--------------------//
     //  Expiration (exp)  //
     //--------------------//
     group('exp', () {
       test('should be expired', () {
-        final duration = Duration(hours: 1);
+        const duration = Duration(hours: 1);
         final token = JWT({'foo': 'bar'}).sign(hsKey, expiresIn: duration);
 
         fakeAsync((async) {
@@ -26,32 +26,30 @@ void main() {
 
       test('should be still valid', () {
         final iat = DateTime(2042);
-        final exp = DateTime(2042).add(Duration(hours: 1));
+        final exp = DateTime(2042).add(const Duration(hours: 1));
 
-        withClock(
-          Clock.fixed(DateTime(2042)),
-          () {
-            final duration = Duration(hours: 1);
-            final token = JWT({'foo': 'bar'}).sign(hsKey, expiresIn: duration);
+        withClock(Clock.fixed(DateTime(2042)), () {
+          const duration = Duration(hours: 1);
+          final token = JWT({'foo': 'bar'}).sign(hsKey, expiresIn: duration);
 
-            fakeAsync((async) {
-              async.elapse(Duration(minutes: 30));
-              expect(
-                JWT.verify(token, hsKey).payload,
-                equals({
-                  'foo': 'bar',
-                  'iat': iat.millisecondsSinceEpoch ~/ 1000,
-                  'exp': exp.millisecondsSinceEpoch ~/ 1000,
-                }),
-              );
-            });
-          },
-        );
+          fakeAsync((async) {
+            async.elapse(const Duration(minutes: 30));
+            expect(
+              JWT.verify(token, hsKey).payload,
+              equals({
+                'foo': 'bar',
+                'iat': iat.millisecondsSinceEpoch ~/ 1000,
+                'exp': exp.millisecondsSinceEpoch ~/ 1000,
+              }),
+            );
+          });
+        });
       });
 
       test('should be valid when exp is disabled', () {
-        final token =
-            JWT({'foo': 'bar'}).sign(hsKey, expiresIn: Duration(hours: -1));
+        final token = JWT({
+          'foo': 'bar',
+        }).sign(hsKey, expiresIn: const Duration(hours: -1));
 
         expect(
           JWT.verify(token, hsKey, checkExpiresIn: false).payload,
@@ -65,7 +63,7 @@ void main() {
     //----------------------//
     group('nbf', () {
       test('should throw when token is not yet valid', () {
-        final notBefore = Duration(hours: 1);
+        const notBefore = Duration(hours: 1);
         final token = JWT({'foo': 'bar'}).sign(hsKey, notBefore: notBefore);
 
         expect(
@@ -76,36 +74,31 @@ void main() {
 
       test('should be valid after nbf time', () {
         final iat = DateTime(2042);
-        final nbf = iat.add(Duration(minutes: 30));
+        final nbf = iat.add(const Duration(minutes: 30));
 
-        withClock(
-          Clock.fixed(DateTime(2042)),
-          () {
-            final token = JWT({'foo': 'bar'}).sign(
-              hsKey,
-              notBefore: Duration(minutes: 30),
+        withClock(Clock.fixed(DateTime(2042)), () {
+          final token = JWT({
+            'foo': 'bar',
+          }).sign(hsKey, notBefore: const Duration(minutes: 30));
+
+          fakeAsync((async) {
+            async.elapse(const Duration(minutes: 45));
+            expect(
+              JWT.verify(token, hsKey).payload,
+              equals({
+                'foo': 'bar',
+                'iat': iat.millisecondsSinceEpoch ~/ 1000,
+                'nbf': nbf.millisecondsSinceEpoch ~/ 1000,
+              }),
             );
-
-            fakeAsync((async) {
-              async.elapse(Duration(minutes: 45));
-              expect(
-                JWT.verify(token, hsKey).payload,
-                equals({
-                  'foo': 'bar',
-                  'iat': iat.millisecondsSinceEpoch ~/ 1000,
-                  'nbf': nbf.millisecondsSinceEpoch ~/ 1000,
-                }),
-              );
-            });
-          },
-        );
+          });
+        });
       });
 
       test('should be valid when nbf check is disabled', () {
-        final token = JWT({'foo': 'bar'}).sign(
-          hsKey,
-          notBefore: Duration(hours: 1),
-        );
+        final token = JWT({
+          'foo': 'bar',
+        }).sign(hsKey, notBefore: const Duration(hours: 1));
 
         expect(
           JWT.verify(token, hsKey, checkNotBefore: false).payload,
@@ -125,25 +118,19 @@ void main() {
 
             expect(
               JWT.verify(token, hsKey).payload,
-              equals({
-                'foo': 'bar',
-                'iat': iat.millisecondsSinceEpoch ~/ 1000,
-              }),
+              equals({'foo': 'bar', 'iat': iat.millisecondsSinceEpoch ~/ 1000}),
             );
           });
         });
 
         test('should be valid when iat is in the future', () {
-          final futureIat = DateTime(2042).add(Duration(hours: 1));
+          final futureIat = DateTime(2042).add(const Duration(hours: 1));
           final token = JWT({
             'foo': 'bar',
-            'iat': futureIat.millisecondsSinceEpoch ~/ 1000
+            'iat': futureIat.millisecondsSinceEpoch ~/ 1000,
           }).sign(hsKey);
 
-          expect(
-            JWT.verify(token, hsKey).payload,
-            contains('foo'),
-          );
+          expect(JWT.verify(token, hsKey).payload, contains('foo'));
         });
       });
     });

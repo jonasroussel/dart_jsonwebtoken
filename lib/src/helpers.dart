@@ -29,18 +29,14 @@ String base64Padded(String value) {
 }
 
 /// Returns the current time in UTC (uses [clock] for testability).
-DateTime timeNowUTC() {
-  return clock.now().toUtc();
-}
+DateTime timeNowUTC() => clock.now().toUtc();
 
 /// Converts [time] to Unix seconds since epoch.
-int secondsSinceEpoch(DateTime time) {
-  return time.millisecondsSinceEpoch ~/ 1000;
-}
+int secondsSinceEpoch(DateTime time) => time.millisecondsSinceEpoch ~/ 1000;
 
 /// Decodes [bytes] as a big-endian signed integer (two's complement).
 BigInt decodeBigInt(List<int> bytes) {
-  var negative = bytes.isNotEmpty && bytes[0] & 0x80 == 0x80;
+  final negative = bytes.isNotEmpty && bytes[0] & 0x80 == 0x80;
 
   BigInt result;
 
@@ -50,8 +46,8 @@ BigInt decodeBigInt(List<int> bytes) {
     result = BigInt.zero;
 
     for (var i = 0; i < bytes.length; i++) {
-      var item = bytes[bytes.length - i - 1];
-      result |= (BigInt.from(item) << (8 * i));
+      final item = bytes[bytes.length - i - 1];
+      result |= BigInt.from(item) << (8 * i);
     }
   }
 
@@ -72,8 +68,8 @@ BigInt decodeBigIntWithSign(int sign, List<int> bytes) {
     result = BigInt.zero;
 
     for (var i = 0; i < bytes.length; i++) {
-      var item = bytes[bytes.length - i - 1];
-      result |= (BigInt.from(item) << (8 * i));
+      final item = bytes[bytes.length - i - 1];
+      result |= BigInt.from(item) << (8 * i);
     }
   }
 
@@ -86,13 +82,14 @@ BigInt decodeBigIntWithSign(int sign, List<int> bytes) {
 
 /// Encodes [v] as a little-endian byte list (unsigned).
 Uint8List bigIntToBytes(BigInt v) {
-  final _b256 = BigInt.from(256);
+  final b256 = BigInt.from(256);
 
-  var bytes = <int>[];
+  final bytes = <int>[];
 
-  while (v.sign != 0) {
-    bytes.add((v % _b256).toInt());
-    v = v ~/ _b256;
+  var val = v;
+  while (val.sign != 0) {
+    bytes.add((val % b256).toInt());
+    val = val ~/ b256;
   }
 
   return Uint8List.fromList(bytes);
@@ -100,17 +97,17 @@ Uint8List bigIntToBytes(BigInt v) {
 
 /// Decodes [bytes] as a little-endian unsigned integer.
 BigInt bigIntFromBytes(Uint8List bytes) {
-  final _b256 = BigInt.from(256);
+  final b256 = BigInt.from(256);
 
-  return bytes.fold(BigInt.zero, (a, b) => a * _b256 + BigInt.from(b));
+  return bytes.fold(BigInt.zero, (a, b) => a * b256 + BigInt.from(b));
 }
 
 /// Splits [s] into substrings of length [chunkSize]
 /// (last chunk may be shorter).
 List<String> chunkString(String s, int chunkSize) {
-  var chunked = <String>[];
+  final chunked = <String>[];
   for (var i = 0; i < s.length; i += chunkSize) {
-    var end = (i + chunkSize < s.length) ? i + chunkSize : s.length;
+    final end = (i + chunkSize < s.length) ? i + chunkSize : s.length;
     chunked.add(s.substring(i, end));
   }
   return chunked;
@@ -131,50 +128,30 @@ Uint8List decodeHMACSecret(String secret, bool isBase64Encoded) {
 }
 
 /// Maps OpenSSL/IANA curve names (e.g. prime256v1) to NIST names (e.g. P-256).
-String curveOpenSSLToNIST(String curveName) {
-  switch (curveName) {
-    case "prime256v1":
-    case "secp256r1":
-      return "P-256";
-    case "secp384r1":
-      return "P-384";
-    case "secp521r1":
-      return "P-521";
-    default:
-      return curveName; // Return the original name if not found
-  }
-}
+String curveOpenSSLToNIST(String curveName) => switch (curveName) {
+  'prime256v1' || 'secp256r1' => 'P-256',
+  'secp384r1' => 'P-384',
+  'secp521r1' => 'P-521',
+  _ => curveName,
+};
 
 /// Maps NIST curve names (e.g. P-256) to OpenSSL names (e.g. prime256v1).
-String curveNISTToOpenSSL(String curveName) {
-  switch (curveName) {
-    case "P-256":
-      return "prime256v1";
-    case "P-384":
-      return "secp384r1";
-    case "P-521":
-      return "secp521r1";
-    default:
-      return curveName;
-  }
-}
+String curveNISTToOpenSSL(String curveName) => switch (curveName) {
+  'P-256' => 'prime256v1',
+  'P-384' => 'secp384r1',
+  'P-521' => 'secp521r1',
+  _ => curveName,
+};
 
 /// Returns the ECDSA algorithm for the given curve name,
 /// or null if unsupported.
-ECDSAAlgorithm? ecCurveToAlgorithm(String curveName) {
-  switch (curveName) {
-    case "P-256":
-      return JWTAlgorithm.ES256;
-    case "P-384":
-      return JWTAlgorithm.ES384;
-    case "P-521":
-      return JWTAlgorithm.ES512;
-    case "secp256k1":
-      return JWTAlgorithm.ES256K;
-    default:
-      return null;
-  }
-}
+ECDSAAlgorithm? ecCurveToAlgorithm(String curveName) => switch (curveName) {
+  'P-256' => JWTAlgorithm.ES256,
+  'P-384' => JWTAlgorithm.ES384,
+  'P-521' => JWTAlgorithm.ES512,
+  'secp256k1' => JWTAlgorithm.ES256K,
+  _ => null,
+};
 
 /// Returns true if [a] and [b] are both null or contain the same elements
 /// in order.
