@@ -1,8 +1,9 @@
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 import 'package:pointycastle/pointycastle.dart' as pc;
+
+import 'ed25519.dart';
 
 import 'exceptions.dart';
 import 'helpers.dart';
@@ -116,7 +117,7 @@ class EdDSAAlgorithm extends JWTAlgorithm {
     assert(key is EdDSAPrivateKey, 'key must be a EdDSAPrivateKey');
     final privateKey = key as EdDSAPrivateKey;
 
-    return ed.sign(privateKey.key, body);
+    return ed25519Sign(privateKey.seed, body);
   }
 
   @override
@@ -125,7 +126,7 @@ class EdDSAAlgorithm extends JWTAlgorithm {
     final publicKey = key as EdDSAPublicKey;
 
     try {
-      return ed.verify(publicKey.key, body, signature);
+      return ed25519Verify(publicKey.bytes, body, signature);
     } catch (ex) {
       return false;
     }

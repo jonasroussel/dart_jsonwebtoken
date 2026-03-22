@@ -4,8 +4,6 @@ import 'dart:typed_data';
 import 'package:pointycastle/asn1/object_identifiers.dart';
 import 'package:pointycastle/pointycastle.dart';
 import 'package:pointycastle/ecc/ecc_fp.dart' as ecc_fp;
-import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
-
 import 'helpers.dart';
 
 abstract class KeyParser {
@@ -250,32 +248,32 @@ abstract class KeyParser {
   // EdDSA Parsing //
   //---------------//
 
-  static ed.PrivateKey edPrivateKeyFromPEM(String pem) {
+  static Uint8List edPrivateKeyFromPEM(String pem) {
     final bytes = bytesFromPEM(pem);
     return edPrivateKey(bytes);
   }
 
-  static ed.PrivateKey edPrivateKey(Uint8List bytes) {
+  static Uint8List edPrivateKey(Uint8List bytes) {
     var asn1Parser = ASN1Parser(bytes);
     var topLevelSeq = asn1Parser.nextObject() as ASN1Sequence;
 
     var octetString = topLevelSeq.elements!.elementAt(2) as ASN1OctetString;
 
-    return ed.newKeyFromSeed(octetString.valueBytes!.sublist(2));
+    return Uint8List.fromList(octetString.valueBytes!.sublist(2));
   }
 
-  static ed.PublicKey edPublicKeyFromPEM(String pem) {
+  static Uint8List edPublicKeyFromPEM(String pem) {
     final bytes = bytesFromPEM(pem);
     return edPublicKey(bytes);
   }
 
-  static ed.PublicKey edPublicKey(Uint8List bytes) {
+  static Uint8List edPublicKey(Uint8List bytes) {
     var asn1Parser = ASN1Parser(bytes);
     var topLevelSeq = asn1Parser.nextObject() as ASN1Sequence;
 
     var bitString = topLevelSeq.elements!.elementAt(1) as ASN1BitString;
 
-    return ed.PublicKey(bitString.valueBytes!.sublist(1));
+    return Uint8List.fromList(bitString.valueBytes!.sublist(1));
   }
 
   //--------------//

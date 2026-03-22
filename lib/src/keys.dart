@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 import 'package:pointycastle/pointycastle.dart' as pc;
 import 'package:pointycastle/ecc/ecc_fp.dart' as ecc_fp;
 
 import 'algorithms.dart';
+import 'ed25519.dart';
 import 'exceptions.dart';
 import 'helpers.dart';
 import 'key_parser.dart';
@@ -366,21 +366,26 @@ class ECPublicKey extends JWTKey {
 
 /// For EdDSA algorithm, in sign method
 class EdDSAPrivateKey extends JWTKey {
-  ed.PrivateKey key;
+  final Uint8List seed;
 
-  EdDSAPrivateKey(List<int> bytes) : key = ed.PrivateKey(bytes);
+  EdDSAPrivateKey(List<int> bytes)
+      : seed = bytes.length == 64
+            ? Uint8List.fromList(bytes.sublist(0, 32))
+            : Uint8List.fromList(bytes);
 
   EdDSAPrivateKey.fromPEM(String pem)
-      : key = KeyParser.edPrivateKeyFromPEM(pem);
+      : seed = KeyParser.edPrivateKeyFromPEM(pem);
 
   @override
   Map<String, dynamic> toJWK({String? keyID}) {
+    final publicKeyBytes = ed25519PublicKeyFromSeed(seed);
+
     Map<String, dynamic> jwk = {
       'kty': 'OKP',
       'use': 'sig',
       'crv': 'Ed25519',
-      'd': base64Unpadded(base64Url.encode(key.bytes.sublist(0, 32))),
-      'x': base64Unpadded(base64Url.encode(key.bytes.sublist(32))),
+      'd': base64Unpadded(base64Url.encode(seed)),
+      'x': base64Unpadded(base64Url.encode(publicKeyBytes)),
       'alg': 'EdDSA',
     };
 
@@ -392,11 +397,12 @@ class EdDSAPrivateKey extends JWTKey {
 
 /// For EdDSA algorithm, in verify method
 class EdDSAPublicKey extends JWTKey {
-  ed.PublicKey key;
+  final Uint8List bytes;
 
-  EdDSAPublicKey(List<int> bytes) : key = ed.PublicKey(bytes);
+  EdDSAPublicKey(List<int> bytes) : bytes = Uint8List.fromList(bytes);
 
-  EdDSAPublicKey.fromPEM(String pem) : key = KeyParser.edPublicKeyFromPEM(pem);
+  EdDSAPublicKey.fromPEM(String pem)
+      : bytes = KeyParser.edPublicKeyFromPEM(pem);
 
   @override
   Map<String, dynamic> toJWK({String? keyID}) {
@@ -404,7 +410,7 @@ class EdDSAPublicKey extends JWTKey {
       'kty': 'OKP',
       'use': 'sig',
       'crv': 'Ed25519',
-      'x': base64Unpadded(base64Url.encode(key.bytes)),
+      'x': base64Unpadded(base64Url.encode(bytes)),
       'alg': 'EdDSA',
     };
 
