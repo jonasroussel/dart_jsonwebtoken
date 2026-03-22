@@ -208,6 +208,8 @@ class RSAAlgorithm extends JWTAlgorithm {
         params,
         salt,
       );
+    } else {
+      params = pc.ParametersWithRandom(params, pc.SecureRandom('Fortuna'));
     }
 
     signer.init(true, params);
@@ -240,6 +242,8 @@ class RSAAlgorithm extends JWTAlgorithm {
           pc.SecureRandom('Fortuna'),
           _getSaltLength(name),
         );
+      } else {
+        params = pc.ParametersWithRandom(params, pc.SecureRandom('Fortuna'));
       }
 
       signer.init(false, params);
