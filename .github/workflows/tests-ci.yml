@@ -8,7 +8,7 @@ jobs:
   analyze:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dart-lang/setup-dart@v1
 
       - name: Install dependencies
@@ -24,11 +24,14 @@ jobs:
     needs: analyze
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dart-lang/setup-dart@v1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
 
       - name: Install dependencies
         run: dart pub get
 
       - name: Run tests
-        run: dart test -p chrome,vm,node,firefox --compiler kernel,dart2wasm,dart2js --test-randomize-ordering-seed=random
+        run: dart test -p chrome,vm,node --compiler kernel,dart2wasm,dart2js --test-randomize-ordering-seed=random

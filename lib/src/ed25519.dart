@@ -300,7 +300,12 @@ class Ed25519Point {
   Ed25519Point(this.x, this.y, this.z, this.w);
 
   Ed25519Point.zero()
-      : this(Register25519(), Register25519(), Register25519(), Register25519());
+      : this(
+          Register25519(),
+          Register25519(),
+          Register25519(),
+          Register25519(),
+        );
 
   bool equals(Ed25519Point other) {
     final v0 = Register25519();

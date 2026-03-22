@@ -1,3 +1,8 @@
+## 3.4.0
+
+- Replace ed25519_edwards with vendored Ed25519 implementation (enable dart2wasm compilation)
+- RSA PKCS1-v1_5 sign/verify (enable RSA algorithm for node.js)
+
 ## 3.3.2
 
 - Use constant-time comparison for HMAC signature verification (timing-attack resistant)
