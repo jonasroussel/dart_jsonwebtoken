@@ -22,7 +22,7 @@ abstract class JWTKey {
   /// Throws a `JWTParseException` if the JWK is invalid or unsupported.
   static JWTKey fromJWK(Map<String, dynamic> jwk) {
     if (jwk['kty'] == 'oct') {
-      final key = base64Padded(jwk['k']);
+      final key = base64Padded(jwk['k'] as String);
 
       return SecretKey(key, isBase64Encoded: true);
     }
@@ -33,18 +33,24 @@ abstract class JWTKey {
           jwk['q'] != null &&
           jwk['d'] != null &&
           jwk['n'] != null) {
-        final p = bigIntFromBytes(base64Url.decode(base64Padded(jwk['p'])));
-        final q = bigIntFromBytes(base64Url.decode(base64Padded(jwk['q'])));
-        final d = bigIntFromBytes(base64Url.decode(base64Padded(jwk['d'])));
-        final n = bigIntFromBytes(base64Url.decode(base64Padded(jwk['n'])));
+        final p =
+            bigIntFromBytes(base64Url.decode(base64Padded(jwk['p'] as String)));
+        final q =
+            bigIntFromBytes(base64Url.decode(base64Padded(jwk['q'] as String)));
+        final d =
+            bigIntFromBytes(base64Url.decode(base64Padded(jwk['d'] as String)));
+        final n =
+            bigIntFromBytes(base64Url.decode(base64Padded(jwk['n'] as String)));
 
         return RSAPrivateKey.raw(pc.RSAPrivateKey(n, d, p, q));
       }
 
       // Public key
       if (jwk['e'] != null && jwk['n'] != null) {
-        final e = bigIntFromBytes(base64Url.decode(base64Padded(jwk['e'])));
-        final n = bigIntFromBytes(base64Url.decode(base64Padded(jwk['n'])));
+        final e =
+            bigIntFromBytes(base64Url.decode(base64Padded(jwk['e'] as String)));
+        final n =
+            bigIntFromBytes(base64Url.decode(base64Padded(jwk['n'] as String)));
 
         return RSAPublicKey.raw(pc.RSAPublicKey(n, e));
       }
@@ -53,7 +59,7 @@ abstract class JWTKey {
     }
 
     if (jwk['kty'] == 'EC') {
-      final crv = jwk['crv'];
+      final crv = jwk['crv'] as String;
 
       if (!['P-256', 'P-384', 'P-521', 'secp256k1'].contains(crv)) {
         throw JWTParseException('Unsupported curve');
@@ -61,7 +67,8 @@ abstract class JWTKey {
 
       // Private key
       if (jwk['d'] != null) {
-        final d = bigIntFromBytes(base64Url.decode(base64Padded(jwk['d'])));
+        final d =
+            bigIntFromBytes(base64Url.decode(base64Padded(jwk['d'] as String)));
 
         return ECPrivateKey.raw(pc.ECPrivateKey(
           d,
@@ -71,8 +78,10 @@ abstract class JWTKey {
 
       // Public key
       if (jwk['x'] != null && jwk['y'] != null) {
-        final x = bigIntFromBytes(base64Url.decode(base64Padded(jwk['x'])));
-        final y = bigIntFromBytes(base64Url.decode(base64Padded(jwk['y'])));
+        final x =
+            bigIntFromBytes(base64Url.decode(base64Padded(jwk['x'] as String)));
+        final y =
+            bigIntFromBytes(base64Url.decode(base64Padded(jwk['y'] as String)));
 
         final params = pc.ECDomainParameters(curveNISTToOpenSSL(crv));
 
@@ -97,8 +106,8 @@ abstract class JWTKey {
 
       // Private key
       if (jwk['d'] != null && jwk['x'] != null) {
-        final d = base64Url.decode(base64Padded(jwk['d']));
-        final x = base64Url.decode(base64Padded(jwk['x']));
+        final d = base64Url.decode(base64Padded(jwk['d'] as String));
+        final x = base64Url.decode(base64Padded(jwk['x'] as String));
 
         return EdDSAPrivateKey(
           Uint8List(d.length + x.length)
@@ -109,7 +118,7 @@ abstract class JWTKey {
 
       // Public key
       if (jwk['x'] != null) {
-        final x = base64Url.decode(base64Padded(jwk['x']));
+        final x = base64Url.decode(base64Padded(jwk['x'] as String));
 
         return EdDSAPublicKey(x);
       }
@@ -156,8 +165,8 @@ class RSAPrivateKey extends JWTKey {
     );
   }
 
-  RSAPrivateKey.raw(pc.RSAPrivateKey _key) : key = _key;
-  RSAPrivateKey.clone(RSAPrivateKey _key) : key = _key.key;
+  RSAPrivateKey.raw(this.key);
+  RSAPrivateKey.clone(RSAPrivateKey other) : key = other.key;
   RSAPrivateKey.bytes(Uint8List bytes) : key = KeyParser.rsaPrivateKey(bytes);
 
   @override

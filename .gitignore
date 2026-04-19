@@ -16,3 +16,6 @@ build/
 doc/api/
 
 .idea/
+
+# MacOS
+.DS_Store

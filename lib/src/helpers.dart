@@ -86,13 +86,13 @@ BigInt decodeBigIntWithSign(int sign, List<int> bytes) {
 
 /// Encodes [v] as a little-endian byte list (unsigned).
 Uint8List bigIntToBytes(BigInt v) {
-  final _b256 = BigInt.from(256);
+  final b256 = BigInt.from(256);
 
   var bytes = <int>[];
 
   while (v.sign != 0) {
-    bytes.add((v % _b256).toInt());
-    v = v ~/ _b256;
+    bytes.add((v % b256).toInt());
+    v = v ~/ b256;
   }
 
   return Uint8List.fromList(bytes);
@@ -100,9 +100,9 @@ Uint8List bigIntToBytes(BigInt v) {
 
 /// Decodes [bytes] as a little-endian unsigned integer.
 BigInt bigIntFromBytes(Uint8List bytes) {
-  final _b256 = BigInt.from(256);
+  final b256 = BigInt.from(256);
 
-  return bytes.fold(BigInt.zero, (a, b) => a * _b256 + BigInt.from(b));
+  return bytes.fold(BigInt.zero, (a, b) => a * b256 + BigInt.from(b));
 }
 
 /// Splits [s] into substrings of length [chunkSize]

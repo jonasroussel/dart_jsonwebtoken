@@ -37,6 +37,7 @@ jobs:
         run: dart test -p chrome,vm,node --compiler kernel,dart2wasm,dart2js --test-randomize-ordering-seed=random
 
   publish:
+    if: ${{ github.repository_owner == 'jonasroussel' }}
     needs: test
     runs-on: ubuntu-latest
     permissions:

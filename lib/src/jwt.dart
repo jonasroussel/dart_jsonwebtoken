@@ -52,9 +52,9 @@ class JWT {
         throw JWTInvalidException('not a jwt');
       }
 
-      final algorithm = JWTAlgorithm.fromName(header['alg']);
+      final algorithm = JWTAlgorithm.fromName(header['alg'] as String);
 
-      final body = utf8.encode(parts[0] + '.' + parts[1]);
+      final body = utf8.encode('${parts[0]}.${parts[1]}');
       final signature = base64Url.decode(base64Padded(parts[2]));
 
       if (!algorithm.verify(key, Uint8List.fromList(body), signature)) {
@@ -72,8 +72,11 @@ class JWT {
       if (payload is Map) {
         // exp
         if (checkExpiresIn && payload.containsKey('exp')) {
+          if (payload['exp'] is! num) {
+            throw JWTInvalidException('invalid exp claim');
+          }
           final exp = DateTime.fromMillisecondsSinceEpoch(
-            (payload['exp'] * 1000).toInt(),
+            ((payload['exp'] as num) * 1000).toInt(),
             isUtc: true,
           );
           if (exp.isBefore(timeNowUTC())) {
@@ -83,8 +86,11 @@ class JWT {
 
         // nbf
         if (checkNotBefore && payload.containsKey('nbf')) {
+          if (payload['nbf'] is! num) {
+            throw JWTInvalidException('invalid nbf claim');
+          }
           final nbf = DateTime.fromMillisecondsSinceEpoch(
-            (payload['nbf'] * 1000).toInt(),
+            ((payload['nbf'] as num) * 1000).toInt(),
             isUtc: true,
           );
           if (nbf.isAfter(timeNowUTC())) {
@@ -94,11 +100,11 @@ class JWT {
 
         // iat
         if (issueAt != null) {
-          if (!payload.containsKey('iat')) {
+          if (!payload.containsKey('iat') || payload['iat'] is! num) {
             throw JWTInvalidException('invalid issue at');
           }
           final iat = DateTime.fromMillisecondsSinceEpoch(
-            (payload['iat'] * 1000).toInt(),
+            ((payload['iat'] as num) * 1000).toInt(),
             isUtc: true,
           );
           final issueAtTime = DateTime.fromMillisecondsSinceEpoch(
@@ -117,7 +123,10 @@ class JWT {
             if (payload['aud'] is String && payload['aud'] != audience.first) {
               throw JWTInvalidException('invalid audience');
             } else if (payload['aud'] is List &&
-                !isListEquals(payload['aud'], audience)) {
+                !isListEquals(
+                  List<String>.from(payload['aud'] as List),
+                  audience,
+                )) {
               throw JWTInvalidException('invalid audience');
             }
           } else {
@@ -306,7 +315,7 @@ class JWT {
     try {
       if (payload is Map<String, dynamic> || payload is Map<dynamic, dynamic>) {
         try {
-          payload = Map<String, dynamic>.from(payload);
+          payload = Map<String, dynamic>.from(payload as Map);
 
           if (!noIssueAt) {
             payload['iat'] = secondsSinceEpoch(timeNowUTC());
@@ -329,7 +338,7 @@ class JWT {
         }
       }
 
-      final tokenHeader = Map.from(header ?? {});
+      final tokenHeader = Map<String, dynamic>.from(header ?? {});
       tokenHeader.putIfAbsent('alg', () => algorithm.name);
       tokenHeader.putIfAbsent('typ', () => 'JWT');
 
@@ -339,7 +348,7 @@ class JWT {
       try {
         b64Payload = base64Unpadded(
           payload is String
-              ? base64Url.encode(utf8.encode(payload))
+              ? base64Url.encode(utf8.encode(payload as String))
               : jsonBase64.encode(payload),
         );
       } catch (ex) {
@@ -358,7 +367,7 @@ class JWT {
         ),
       );
 
-      return body + '.' + signature;
+      return '$body.$signature';
     } catch (ex, stackTrace) {
       if (ex is Exception && ex is! JWTException) {
         throw JWTUndefinedException(ex, stackTrace);
@@ -423,9 +432,9 @@ class Audience extends ListBase<String> {
   void operator []=(int index, String value) => _audiences[index] = value;
 
   @override
-  void add(String value) => _audiences.add(value);
+  void add(String element) => _audiences.add(element);
   @override
-  void addAll(Iterable<String> all) => _audiences.addAll(all);
+  void addAll(Iterable<String> iterable) => _audiences.addAll(iterable);
 
   dynamic toJson() {
     if (_audiences.length == 1) {

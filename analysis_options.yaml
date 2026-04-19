@@ -1,1 +1,11 @@
-include: package:lints/core.yaml
+include: package:lints/recommended.yaml
+
+analyzer:
+  language:
+    strict-casts: true
+    strict-inference: true
+
+linter:
+  rules:
+    no_leading_underscores_for_local_identifiers: false
+    constant_identifier_names: false

@@ -144,7 +144,7 @@ abstract class KeyParser {
     var b2Data = b2.objectIdentifierAsString;
     var b2Curvedata = ObjectIdentifiers.getIdentifierByIdentifier(b2Data);
     if (b2Curvedata != null) {
-      curveName = b2Curvedata['readableName'];
+      curveName = b2Curvedata['readableName'] as String?;
     }
 
     var octetString = topLevelSeq.elements!.elementAt(2) as ASN1OctetString;
@@ -181,7 +181,7 @@ abstract class KeyParser {
       curveNameOi.objectIdentifierAsString,
     );
     if (data != null) {
-      curveName = data['readableName'];
+      curveName = data['readableName'] as String?;
     }
 
     final x = privateKeyAsOctetString.valueBytes!;
@@ -212,7 +212,7 @@ abstract class KeyParser {
     var data = ObjectIdentifiers.getIdentifierByIdentifier(
         curveNameOi.objectIdentifierAsString);
     if (data != null) {
-      curveName = data['readableName'];
+      curveName = data['readableName'] as String?;
     }
 
     var subjectPublicKey = topLevelSeq.elements![1] as ASN1BitString;

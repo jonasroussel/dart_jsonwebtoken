@@ -193,7 +193,7 @@ class RSAAlgorithm extends JWTAlgorithm {
 
     final algorithm = _getAlgorithm(name);
 
-    final signer = pc.Signer('${_getHash(name)}/${algorithm}');
+    final signer = pc.Signer('${_getHash(name)}/$algorithm');
     pc.CipherParameters params = pc.PrivateKeyParameter<pc.RSAPrivateKey>(
       privateKey.key,
     );
@@ -231,7 +231,7 @@ class RSAAlgorithm extends JWTAlgorithm {
     try {
       final algorithm = _getAlgorithm(name);
 
-      final signer = pc.Signer('${_getHash(name)}/${algorithm}');
+      final signer = pc.Signer('${_getHash(name)}/$algorithm');
       pc.CipherParameters params = pc.PublicKeyParameter<pc.RSAPublicKey>(
         publicKey.key,
       );

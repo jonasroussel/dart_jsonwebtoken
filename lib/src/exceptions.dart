@@ -10,7 +10,7 @@ class JWTException implements Exception {
 
 /// An exception thrown when jwt is invalid
 class JWTInvalidException extends JWTException {
-  JWTInvalidException(String message) : super(message);
+  JWTInvalidException(super.message);
 
   @override
   String toString() => 'JWTInvalidException: $message';
@@ -34,7 +34,7 @@ class JWTNotActiveException extends JWTException {
 
 /// An exception thrown when parsing failed
 class JWTParseException extends JWTException {
-  JWTParseException(String message) : super(message);
+  JWTParseException(super.message);
 
   @override
   String toString() => 'JWTParseException: $message';
