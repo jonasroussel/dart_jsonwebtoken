@@ -1,3 +1,10 @@
+## 3.4.1
+
+- Fix `aud` list verification crashing on JSON-decoded tokens (`List<dynamic>` to `List<String>` cast)
+- Add defensive type guards on `exp`, `nbf` and `iat` claims (throw `JWTInvalidException` instead of runtime error)
+- Adopt `package:lints/recommended` with strict-casts/inference
+- Internal lint cleanups (`super.message`, string interpolation, remove deprecated `library` directive)
+
 ## 3.4.0
 
 - Replace ed25519_edwards with vendored Ed25519 implementation (enable dart2wasm compilation)
